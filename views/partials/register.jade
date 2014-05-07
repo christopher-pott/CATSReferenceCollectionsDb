@@ -1,0 +1,39 @@
+div#registerContainer
+div.group Core group
+	p
+	form(ng-submit="register()")#coreData
+	
+		div Sample type
+			select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required)
+				option(value="") Select Sample Type
+		div Reference number 
+			input(type="text", ng-model="record.referenceNumber", required)
+		div Sample origin 
+			input(type="text", ng-model="record.originLocation")
+		div Sample date 
+			input(type="text", ng-model="record.sampleDate")
+		div Employee 
+			input(type="text", ng-model="record.employee")
+		div Institution 
+			input(type="text", ng-model="record.owner")
+		div Sample location 
+			input(type="text", ng-model="record.sampleLocation")
+		div Remarks 
+			input(type="text", ng-model="record.remarks")
+		div Raman analysis 
+			input(type="checkbox", ng-model="record.ramanAnalysis")
+		div FTIR analysis 
+			input(type="checkbox", ng-model="record.ftirAnalysis")
+		div GC-MS chromatograms 
+			input(type="checkbox", ng-model="record.gcmsChromatagrams")
+		
+		div(ng-switch on="record.sampleType.id")
+			div(ng-switch-when="paint")
+				div Paint layer description
+					input(type="text", ng-model="record.paintLayerDescription")
+			div(ng-switch-when="fibre")
+				div Filler
+					input(type="checkbox", ng-model="record.filler")
+		p
+		button(type="submit") Save
+

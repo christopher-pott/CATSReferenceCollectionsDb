@@ -1,0 +1,17 @@
+div#searchContainer
+	div#search Search term
+		form(ng-submit="search()")
+			input(type="text", ng-model="searchTerm", required)
+			button(type="submit") Search
+	div
+		table
+			thead
+				tr
+					th Reference number
+					th Sample Type
+					th Sample Date
+			tbody
+				tr(ng-repeat="res in searchResultsList")
+					td{{res.sample_record.referenceNumber}}
+					td{{res.sample_record.sampleType}}
+					td{{res.sample_record.sampleDate}}
