@@ -1,30 +1,41 @@
 div#registerContainer
-div.group Core group
+div.group 
 	p
-	form(ng-submit="register()")#coreData
+	form(ng-submit="register()").form-horizontal
 	
-		div Sample type
+		div 
+			label.col-sm-2.control_label Sample type
 			select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required)
 				option(value="") Select Sample Type
-		div Reference number 
+		div 
+			label.col-sm-2.control_label Reference number 
 			input(type="text", ng-model="record.referenceNumber", required)
-		div Sample origin 
+		div 
+			label.col-sm-2.control_label Sample origin 
 			input(type="text", ng-model="record.originLocation")
-		div Sample date 
+		div 
+			label.col-sm-2.control_label Sample date 
 			input(type="text", ng-model="record.sampleDate")
-		div Employee 
+		div 
+			label.col-sm-2.control_label Employee 
 			input(type="text", ng-model="record.employee")
-		div Institution 
+		div 
+			label.col-sm-2.control_label Institution 
 			input(type="text", ng-model="record.owner")
-		div Sample location 
+		div 
+			label.col-sm-2.control_label Sample location 
 			input(type="text", ng-model="record.sampleLocation")
-		div Remarks 
+		div 
+			label.col-sm-2.control_label Remarks 
 			input(type="text", ng-model="record.remarks")
-		div Raman analysis 
+		div 
+			label.col-sm-2.control_label Raman analysis 
 			input(type="checkbox", ng-model="record.ramanAnalysis")
-		div FTIR analysis 
+		div 
+			label.col-sm-2.control_label FTIR analysis 
 			input(type="checkbox", ng-model="record.ftirAnalysis")
-		div GC-MS chromatograms 
+		div 
+			label.col-sm-2.control_label GC-MS chromatograms 
 			input(type="checkbox", ng-model="record.gcmsChromatagrams")
 		
 		div(ng-switch on="record.sampleType.id")
@@ -36,4 +47,5 @@ div.group Core group
 					input(type="checkbox", ng-model="record.filler")
 		p
 		button(type="submit") Save
-
+		div
+			alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}

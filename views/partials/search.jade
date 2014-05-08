@@ -1,5 +1,5 @@
 div#searchContainer
-	div#search Search term
+	div#search
 		form(ng-submit="search()")
 			input(type="text", ng-model="searchTerm", required)
 			button(type="submit") Search
@@ -8,10 +8,10 @@ div#searchContainer
 			thead
 				tr
 					th Reference number
-					th Sample Type
-					th Sample Date
+					th Type
+					th Date
 			tbody
 				tr(ng-repeat="res in searchResultsList")
-					td{{res.sample_record.referenceNumber}}
-					td{{res.sample_record.sampleType}}
+					td: a(href='register', ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
+					td{{res.sample_record.sampleType.name}}
 					td{{res.sample_record.sampleDate}}

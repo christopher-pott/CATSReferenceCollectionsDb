@@ -19,8 +19,16 @@ serviceMod.factory('catsAPIservice', function($http) {
 		             method: "POST",
 		             data: postData,
 		             headers: {'Content-Type': 'application/json'}
-	         		});				
+	         		});
 		}
 	};
 });
 
+serviceMod.factory("state",function(){
+	'use strict';
+	var state = {};
+	
+	return {
+	  state: state,
+	};
+});

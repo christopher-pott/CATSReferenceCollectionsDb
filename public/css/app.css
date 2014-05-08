@@ -28,3 +28,11 @@
   content: "";
   padding: 0;
 }
+/*This is for bootstrap UI*/
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/* .group{ */
+/* 	border:1px solid; */
+/* 	margin-top:15px; */
+/* 	width: 800px; */
+/* } */
