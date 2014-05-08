@@ -24,6 +24,10 @@ controller('BrowseController', function ($scope) {
 controller('RegisterController', function ($scope, state, catsAPIservice) {
 	$scope.alerts = [];
 	
+//	$scope.initDate = new Date('2016-15-20');
+//	$scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+//	$scope.format = $scope.formats[0];
+	  
 	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
 	                      {id: 'paint', name: 'Paint'},
 	                      {id: 'material', name: 'Material'},
@@ -32,6 +36,10 @@ controller('RegisterController', function ($scope, state, catsAPIservice) {
 	                      {id: 'xray', name: 'Xray'},
 	                      {id: 'photograph', name: 'photograph'},
 	                      {id: 'infrared', name: 'infrared'}];
+	
+	$scope.groundTypes = [{id: 'onelayer', name: '1-layer'},
+	                      {id: 'twolayer', name: '2-layer'},
+	                      {id: 'colour', name: 'colour'}];	
 
 	if (state.create){
 		$scope.record = {sampleType: "",
@@ -95,4 +103,21 @@ controller('SearchController', function ($scope, catsAPIservice, state) {
 		state.sample = sample;
 		state.create = false;
 	};
+}).
+controller('DatepickerController', function ($scope) {
+	  $scope.open = function($event) {
+	    $event.preventDefault();
+	    $event.stopPropagation();
+
+	    $scope.opened = true;
+	  };
+
+	  $scope.dateOptions = {
+	    formatYear: 'yy',
+	    startingDay: 1
+	  };
+
+	  $scope.initDate = new Date('2016-15-20');
+	  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+	  $scope.format = $scope.formats[0];
 });
