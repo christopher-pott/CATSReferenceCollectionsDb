@@ -21,13 +21,9 @@ controller('BrowseController', function ($scope) {
 	// write Ctrl here
 
 }).
-controller('RegisterController', function ($scope, state, catsAPIservice) {
+controller('ViewController', function ($scope, state, catsAPIservice) {
 	$scope.alerts = [];
-	
-//	$scope.initDate = new Date('2016-15-20');
-//	$scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
-//	$scope.format = $scope.formats[0];
-	  
+
 	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
 	                      {id: 'paint', name: 'Paint'},
 	                      {id: 'material', name: 'Material'},
@@ -104,7 +100,7 @@ controller('SearchController', function ($scope, catsAPIservice, state) {
 		state.create = false;
 	};
 }).
-controller('DatepickerController', function ($scope) {
+controller('DatepickerCntrl', function ($scope) {
 	  $scope.open = function($event) {
 	    $event.preventDefault();
 	    $event.stopPropagation();
@@ -114,10 +110,100 @@ controller('DatepickerController', function ($scope) {
 
 	  $scope.dateOptions = {
 	    formatYear: 'yy',
-	    startingDay: 1
+	    startingDay: 1,
+	    datepickerMode: 'day'
 	  };
 
 	  $scope.initDate = new Date('2016-15-20');
 	  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
 	  $scope.format = $scope.formats[0];
 });
+
+var ModalDemoCtrl = function ($scope, $modal, $log) {
+
+	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
+	                      {id: 'paint', name: 'Paint'},
+	                      {id: 'material', name: 'Material'},
+	                      {id: 'pigment', name: 'Pigment'},
+	                      {id: 'stretcher', name: 'Stretcher'},
+	                      {id: 'xray', name: 'Xray'},
+	                      {id: 'photograph', name: 'photograph'},
+	                      {id: 'infrared', name: 'infrared'}];
+
+	$scope.open = function (size) {
+
+		var modalInstance = $modal.open({
+			templateUrl: 'myModalContent',
+			controller: ModalInstanceCtrl,
+			size: size,
+			resolve:{
+				sampleTypes: function () {
+					return $scope.sampleTypes;
+				}
+			}
+		});
+		modalInstance.result.then(function (selectedItem) {
+			$scope.selected = selectedItem;
+		}, function () {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+	};
+};
+
+	// Please note that $modalInstance represents a modal window (instance) dependency.
+	// It is not the same as the $modal service used above.
+
+var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIservice) {
+
+	$scope.record = {sampleType: "",
+			referenceNumber: "", 
+			originLocation: "",
+			sampleDate: "", 
+			employee: "",
+			owner: "",
+			sampleLocation: "",
+			remarks: "",
+			ramanAnalysis: "",
+			ftirAnalysis: "",
+			gcmsChromatagrams: ""};
+	
+	$scope.sampleTypes = sampleTypes;
+	
+	$scope.selected = {
+		sampleType: $scope.sampleTypes[0]
+	};
+	$scope.register = function () {
+		catsAPIservice.create($scope.record).success(function (response) {
+			alert('Record saved');
+			$modalInstance.close($scope.selected.sampleType);
+		//	$scope.alert = { type: 'success', msg: 'Record saved' };
+		//	 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
+		});
+	};
+
+	$scope.ok = function () {
+		$modalInstance.close($scope.selected.sampleType);
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+};
+	
+function CarouselDemoCtrl($scope) {
+	$scope.myInterval = 5000;
+
+	var slides = $scope.slides = [];
+	$scope.addSlide = function() {
+		var newWidth = 300 + slides.length;
+		slides.push({
+			image: 'http://placekitten.com/' + newWidth + '/300',
+			text: ['More','Extra','Lots of','Surplus'][slides.length % 4] + ' ' +
+				  ['Cats', 'Kittys', 'Felines', 'Cutes'][slides.length % 4]
+		});
+	};
+	
+	for (var i=0; i<4; i++) {
+		$scope.addSlide();
+	}
+};

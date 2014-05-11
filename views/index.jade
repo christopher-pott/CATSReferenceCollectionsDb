@@ -1,13 +1,13 @@
 extends layout
 
 block body
-  div(ng-controller='AppCtrl')
+  div(ng-controller='AppCtrl').titlearea
     h2 CATS Reference Samples
     ul.menu
       li
         a(href='browse') Browse
       li
-        a(href='register') Register
+        a(href='view') View
       li
         a(href='search') Search
     div(ng-view)

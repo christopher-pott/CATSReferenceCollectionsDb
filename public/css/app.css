@@ -31,6 +31,13 @@
 /*This is for bootstrap UI*/
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
+.titlearea{
+	background: @gray-lighter;
+}
+#viewContainer, #searchContainer {
+	margin: 16px;
+}
+
 /* .group{ */
 /* 	border:1px solid; */
 /* 	margin-top:15px; */

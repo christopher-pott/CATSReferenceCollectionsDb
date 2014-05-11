@@ -13,11 +13,11 @@ config(function ($routeProvider, $locationProvider) {
   $routeProvider.
     when('/browse', {
       templateUrl: 'partials/browse',
-      controller: 'BrowseController'
+      controller: 'ModalDemoCtrl'
     }).
-    when('/register', {
-      templateUrl: 'partials/register',
-      controller: 'RegisterController'
+    when('/view', {
+      templateUrl: 'partials/view',
+      controller: 'ViewController'
     }).
     when('/search', {
         templateUrl: 'partials/search',

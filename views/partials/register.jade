@@ -1,74 +1,62 @@
 div#registerContainer
-div.group 
-	p
-	form(ng-submit="register()", role="form").form-horizontal
-	
-		div.form-group
-			label.col-sm-1.control_label Sample type
-			div.col-sm-2
-				select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes").form-control
-					option(value="") Select Sample Type
-		div.form-group
-			label.col-sm-1.control_label Reference number
-			div.col-sm-2
-				input(type="text", ng-model="record.referenceNumber", required).form-control
-		div.form-group
-			label.col-sm-1.control_label Sample origin
-			div.col-sm-2
-				input(type="text", ng-model="record.originLocation").form-control
-		div.form-group
-			label.col-sm-1.control_label Sample date
-			div(ng-controller="DatepickerController").col-sm-2
-				p.input-group
-					input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
-					span.input-group-btn
-						button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-		div.form-group
-			label.col-sm-1.control_label Employee
-			div.col-sm-2
-				input(type="text", ng-model="record.employee").form-control
-		div.form-group
-			label.col-sm-1.control_label Institution
-			div.col-sm-2
-				input(type="text", ng-model="record.owner").form-control
-		div.form-group
-			label.col-sm-1.control_label Sample location
-			div.col-sm-2
-				input(type="text", ng-model="record.sampleLocation").form-control
-		div.form-group
-			label.col-sm-1.control_label Remarks
-			div.col-sm-2
-				textarea(rows="3", ng-model="record.remarks").form-control
-		div.form-group
+		div.row 
+			div.col-sm-1
+				label Sample type
+			div.col-sm-1{{record.sampleType.name}}
+		div.row
+			div.col-sm-1
+				label Reference number
+			div.col-sm-1{{record.referenceNumber}}
+		div.row
+			div.col-sm-1
+				label Sample origin
+			div.col-sm-1{{record.originLocation}}
+		div.row
+			div.col-sm-1
+				label Sample date
+			div.col-sm-1{{record.sampleDate}}
+		div.row
+			div.col-sm-1
+				label Employee
+			div.col-sm-1{{record.employee}}
+		div.row
+			div.col-sm-1
+				label Institution
+			div.col-sm-1{{record.owner}}
+		div.row
+			div.col-sm-1
+				label Sample location
+			div.col-sm-1{{record.sampleLocation}}
+		div.row
+			div.col-sm-1
+				label Remarks
+			div.col-sm-1{{record.remarks}}
+		div.row
 			label.col-sm-1.control_label Analysis
 			div.col-sm-2
-				label.checkbox-inline.control_label Raman
-					input(type="checkbox", ng-model="record.ramanAnalysis")
-				label.checkbox-inline.control_label FTIR
-					input(type="checkbox", ng-model="record.ftirAnalysis")
-				label.checkbox-inline.control_label GC-MS Chrom.
-					input(type="checkbox", ng-model="record.gcmsChromatagrams")
+				div(ng-switch on="record.ramanAnalysis")
+					div(ng-switch-when="true") Raman
+				div(ng-switch on="record.ftirAnalysis")
+					div(ng-switch-when="true") FTIR
+				div(ng-switch on="record.gcmsChromatagrams")
+					div(ng-switch-when="true") GC-MS Chrom.
 
 		div(ng-switch on="record.sampleType.id")
 			div(ng-switch-when="paint")
-				div.form-group
-					label.col-sm-1.control_label Ground type
-					div.col-sm-2
-						p.input-group
-							select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
-								option(value="") Select Ground Type
-							span.input-group-btn
-								button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-plus
-				div.form-group 
-					label.col-sm-1.control_label Paint layer description
-					div.col-sm-2
-						input(type="text", ng-model="record.paintLayerDescription").form-control
+				div.row
+					div.col-sm-1
+						label Ground type
+					div.col-sm-1{{record.groundType}}
+				div.row
+					div.col-sm-1
+						label Paint layer description
+					div.col-sm-1{{record.paintLayerDescription}}
 			div(ng-switch-when="fibre")
-				div.form-group 
-					label.col-sm-1.control_label Filler
+				div.row
+					div.col-sm-1
+						label Filler
 					div.col-sm-2
-						input(type="checkbox", ng-model="record.filler").form-control
-		p
-		button(type="submit") Save
-		div
-			alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+						div(ng-switch on="record.filler")
+							div(ng-switch-when="true") Yes
+
+

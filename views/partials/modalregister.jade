@@ -1,60 +1,62 @@
-div
+div(ng-controller="ModalDemoCtrl")
 	script(type="text/ng-template")#myModalContent
-		form(ng-submit="register()", role="form").form-horizontal
-			div.modal-header
-				h3.modal-title Create New Reference Sample
-			div.modal-body
-				div.group
+		div.modal-header
+			h3.modal-title I'm a modal!	
+		div.modal-body
+			div.group 
+				p
+				form(ng-submit="register()", role="form").form-horizontal
 					div.form-group
-						label.col-sm-2.control_label Sample type
-						div.col-sm-4
-							select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required).form-control
+						label.col-sm-1.control_label Sample type
+						div.col-sm-2
+							select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes").form-control
 								option(value="") Select Sample Type
-					div.form-group 
-						label.col-sm-2.control_label Reference number
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Reference number
+						div.col-sm-2
 							input(type="text", ng-model="record.referenceNumber", required).form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample origin
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Sample origin
+						div.col-sm-2
 							input(type="text", ng-model="record.originLocation").form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample date
-						div(ng-controller="DatepickerCntrl").col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Sample date
+						div(ng-controller="DatepickerController").col-sm-2
 							div.input-group
 								input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-					div.form-group 
-						label.col-sm-2.control_label Employee
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Employee
+						div.col-sm-2
 							input(type="text", ng-model="record.employee").form-control
-					div.form-group 
-						label.col-sm-2.control_label Institution
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Institution
+						div.col-sm-2
 							input(type="text", ng-model="record.owner").form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample location
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Sample location
+						div.col-sm-2
 							input(type="text", ng-model="record.sampleLocation").form-control
-					div.form-group 
-						label.col-sm-2.control_label Remarks
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Remarks
+						div.col-sm-2
 							textarea(rows="3", ng-model="record.remarks").form-control
-					div.form-group 
-						label.col-sm-2.control_label Analysis
-						div.col-sm-4
+					div.form-group
+						label.col-sm-1.control_label Analysis
+						div.col-sm-2
 							label.checkbox-inline.control_label Raman
 								input(type="checkbox", ng-model="record.ramanAnalysis")
 							label.checkbox-inline.control_label FTIR
 								input(type="checkbox", ng-model="record.ftirAnalysis")
-							label.checkbox-inline.control_label GC-MS
+							label.checkbox-inline.control_label GC-MS Chrom.
 								input(type="checkbox", ng-model="record.gcmsChromatagrams")
+			
 					div(ng-switch on="record.sampleType.id")
 						div(ng-switch-when="paint")
 							div.form-group
-								label.col-sm-2.control_label Ground type
-								div.col-sm-4
+								label.col-sm-1.control_label Ground type
+								div.col-sm-2
 									div.input-group
 										select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
 											option(value="") Select Ground Type
@@ -67,21 +69,15 @@ div
 										span.input-group-btn
 											button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-minus
 							div.form-group 
-								label.col-sm-2.control_label Paint layer description
-								div.col-sm-4
+								label.col-sm-1.control_label Paint layer description
+								div.col-sm-2
 									input(type="text", ng-model="record.paintLayerDescription").form-control
 						div(ng-switch-when="fibre")
 							div.form-group 
-								label.col-sm-2.control_label 
-								div.col-sm-4
-									label.checkbox-inline.control_label Filler
-										input(type="checkbox", ng-model="record.filler")
+								label.col-sm-1.control_label Filler
+								div.col-sm-2
+									input(type="checkbox", ng-model="record.filler").form-control
+					p
+					button(type="submit") Save
 					div
 						alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
-			div.modal-footer
-				p
-				button(type="submit").btn.btn-primary Save
-				button().btn.btn-primary OK
-				button(ng-click="cancel()").btn.btn-warning Cancel
-	button(ng-click="open('lg')").btn.btn-default Create new sample
-	div(ng-show="selected") Selection from a modal: {{selected}}

@@ -1,10 +1,17 @@
 div#searchContainer
-	div#search
-		form(ng-submit="search()")
-			input(type="text", ng-model="searchTerm", required)
-			button(type="submit") Search
-	div
-		table
+	div.group
+		form(ng-submit="search()", role="form").form-inline
+			div.form-group
+				label.sr-only Search
+				div.input-group
+					input(type="text", ng-model="searchTerm", placeholder="Enter search term", required).form-control
+					span.input-group-btn
+						button(type="submit").btn.btn-default: i.glyphicon.glyphicon-search
+	p
+	p
+	p
+	div.group
+		table.table.table-hover
 			thead
 				tr
 					th Reference number
@@ -12,6 +19,8 @@ div#searchContainer
 					th Date
 			tbody
 				tr(ng-repeat="res in searchResultsList")
-					td: a(href='register', ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
+					td: a(href='view', ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
 					td{{res.sample_record.sampleType.name}}
 					td{{res.sample_record.sampleDate}}
+
+
