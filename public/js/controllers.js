@@ -191,13 +191,13 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIse
 };
 	
 function CarouselDemoCtrl($scope) {
-	$scope.myInterval = 5000;
+	$scope.myInterval = -1;
 
 	var slides = $scope.slides = [];
 	$scope.addSlide = function() {
-		var newWidth = 300 + slides.length;
+		var newWidth = 600 + slides.length;
 		slides.push({
-			image: 'http://placekitten.com/' + newWidth + '/300',
+			image: 'http://placekitten.com/' + newWidth + '/600',
 			text: ['More','Extra','Lots of','Surplus'][slides.length % 4] + ' ' +
 				  ['Cats', 'Kittys', 'Felines', 'Cutes'][slides.length % 4]
 		});

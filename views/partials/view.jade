@@ -1,62 +1,72 @@
 div#viewContainer
-	div.row 
-		div.col-sm-1
-			label Sample type
-		div.col-sm-1{{record.sampleType.name}}
-	div.row
-		div.col-sm-1
-			label Reference number
-		div.col-sm-1{{record.referenceNumber}}
-	div.row
-		div.col-sm-1
-			label Sample origin
-		div.col-sm-1{{record.originLocation}}
-	div.row
-		div.col-sm-1
-			label Sample date
-		div.col-sm-1{{record.sampleDate}}
-	div.row
-		div.col-sm-1
-			label Employee
-		div.col-sm-1{{record.employee}}
-	div.row
-		div.col-sm-1
-			label Institution
-		div.col-sm-1{{record.owner}}
-	div.row
-		div.col-sm-1
-			label Sample location
-		div.col-sm-1{{record.sampleLocation}}
-	div.row
-		div.col-sm-1
-			label Remarks
-		div.col-sm-1{{record.remarks}}
-	div.row
-		label.col-sm-1.control_label Analysis
-		div.col-sm-2
-			div(ng-switch on="record.ramanAnalysis")
-				div(ng-switch-when="true") Raman
-			div(ng-switch on="record.ftirAnalysis")
-				div(ng-switch-when="true") FTIR
-			div(ng-switch on="record.gcmsChromatagrams")
-				div(ng-switch-when="true") GC-MS Chrom.
-
-	div(ng-switch on="record.sampleType.id")
-		div(ng-switch-when="paint")
+	div(ng-controller="CarouselDemoCtrl").row
+		div.col-sm-6
+			div.row 
+				div.col-sm-4
+					label Sample type
+				div.col-sm-4{{record.sampleType.name}}
 			div.row
-				div.col-sm-1
-					label Ground type
-				div.col-sm-1{{record.groundType}}
+				div.col-sm-4
+					label Reference number
+				div.col-sm-4{{record.referenceNumber}}
 			div.row
-				div.col-sm-1
-					label Paint layer description
-				div.col-sm-1{{record.paintLayerDescription}}
-		div(ng-switch-when="fibre")
+				div.col-sm-4
+					label Sample origin
+				div.col-sm-4{{record.originLocation}}
 			div.row
-				div.col-sm-1
-					label Filler
-				div.col-sm-2
-					div(ng-switch on="record.filler")
-						div(ng-switch-when="true") Yes
+				div.col-sm-4
+					label Sample date
+				div.col-sm-4{{record.sampleDate | date:'dd-MM-yyyy'}}
+			div.row
+				div.col-sm-4
+					label Employee
+				div.col-sm-4{{record.employee}}
+			div.row
+				div.col-sm-4
+					label Institution
+				div.col-sm-4{{record.owner}}
+			div.row
+				div.col-sm-4
+					label Sample location
+				div.col-sm-4{{record.sampleLocation}}
+			div.row
+				div.col-sm-4
+					label Remarks
+				div.col-sm-8{{record.remarks}}
+			div.row
+				label.col-sm-4.control_label Analysis
+				div.col-sm-4
+					div(ng-switch on="record.ramanAnalysis")
+						div(ng-switch-when="true") Raman
+					div(ng-switch on="record.ftirAnalysis")
+						div(ng-switch-when="true") FTIR
+					div(ng-switch on="record.gcmsChromatagrams")
+						div(ng-switch-when="true") GC-MS Chrom.
+		
+			div(ng-switch on="record.sampleType.id")
+				div(ng-switch-when="paint")
+					div.row
+						div.col-sm-4
+							label Ground type
+						div.col-sm-4{{record.groundType}}
+					div.row
+						div.col-sm-4
+							label Paint layer description
+						div.col-sm-4{{record.paintLayerDescription}}
+				div(ng-switch-when="fibre")
+					div.row
+						div.col-sm-4
+							label Filler
+						div.col-sm-2
+							div(ng-switch on="record.filler")
+								div(ng-switch-when="true") Yes
+		div(style="height: 600px").col-sm-6
+			carousel(interval="myInterval")
+				slide(ng-repeat="slide in slides", active="slide.active")
+					img(ng-src="{{slide.image}}", style="margin:auto")
+					div.carousel-caption
+						h4 Image {{$index + 1}}
+						p{{slide.text}}
+	
 
 

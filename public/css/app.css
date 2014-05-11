@@ -4,7 +4,7 @@
   list-style: none;
   border-bottom: 0.1em solid black;
   margin-bottom: 2em;
-  padding: 0 0 0.5em;
+/*   padding: 0 0 0.5em; */
 }
 
 .menu:before {
@@ -35,7 +35,19 @@
 	background: @gray-lighter;
 }
 #viewContainer, #searchContainer {
-	margin: 16px;
+	margin: 20px;
+}
+.titlearea {
+	background : #212121; /*similar to CATS logo bg*/
+	color : white;
+	vertical-align : top;
+}
+.titlearea h2 {
+	margin-left: 20px;
+}
+.titlearea img {
+	margin-right: 20px;
+	float:right;
 }
 
 /* .group{ */

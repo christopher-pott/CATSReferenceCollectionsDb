@@ -1,20 +1,24 @@
 extends layout
 
 block body
-  div(ng-controller='AppCtrl').titlearea
-    h2 CATS Reference Samples
-    ul.menu
-      li
-        a(href='browse') Browse
-      li
-        a(href='view') View
-      li
-        a(href='search') Search
-    div(ng-view)
+  div(ng-controller='AppCtrl').titlearea.group
+    div.div.row 
+      div.col-sm-4
+         h2 Reference Sample Database
+      div.col-sm-8
+         img(src="/images/logo2.jpg")
+  ul.menu
+    li
+      a(href='browse') Browse
+    li
+      a(href='view') View
+    li
+      a(href='search') Search
+  div(ng-view)
 
-    div
-      | CATS Reference Sample Database: v
-      span(app-version)
+  div
+    | CATS Reference Sample Database: v
+    span(app-version)
 
   script(src='js/lib/angular_1.2.16/angular.js')
   script(src='js/lib/angular_1.2.16/angular-route.js')
