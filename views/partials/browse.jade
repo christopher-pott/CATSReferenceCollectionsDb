@@ -1,87 +1,114 @@
-div
+div#browseContainer
 	script(type="text/ng-template")#myModalContent
 		form(ng-submit="register()", role="form").form-horizontal
 			div.modal-header
 				h3.modal-title Create New Reference Sample
 			div.modal-body
-				div.group
-					div.form-group
-						label.col-sm-2.control_label Sample type
-						div.col-sm-4
-							select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required).form-control
-								option(value="") Select Sample Type
-					div.form-group 
-						label.col-sm-2.control_label Reference number
-						div.col-sm-4
-							input(type="text", ng-model="record.referenceNumber", required).form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample origin
-						div.col-sm-4
-							input(type="text", ng-model="record.originLocation").form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample date
-						div(ng-controller="DatepickerCntrl").col-sm-4
-							div.input-group
-								input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
-								span.input-group-btn
-									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-					div.form-group 
-						label.col-sm-2.control_label Employee
-						div.col-sm-4
-							input(type="text", ng-model="record.employee").form-control
-					div.form-group 
-						label.col-sm-2.control_label Institution
-						div.col-sm-4
-							input(type="text", ng-model="record.owner").form-control
-					div.form-group 
-						label.col-sm-2.control_label Sample location
-						div.col-sm-4
-							input(type="text", ng-model="record.sampleLocation").form-control
-					div.form-group 
-						label.col-sm-2.control_label Remarks
-						div.col-sm-4
-							textarea(rows="3", ng-model="record.remarks").form-control
-					div.form-group 
-						label.col-sm-2.control_label Analysis
-						div.col-sm-4
-							label.checkbox-inline.control_label Raman
-								input(type="checkbox", ng-model="record.ramanAnalysis")
-							label.checkbox-inline.control_label FTIR
-								input(type="checkbox", ng-model="record.ftirAnalysis")
-							label.checkbox-inline.control_label GC-MS
-								input(type="checkbox", ng-model="record.gcmsChromatagrams")
-					div(ng-switch on="record.sampleType.id")
-						div(ng-switch-when="paint")
-							div.form-group
-								label.col-sm-2.control_label Ground type
-								div.col-sm-4
-									div.input-group
-										select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
-											option(value="") Select Ground Type
-										span.input-group-btn
-											button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-plus
-								div(ng-repeat="gt in record.groundType").col-sm-2
-									p.input-group
-										select(ng-model="record.groundType[$index]", ng-options="type as type.name for type in groundTypes").form-control
-											option(value="") Select Another Ground Type
-										span.input-group-btn
-											button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-minus
-							div.form-group 
-								label.col-sm-2.control_label Paint layer description
-								div.col-sm-4
-									input(type="text", ng-model="record.paintLayerDescription").form-control
-						div(ng-switch-when="fibre")
-							div.form-group 
-								label.col-sm-2.control_label 
-								div.col-sm-4
-									label.checkbox-inline.control_label Filler
-										input(type="checkbox", ng-model="record.filler")
-					div
-						alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+				div.row
+					div.group.col-sm-6
+						div.form-group
+							label.col-sm-4.control_label Sample type
+							div.col-sm-8
+								select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required).form-control
+									option(value="") Select Sample Type
+						div.form-group 
+							label.col-sm-4.control_label Reference number
+							div.col-sm-8
+								input(type="text", ng-model="record.referenceNumber", required).form-control
+						div.form-group 
+							label.col-sm-4.control_label Sample origin
+							div.col-sm-8
+								input(type="text", ng-model="record.originLocation").form-control
+						div.form-group 
+							label.col-sm-4.control_label Sample date
+							div(ng-controller="DatepickerCntrl").col-sm-8
+								div.input-group
+									input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
+									span.input-group-btn
+										button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+						div.form-group 
+							label.col-sm-4.control_label Employee
+							div.col-sm-8
+								input(type="text", ng-model="record.employee").form-control
+						div.form-group 
+							label.col-sm-4.control_label Institution
+							div.col-sm-8
+								input(type="text", ng-model="record.owner").form-control
+						div.form-group 
+							label.col-sm-4.control_label Sample location
+							div.col-sm-8
+								input(type="text", ng-model="record.sampleLocation").form-control
+						div.form-group 
+							label.col-sm-4.control_label Remarks
+							div.col-sm-8
+								textarea(rows="3", ng-model="record.remarks").form-control
+						div.form-group 
+							label.col-sm-4.control_label Analysis
+							div.col-sm-8
+								label.checkbox-inline.control_label Raman
+									input(type="checkbox", ng-model="record.ramanAnalysis")
+								label.checkbox-inline.control_label FTIR
+									input(type="checkbox", ng-model="record.ftirAnalysis")
+								label.checkbox-inline.control_label GC-MS
+									input(type="checkbox", ng-model="record.gcmsChromatagrams")
+						div(ng-switch on="record.sampleType.id")
+							div(ng-switch-when="paint")
+								div.form-group
+									label.col-sm-4.control_label Ground type
+									div.col-sm-8
+										div.input-group
+											select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
+												option(value="") Select Ground Type
+											span.input-group-btn
+												button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-plus
+									div(ng-repeat="gt in record.groundType").col-sm-2
+										p.input-group
+											select(ng-model="record.groundType[$index]", ng-options="type as type.name for type in groundTypes").form-control
+												option(value="") Select Another Ground Type
+											span.input-group-btn
+												button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-minus
+								div.form-group 
+									label.col-sm-4.control_label Paint layer description
+									div.col-sm-8
+										input(type="text", ng-model="record.paintLayerDescription").form-control
+							div(ng-switch-when="fibre")
+								div.form-group 
+									label.col-sm-4.control_label 
+									div.col-sm-8
+										label.checkbox-inline.control_label Filler
+											input(type="checkbox", ng-model="record.filler")
+						div
+							alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+					div(ng-controller="CarouselImageCtrl").col-sm-6
+						div(ng-controller="ImageUploadCtrl")
+							input(type="file", name="file")#file.btn.btn-primary
+							button(ng-click="add()").btn.btn-primary Add
+							p {{data}}					
+						div(style="height: 200px")
+							carousel(interval="myInterval")
+								slide(ng-repeat="slide in slides", active="slide.active")
+									img(ng-src="{{slide.image}}", style="margin:auto")
+									div.carousel-caption
+										h4 Image {{$index + 1}}
+										p{{slide.text}}
 			div.modal-footer
 				p
+				label.col-sm-2.checkbox-inline.control_label Create another
+					input(type="checkbox", ng-model="createAnother")
 				button(type="submit").btn.btn-primary Save
-				button().btn.btn-primary OK
 				button(ng-click="cancel()").btn.btn-warning Cancel
-	button(ng-click="open('lg')").btn.btn-default Create new sample
-	div(ng-show="selected") Selection from a modal: {{selected}}
+	div.row
+		div.col-sm-4
+			h2 Establishing a CATS reference collection database and digital documentation
+			div
+				strong
+					|A materials reference collection, begun in the early 1960ies is a repository of reference samples for use in the comparative analysis of art objects. We must seize the opportunities and challenges of providing broader access to such information as part of the growing online accessibility of museum collections.
+			br
+			a(href="http://www.cats-cons.dk/wp-content/uploads/2012/01/WP6-Arkivalier-Abildgaard2-e1329153162659.jpg"): img(src="http://www.cats-cons.dk/wp-content/uploads/2012/01/WP6-Arkivalier-Abildgaard2-e1331731430455.jpg", alt="Abildgaard handwritten reference", title="WP6 Arkivalier - Abildgaard2", width="613", height="157")
+			br
+			div
+				br
+				|The collection includes tubes of paint and the multitudinous raw materials historically used for paint manufacture and employed in pictorial art.
+				|Since its humble beginning, the collection has grown to more than several thousand samples. Housed today as separate collections in the three partner institutions, it has exceptional potential as a support for the research and service functions of the CATS consortium and associated partners, the conservation laboratories of the National Gallery of Denmark, National Museum of Denmark and School of Conservation, as well as the international conservation community.
+				|In order to fully exploit and benefit from the valuable resources of the sample collection, it must be catalogued digitally to allow advanced searching. A vast amount of documentation is continuously being generated by the scientific staff and conservators at the partner institutions, and it is our aim to assemble, organise and upload the data in a database for historical, scientific and technical information. This will be available from terminals located in the CATS documentation centre.
+				br

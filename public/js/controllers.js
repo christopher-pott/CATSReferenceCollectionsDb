@@ -3,7 +3,7 @@
 /* Controllers */
 
 angular.module('myApp.controllers', ['ui.bootstrap']).
-controller('AppCtrl', function ($scope, $http) {
+controller('AppCtrl', function ($scope, $http, state, $location) {
 
 	$http({
 		method: 'GET',
@@ -15,6 +15,73 @@ controller('AppCtrl', function ($scope, $http) {
 	error(function (data, status, headers, config) {
 		$scope.name = 'Error!';
 	});
+	$scope.searchClicked = function(searchTerm) {
+		$location.path('/search');
+		state.searchTerm = searchTerm;
+		state.searchRequested = true;
+
+//		$scope.$broadcast('searchRefresh');
+	};
+
+}).
+controller('SearchController', function ($scope, catsAPIservice, state, $modal, $log) {
+	/*used in modal*/
+	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
+	                      {id: 'paint', name: 'Paint'},
+	                      {id: 'material', name: 'Material'},
+	                      {id: 'pigment', name: 'Pigment'},
+	                      {id: 'stretcher', name: 'Stretcher'},
+	                      {id: 'xray', name: 'Xray'},
+	                      {id: 'photograph', name: 'photograph'},
+	                      {id: 'infrared', name: 'infrared'}];
+	
+	$scope.searchResultsList = state.resultList;
+	$scope.searchTerm = state.searchTerm;
+
+	$scope.search = function() {
+		catsAPIservice.search(state.searchTerm).success(function (response) {
+			$scope.searchResultsList = response;
+			state.resultList = response;
+//			state.searchTerm = $scope.searchTerm;
+		});
+	};
+	$scope.viewSample = function(sample) {
+		//alert('sample : ' + refNum);
+		state.sample = sample;
+		state.create = false;
+	};
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.searchRequested; },
+        // This is the change handler
+        function(newValue, oldValue) {
+        	if ( newValue === true ) {
+        		$scope.search();
+        		state.searchRequested = false;
+        	}
+        }
+    );
+    
+    /*open create new record modal*/
+	$scope.open = function (size) {
+
+		var modalInstance = $modal.open({
+			templateUrl: 'myModalContent',
+			controller: ModalInstanceCtrl,
+			size: size,
+			resolve:{
+				sampleTypes: function () {
+					return $scope.sampleTypes;
+				}
+			}
+		});
+		modalInstance.result.then(function (selectedItem) {
+			$scope.selected = selectedItem;
+		}, function () {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
+	};
+
 
 }).
 controller('BrowseController', function ($scope) {
@@ -82,24 +149,6 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 		 $scope.alerts.splice(index, 1);
 	};
 }).
-controller('SearchController', function ($scope, catsAPIservice, state) {
-
-	$scope.searchResultsList = state.resultList;
-	$scope.searchTerm = state.searchTerm;
-
-	$scope.search = function() {
-		catsAPIservice.search($scope.searchTerm).success(function (response) {
-			$scope.searchResultsList = response;
-			state.resultList = response;
-			state.searchTerm = $scope.searchTerm;
-		});
-	};
-	$scope.viewSample = function(sample) {
-		//alert('sample : ' + refNum);
-		state.sample = sample;
-		state.create = false;
-	};
-}).
 controller('DatepickerCntrl', function ($scope) {
 	  $scope.open = function($event) {
 	    $event.preventDefault();
@@ -155,6 +204,8 @@ var ModalDemoCtrl = function ($scope, $modal, $log) {
 
 var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIservice) {
 
+	$scope.createAnother = false;
+	
 	$scope.record = {sampleType: "",
 			referenceNumber: "", 
 			originLocation: "",
@@ -175,7 +226,9 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIse
 	$scope.register = function () {
 		catsAPIservice.create($scope.record).success(function (response) {
 			alert('Record saved');
-			$modalInstance.close($scope.selected.sampleType);
+			if ($scope.createAnother === false){
+				$modalInstance.close($scope.selected.sampleType);
+			}
 		//	$scope.alert = { type: 'success', msg: 'Record saved' };
 		//	 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
 		});
@@ -190,7 +243,7 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIse
 	};
 };
 	
-function CarouselDemoCtrl($scope) {
+function CarouselImageCtrl($scope) {
 	$scope.myInterval = -1;
 
 	var slides = $scope.slides = [];
@@ -207,3 +260,16 @@ function CarouselDemoCtrl($scope) {
 		$scope.addSlide();
 	}
 };
+
+function ImageUploadCtrl($scope) {
+    $scope.data = 'none';
+    
+    $scope.add = function(){
+      var f = document.getElementById('file').files[0],
+          r = new FileReader();
+      r.onloadend = function(e){
+        $scope.data = e.target.result;
+      }
+      r.readAsBinaryString(f);
+    }
+}

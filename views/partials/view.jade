@@ -1,5 +1,5 @@
 div#viewContainer
-	div(ng-controller="CarouselDemoCtrl").row
+	div(ng-controller="CarouselImageCtrl").row
 		div.col-sm-6
 			div.row 
 				div.col-sm-4
@@ -60,7 +60,7 @@ div#viewContainer
 						div.col-sm-2
 							div(ng-switch on="record.filler")
 								div(ng-switch-when="true") Yes
-		div(style="height: 600px").col-sm-6
+		div(style="height: 600px").col-sm-5
 			carousel(interval="myInterval")
 				slide(ng-repeat="slide in slides", active="slide.active")
 					img(ng-src="{{slide.image}}", style="margin:auto")

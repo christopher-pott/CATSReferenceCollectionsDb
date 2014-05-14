@@ -34,7 +34,7 @@
 .titlearea{
 	background: @gray-lighter;
 }
-#viewContainer, #searchContainer {
+#viewContainer, #searchContainer, #browseContainer {
 	margin: 20px;
 }
 .titlearea {
@@ -45,9 +45,31 @@
 .titlearea h2 {
 	margin-left: 20px;
 }
+.titlearea form {
+	padding-top: 20px;
+}
+/*remove link styling in title TODO: use image instead*/
+.titlearea a {
+  color: inherit; 
+  text-decoration: inherit; /* no underline */
+}
+.titlearea .login {
+	padding-top: 20px;
+}
 .titlearea img {
 	margin-right: 20px;
 	float:right;
+}
+/*removes grey background form carousel*/
+#viewContainer .carousel-control.left, #viewContainer .carousel-control.right{
+ background-image: none;
+}
+/*Fix found on stackoverflow for glyphicon font problem*/
+.glyphicon {
+    font-family: inherit;
+}
+.glyphicon:before{
+    font-family:'Glyphicons Halflings';
 }
 
 /* .group{ */

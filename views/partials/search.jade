@@ -1,26 +1,148 @@
 div#searchContainer
-	div.group
-		form(ng-submit="search()", role="form").form-inline
-			div.form-group
-				label.sr-only Search
-				div.input-group
-					input(type="text", ng-model="searchTerm", placeholder="Enter search term", required).form-control
-					span.input-group-btn
-						button(type="submit").btn.btn-default: i.glyphicon.glyphicon-search
-	p
-	p
-	p
-	div.group
+	script(type="text/ng-template")#myModalContent
+		form(ng-submit="register()", role="form").form-horizontal
+			div.modal-header
+				h3.modal-title Create New Reference Sample
+			tabset(justified="true")
+				tab(heading="Metadata")
+					div.modal-body
+						div.row
+							div.group.col-sm-6
+								div.form-group
+									label.col-sm-4.control_label Sample type
+									div.col-sm-8
+										select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required).form-control
+											option(value="") Select Sample Type
+								div.form-group 
+									label.col-sm-4.control_label Reference number
+									div.col-sm-8
+										input(type="text", ng-model="record.referenceNumber", required).form-control
+								div.form-group 
+									label.col-sm-4.control_label Sample origin
+									div.col-sm-8
+										input(type="text", ng-model="record.originLocation").form-control
+								div.form-group 
+									label.col-sm-4.control_label Sample date
+									div(ng-controller="DatepickerCntrl").col-sm-8
+										div.input-group
+											input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
+											span.input-group-btn
+												button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+								div.form-group 
+									label.col-sm-4.control_label Employee
+									div.col-sm-8
+										input(type="text", ng-model="record.employee").form-control
+								div.form-group 
+									label.col-sm-4.control_label Institution
+									div.col-sm-8
+										input(type="text", ng-model="record.owner").form-control
+								div.form-group 
+									label.col-sm-4.control_label Sample location
+									div.col-sm-8
+										input(type="text", ng-model="record.sampleLocation").form-control
+								div.form-group 
+									label.col-sm-4.control_label Remarks
+									div.col-sm-8
+										textarea(rows="3", ng-model="record.remarks").form-control
+								div.form-group 
+									label.col-sm-4.control_label Analysis
+									div.col-sm-8
+										label.checkbox-inline.control_label Raman
+											input(type="checkbox", ng-model="record.ramanAnalysis")
+										label.checkbox-inline.control_label FTIR
+											input(type="checkbox", ng-model="record.ftirAnalysis")
+										label.checkbox-inline.control_label GC-MS
+											input(type="checkbox", ng-model="record.gcmsChromatagrams")
+							div(ng-switch on="record.sampleType.id").col-sm-6
+								div(ng-switch-when="paint")
+									div.form-group
+										label.col-sm-4.control_label Ground type
+										div.col-sm-8
+											div.input-group
+												select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
+													option(value="") Select Ground Type
+												span.input-group-btn
+													button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-plus
+										div(ng-repeat="gt in record.groundType").col-sm-2
+											p.input-group
+												select(ng-model="record.groundType[$index]", ng-options="type as type.name for type in groundTypes").form-control
+													option(value="") Select Another Ground Type
+												span.input-group-btn
+													button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-minus
+									div.form-group 
+										label.col-sm-4.control_label Paint layer description
+										div.col-sm-8
+											input(type="text", ng-model="record.paintLayerDescription").form-control
+								div(ng-switch-when="fibre")
+									div.form-group 
+										label.col-sm-4.control_label 
+										div.col-sm-8
+											label.checkbox-inline.control_label Filler
+												input(type="checkbox", ng-model="record.filler")
+								div
+									alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+				tab(heading="Images")
+					| Images can be attached here
+				tab(heading="Related Artworks")
+					| Artworks can be related here
+			div.modal-footer
+				p
+				label.col-sm-2.checkbox-inline.control_label Create another
+					input(type="checkbox", ng-model="createAnother")
+				button(type="submit").btn.btn-primary Save
+				button(ng-click="cancel()").btn.btn-warning Cancel
+	div.group.row
+		div.col-sm-1
+			button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-default 
+				span.glyphicon.glyphicon-filter 
+					|Filter
+		div.col-sm-9
+			button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-default 
+				span.glyphicon.glyphicon-ban-circle 
+					|Reset
+		div.col-sm-1
+			button(ng-click="open('lg')").btn.btn-default
+				span.glyphicon.glyphicon-plus
+					| Create new sample
+
+	div.group.row
+		p
+	div.group.row
+		p
+	div.group.row
+		p
+	div.group.row
 		table.table.table-hover
 			thead
 				tr
+					h3 Search Results
+					br
+				tr
 					th Reference number
 					th Type
+					th Origin
+					th Institution
 					th Date
+					th Edit
+					th Delete
 			tbody
 				tr(ng-repeat="res in searchResultsList")
 					td: a(href='view', ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
 					td{{res.sample_record.sampleType.name}}
+					td{{res.sample_record.originLocation}}
+					td{{res.sample_record.owner}}
 					td{{res.sample_record.sampleDate}}
-
+					td: button(popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-primary
+							span.glyphicon.glyphicon-edit 
+					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-warning
+							span.glyphicon.glyphicon-remove 
+	div.group.row
+		div.col-sm-1
+			button(popover="Generate a report of the search results in .pdf format", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-primary 
+				span.glyphicon.glyphicon-print 
+					|Report
+		div.col-sm-1
+			button(popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-primary
+				span.glyphicon.glyphicon-download 
+					|Export
 
