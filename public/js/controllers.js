@@ -157,9 +157,10 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
                         { name: "Safari" },
                         {     name: "Chrome"  }
                     ]; 
-	$scope.lists.layerTypes = [{id: '1', name: 'Ground', grp:'group A'},
-	  	                      {id: '2', name: 'Imprimatura', grp:'group B'},
-	  	                      {id: '3', name: 'Colour', grp:'group A'}];
+	$scope.lists.layerTypes = [{id: '1', name: 'Ground'},
+	  	                      {id: '2', name: 'Imprimatura'},
+	  	                      {id: '2', name: 'Varnish'},
+	  	                      {id: '3', name: 'Paint'}];
 	
 	$scope.lists.analysisTypes = [{id: '1', name: 'C14', grp:'group A'},
 		  	                      {id: '2', name: 'FTIR', grp:'group B'},

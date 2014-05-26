@@ -25,7 +25,7 @@ div#searchContainer
 									label.col-sm-4.control_label Sample date
 									div(ng-controller="DatepickerCntrl").col-sm-8
 										div.input-group
-											input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close").form-control
+											input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 											span.input-group-btn
 												button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 								div.form-group 
@@ -153,23 +153,16 @@ div#searchContainer
 								div.embeddedTab
 									div.row
 										div.col-sm-4
-											form(ng-submit="artworkSearch()", role="form").form-inline
-												div.form-group
-													label.sr-only Search
-													div.input-group
-														input(type="text", ng-model="artworkSearchTerm", placeholder="Enter reference number").form-control
-														span.input-group-btn
-															button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
-																span.col-sm-10
+
 							tab(select="addArtwork()")
 								tab-heading
-									i.glyphicon.glyphicon-plus		
+									i.glyphicon.glyphicon-plus
 			div.modal-footer
 				p
 				label.col-sm-2.checkbox-inline.control_label Create another
 					input(type="checkbox", ng-model="createAnother")
-				button(type="submit").btn.btn-primary 
-					span.glyphicon.glyphicon-save 
+				button(type="submit").btn.btn-primary
+					span.glyphicon.glyphicon-save
 						|Save
 				button(ng-click="cancel()").btn.btn-warning 
 					span.glyphicon.glyphicon-ban-circle 
@@ -214,9 +207,9 @@ div#searchContainer
 					td{{res.sample_record.originLocation}}
 					td{{res.sample_record.owner}}
 					td{{res.sample_record.sampleDate}}
-					td: button(ng-click="registerClicked()", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-primary
+					td: button(ng-click="registerClicked()", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
-					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-warning
+					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 
 	div.group.row
 		div.col-sm-10
