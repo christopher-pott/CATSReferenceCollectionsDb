@@ -1,12 +1,12 @@
 div#searchContainer
-	script(type="text/ng-template")#myModalContent
+	script(ng-controller="RegisterCtrl", type="text/ng-template")#myModalContent
 		form(ng-submit="register()", role="form").form-horizontal
 			div.modal-header
-				h3.modal-title Create New Reference Sample
+				h3.modal-title Register a new reference sample
 			tabset(justified="true")
 				tab(heading="Metadata")
 					div.modal-body
-						div.row
+						div.row.uigroup
 							div.group.col-sm-6
 								div.form-group
 									label.col-sm-4.control_label Sample type
@@ -14,7 +14,7 @@ div#searchContainer
 										select(ng-model="record.sampleType", ng-options="type as type.name for type in sampleTypes", required).form-control
 											option(value="") Select Sample Type
 								div.form-group 
-									label.col-sm-4.control_label Reference number
+									label.col-sm-4.control_label Ref. number
 									div.col-sm-8
 										input(type="text", ng-model="record.referenceNumber", required).form-control
 								div.form-group 
@@ -32,6 +32,7 @@ div#searchContainer
 									label.col-sm-4.control_label Employee
 									div.col-sm-8
 										input(type="text", ng-model="record.employee").form-control
+							div.group.col-sm-6
 								div.form-group 
 									label.col-sm-4.control_label Institution
 									div.col-sm-8
@@ -44,66 +45,147 @@ div#searchContainer
 									label.col-sm-4.control_label Remarks
 									div.col-sm-8
 										textarea(rows="3", ng-model="record.remarks").form-control
-								div.form-group 
-									label.col-sm-4.control_label Analysis
-									div.col-sm-8
-										label.checkbox-inline.control_label Raman
-											input(type="checkbox", ng-model="record.ramanAnalysis")
-										label.checkbox-inline.control_label FTIR
-											input(type="checkbox", ng-model="record.ftirAnalysis")
-										label.checkbox-inline.control_label GC-MS
-											input(type="checkbox", ng-model="record.gcmsChromatagrams")
-							div(ng-switch on="record.sampleType.id").col-sm-6
-								div(ng-switch-when="paint")
-									div.form-group
-										label.col-sm-4.control_label Ground type
-										div.col-sm-8
-											div.input-group
-												select(ng-model="record.groundType", ng-options="type as type.name for type in groundTypes").form-control
-													option(value="") Select Ground Type
-												span.input-group-btn
-													button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-plus
-										div(ng-repeat="gt in record.groundType").col-sm-2
-											p.input-group
-												select(ng-model="record.groundType[$index]", ng-options="type as type.name for type in groundTypes").form-control
-													option(value="") Select Another Ground Type
-												span.input-group-btn
-													button(type="button", ng-click="plus($event)").btn.btn-default: i.glyphicon.glyphicon-minus
-									div.form-group 
-										label.col-sm-4.control_label Paint layer description
-										div.col-sm-8
-											input(type="text", ng-model="record.paintLayerDescription").form-control
-								div(ng-switch-when="fibre")
-									div.form-group 
-										label.col-sm-4.control_label 
-										div.col-sm-8
-											label.checkbox-inline.control_label Filler
-												input(type="checkbox", ng-model="record.filler")
-								div
-									alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+						div(ng-switch on="record.sampleType.id")
+							div(ng-switch-when="paint")
+								div.row.uigroup
+									tabset
+										tab(ng-repeat="catslayer in record.catslayer", active="catslayer.active")
+											tab-heading
+												{{catslayer.layerType.name}} Layer 
+												a(ng-click="removeLayerTab($index)", href=''): i.glyphicon.glyphicon-remove
+											div.embeddedTab
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Type
+														div.col-sm-8.control_label.multi
+															multiselect(ng-model="catslayer.layerType", options="c.name for c in layerTypes",
+															ms-header="Select layer type")
+													div.form-group
+														label.col-sm-4.control_label Binders
+														div.col-sm-8.control_label.multi
+															multiselect(multiple="true", ng-model="catslayer.catsbinder", options="c.name for c in catsbinders",
+															ms-header="Select binders").multi
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Colours
+														div.col-sm-8.control_label.multi
+															multiselect(multiple="true", ng-model="catslayer.colour", options="c.name for c in colours",
+															ms-header="Select colours").multi
+													div.form-group
+														label.col-sm-4.control_label Pigments
+														div.col-sm-8.control_label.multi
+															multiselect(multiple="true", ng-model="catslayer.pigment", options="c.name for c in pigments",
+															ms-header="Select binders").multi
+													div.form-group
+														label.col-sm-4.control_label Dyes
+														div.col-sm-8.control_label.multi
+															multiselect(multiple="true", ng-model="catslayer.dye", options="c.name for c in dyes",
+															ms-header="Select binders").multi
+										tab(select="addLayer()")
+											tab-heading
+												i.glyphicon.glyphicon-plus
+								div.row
+									div.group.col-sm-12
+										div.form-group 
+											label.col-sm-2.control_label Paint layers description
+											div.col-sm-10
+												textarea(rows="3", ng-model="record.paintLayerDescription").form-control
+								div.row
+									div.group.col-sm-6
+										div.form-group 
+											label.col-sm-4.control_label 
+											div.col-sm-8
+												label.checkbox-inline.control_label Priming
+													input(type="checkbox", ng-model="record.priming")
+							div(ng-switch-when="fibre")
+								div.row
+									div.group.col-sm-6
+										div.form-group
+											label.col-sm-4.control_label Fibre Type
+											div(multi-select, output-model="record.fibreType", input-model="fibreTypes", button-label="name", 
+												item-label="name", tick-property="ticked").col-sm-8.control_label.multi	
+								div.row
+									div.group.col-sm-6
+										div.form-group
+											label.col-sm-4.control_label Glue
+											div(multi-select, output-model="record.glue", input-model="glueTypes", button-label="name", 
+												item-label="name", tick-property="ticked").col-sm-8.control_label.multi
+								div.row
+									div.group.col-sm-6
+										div.form-group
+											label.col-sm-4.control_label 
+											div.col-sm-8
+												label.checkbox-inline.control_label Ligin
+													input(type="checkbox", ng-model="record.ligin")
+												label.checkbox-inline.control_label Alum
+													input(type="checkbox", ng-model="record.alum")
+												label.checkbox-inline.control_label Filler
+													input(type="checkbox", ng-model="record.filler")
+							div
+								alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
+				tab(heading="Analysis")
+					div.row.embeddedTab
+						tabset
+							tab(ng-repeat="catsanalysis in record.catsanalysis", heading="{{catsanalysis.catsanalysisType.name}}" +  " Analysis", active="catsanalysis.active")
+								div.embeddedTab
+									div.row
+										div.group.col-sm-6
+											div.form-group
+												label.col-sm-4.control_label Analysis Method
+												div.col-sm-8.control_label.multi
+													multiselect(ng-model="catsanalysis.catsanalysisType", options="c.name for c in analysisTypes",
+													ms-header="Select analysis method").multi
+									div.row
+										div.group.col-sm-12
+											div.form-group 
+												label.col-sm-2.control_label Description
+												div.col-sm-10
+													textarea(rows="5", ng-model="catsanalysis.catsanalysisDescription").form-control
+							tab(select="addAnalysis()")
+								tab-heading
+									i.glyphicon.glyphicon-plus
 				tab(heading="Images")
 					| Images can be attached here
 				tab(heading="Related Artworks")
-					| Artworks can be related here
+					div.row.embeddedTab
+						tabset
+							tab(ng-repeat="relatedartwork in record.relatedartworks", heading="{{relatedartwork.refnumber.name}}", active="relatedartwork.active")
+								div.embeddedTab
+									div.row
+										div.col-sm-4
+											form(ng-submit="artworkSearch()", role="form").form-inline
+												div.form-group
+													label.sr-only Search
+													div.input-group
+														input(type="text", ng-model="artworkSearchTerm", placeholder="Enter reference number").form-control
+														span.input-group-btn
+															button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
+																span.col-sm-10
+							tab(select="addArtwork()")
+								tab-heading
+									i.glyphicon.glyphicon-plus		
 			div.modal-footer
 				p
 				label.col-sm-2.checkbox-inline.control_label Create another
 					input(type="checkbox", ng-model="createAnother")
-				button(type="submit").btn.btn-primary Save
-				button(ng-click="cancel()").btn.btn-warning Cancel
+				button(type="submit").btn.btn-primary 
+					span.glyphicon.glyphicon-save 
+						|Save
+				button(ng-click="cancel()").btn.btn-warning 
+					span.glyphicon.glyphicon-ban-circle 
+						|Cancel
 	div.group.row
-		div.col-sm-1
-			button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-default 
+		div.col-sm-10
+			button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-filter 
 					|Filter
-		div.col-sm-9
-			button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-default 
+			button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-ban-circle 
 					|Reset
 		div.col-sm-1
-			button(ng-click="open('lg')").btn.btn-default
-				span.glyphicon.glyphicon-plus
-					| Create new sample
+			button(ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
+				span.glyphicon.glyphicon-plus 
+					|Register
 
 	div.group.row
 		p
@@ -132,17 +214,18 @@ div#searchContainer
 					td{{res.sample_record.originLocation}}
 					td{{res.sample_record.owner}}
 					td{{res.sample_record.sampleDate}}
-					td: button(popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-primary
+					td: button(ng-click="registerClicked()", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-primary
 							span.glyphicon.glyphicon-edit 
 					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-warning
 							span.glyphicon.glyphicon-remove 
 	div.group.row
+		div.col-sm-10
 		div.col-sm-1
-			button(popover="Generate a report of the search results in .pdf format", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-primary 
+			button(popover="Generate a report of the search results in .pdf format", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-print 
 					|Report
 		div.col-sm-1
-			button(popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="2000").btn.btn-primary
+			button(popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
 

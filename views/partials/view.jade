@@ -48,7 +48,9 @@ div#viewContainer
 					div.row
 						div.col-sm-4
 							label Ground type
-						div.col-sm-4{{record.groundType}}
+						div.col-sm-4
+							span(ng-repeat="item in record.groundType")
+								{{item.name}}{{$last ? '' : ', '}}
 					div.row
 						div.col-sm-4
 							label Paint layer description

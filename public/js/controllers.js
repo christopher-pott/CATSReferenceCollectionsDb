@@ -19,22 +19,11 @@ controller('AppCtrl', function ($scope, $http, state, $location) {
 		$location.path('/search');
 		state.searchTerm = searchTerm;
 		state.searchRequested = true;
-
-//		$scope.$broadcast('searchRefresh');
 	};
 
 }).
 controller('SearchController', function ($scope, catsAPIservice, state, $modal, $log) {
-	/*used in modal*/
-	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
-	                      {id: 'paint', name: 'Paint'},
-	                      {id: 'material', name: 'Material'},
-	                      {id: 'pigment', name: 'Pigment'},
-	                      {id: 'stretcher', name: 'Stretcher'},
-	                      {id: 'xray', name: 'Xray'},
-	                      {id: 'photograph', name: 'photograph'},
-	                      {id: 'infrared', name: 'infrared'}];
-	
+
 	$scope.searchResultsList = state.resultList;
 	$scope.searchTerm = state.searchTerm;
 
@@ -42,7 +31,6 @@ controller('SearchController', function ($scope, catsAPIservice, state, $modal, 
 		catsAPIservice.search(state.searchTerm).success(function (response) {
 			$scope.searchResultsList = response;
 			state.resultList = response;
-//			state.searchTerm = $scope.searchTerm;
 		});
 	};
 	$scope.viewSample = function(sample) {
@@ -61,28 +49,9 @@ controller('SearchController', function ($scope, catsAPIservice, state, $modal, 
         	}
         }
     );
-    
-    /*open create new record modal*/
-	$scope.open = function (size) {
-
-		var modalInstance = $modal.open({
-			templateUrl: 'myModalContent',
-			controller: ModalInstanceCtrl,
-			size: size,
-			resolve:{
-				sampleTypes: function () {
-					return $scope.sampleTypes;
-				}
-			}
-		});
-		modalInstance.result.then(function (selectedItem) {
-			$scope.selected = selectedItem;
-		}, function () {
-			$log.info('Modal dismissed at: ' + new Date());
-		});
+	$scope.registerClicked = function() {
+		state.registerRequested = true;
 	};
-
-
 }).
 controller('BrowseController', function ($scope) {
 	// write Ctrl here
@@ -91,19 +60,30 @@ controller('BrowseController', function ($scope) {
 controller('ViewController', function ($scope, state, catsAPIservice) {
 	$scope.alerts = [];
 
-	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
-	                      {id: 'paint', name: 'Paint'},
-	                      {id: 'material', name: 'Material'},
-	                      {id: 'pigment', name: 'Pigment'},
-	                      {id: 'stretcher', name: 'Stretcher'},
-	                      {id: 'xray', name: 'Xray'},
-	                      {id: 'photograph', name: 'photograph'},
-	                      {id: 'infrared', name: 'infrared'}];
+	$scope.sampleTypes = 
+		[{id: 'fibre', name: 'Fibre(paper)'},
+	     {id: 'paint', name: 'Paint Cross Section'},
+	     {id: 'material', name: 'Material'},
+	     {id: 'pigment', name: 'Pigment'},
+	     {id: 'stretcher', name: 'Stretcher'},
+	     {id: 'xray', name: 'Xray'},
+	     {id: 'photograph', name: 'photograph'},
+	     {id: 'infrared', name: 'infrared'}];
 	
-	$scope.groundTypes = [{id: 'onelayer', name: '1-layer'},
-	                      {id: 'twolayer', name: '2-layer'},
-	                      {id: 'colour', name: 'colour'}];	
-
+	$scope.groundTypes = 
+		[{id: 'onelayer', name: '1-layer'},
+	     {id: 'twolayer', name: '2-layer'},
+	     {id: 'colour', name: 'colour'}];	
+	
+	$scope.groundMaterials =
+		[{id: '1', name: 'ground material'},
+	    {id: '2', name: 'another ground material'},
+	    {id: '3', name: 'ground material 3'},
+	    {id: '4', name: 'ground material 4'},
+	    {id: '5', name: 'ground material 5'},
+	    {id: '6', name: 'ground material 6'},
+	    {id: '7', name: 'yet another ground material'}];	
+	
 	if (state.create){
 		$scope.record = {sampleType: "",
 				referenceNumber: "", 
@@ -166,28 +146,80 @@ controller('DatepickerCntrl', function ($scope) {
 	  $scope.initDate = new Date('2016-15-20');
 	  $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
 	  $scope.format = $scope.formats[0];
-});
+}).
+controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 
-var ModalDemoCtrl = function ($scope, $modal, $log) {
+	$scope.lists = {};
+	$scope.lists.test = [
+                        {  name: "Opera"          },
+                        {   name: "Internet Explorer" },
+                        {  name: "Firefox"  },
+                        { name: "Safari" },
+                        {     name: "Chrome"  }
+                    ]; 
+	$scope.lists.layerTypes = [{id: '1', name: 'Ground', grp:'group A'},
+	  	                      {id: '2', name: 'Imprimatura', grp:'group B'},
+	  	                      {id: '3', name: 'Colour', grp:'group A'}];
+	
+	$scope.lists.analysisTypes = [{id: '1', name: 'C14', grp:'group A'},
+		  	                      {id: '2', name: 'FTIR', grp:'group B'},
+		  	                      {id: '2', name: 'GC-MS', grp:'group B'},
+		  	                      {id: '2', name: 'HPLC', grp:'group B'},
+		  	                      {id: '2', name: 'Microsopic', grp:'group B'},
+		  	                      {id: '2', name: 'Photographic', grp:'group B'},
+		  	                      {id: '2', name: 'Polar. Micro.', grp:'group B'},
+		  	                      {id: '2', name: 'Raman', grp:'group B'},
+		  	                      {id: '2', name: 'SEM/EDX', grp:'group B'},
+		  	                      {id: '2', name: 'Visual', grp:'group B'},
+		  	                      {id: '2', name: 'XRF', grp:'group B'},
+		  	                      {id: '3', name: 'Other', grp:'group A'}];	
+	
+	$scope.lists.groundTypes = [{id: 'onelayer', name: '1-layer'},
+	                      {id: 'twolayer', name: '2-layer'},
+	                      {id: 'colour', name: 'colour'}];
+	
+	$scope.lists.artworks = [{id: '1', name: 'KMS8050'},
+	  	                      {id: '2', name: 'KKShm2345 verso'},
+	  	                      {id: '3', name: 'DEP620'}];
 
-	$scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
-	                      {id: 'paint', name: 'Paint'},
+	
+	$scope.lists.catsbinders = [{id: '1', name: 'binder 1', grp:'group A'},
+	  	                      {id: '2', name: 'binder two', grp:'group B'},
+	  	                      {id: '3', name: 'binder three', grp:'group B'},
+	  	                      {id: '4', name: 'binder four', grp:'group B'},	
+	  	                      {id: '5', name: 'binder 5', grp:'group A'}];
+	
+	$scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
+	                      {id: 'paint', name: 'Paint Cross Section'},
 	                      {id: 'material', name: 'Material'},
 	                      {id: 'pigment', name: 'Pigment'},
 	                      {id: 'stretcher', name: 'Stretcher'},
 	                      {id: 'xray', name: 'Xray'},
 	                      {id: 'photograph', name: 'photograph'},
 	                      {id: 'infrared', name: 'infrared'}];
+	
+	$scope.lists.colours =
+		[{id: '1', name: 'white', namedk:'(hvid)', type:'Other', ticked:'false'},
+	    {id: '2', name: 'black', namedk:'(sort)', type:'Other', ticked:'false'},
+	    {id: '3', name: 'green', namedk:'(grøn)', type:'RGB', ticked:'false'},
+	    {id: '4', name: 'blue', namedk:'(blå)', type:'RGB', ticked:'false'},
+	    {id: '5', name: 'red', namedk:'(rød)', type:'RGB', ticked:'false'},
+	    {id: '6', name: 'cyan', namedk:'(cyan)', type:'CMY', ticked:'false'},
+	    {id: '7', name: 'magenta', namedk:'(magenta)', type:'CMY', ticked:'false'},
+	    {id: '8', name: 'yellow', namedk:'(gul)', type:'CMY', ticked:'false'},
+	    {id: '9', name: '', namedk:'(blågrøn)', type:'Other', ticked:'false'}];
 
+
+	//open the modal dialog
 	$scope.open = function (size) {
-
 		var modalInstance = $modal.open({
 			templateUrl: 'myModalContent',
 			controller: ModalInstanceCtrl,
 			size: size,
+			backdrop: 'static',
 			resolve:{
-				sampleTypes: function () {
-					return $scope.sampleTypes;
+				lists: function () {
+					return $scope.lists;
 				}
 			}
 		});
@@ -197,16 +229,30 @@ var ModalDemoCtrl = function ($scope, $modal, $log) {
 			$log.info('Modal dismissed at: ' + new Date());
 		});
 	};
-};
+	
+	//this will call the open function
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.registerRequested; },
+        // This is the change handler
+        function(newValue, oldValue) {
+        	if ( newValue === true ) {
+        		$scope.open('lg');
+        		state.registerRequested = false;
+        	}
+        }
+    );
+});
 
 	// Please note that $modalInstance represents a modal window (instance) dependency.
 	// It is not the same as the $modal service used above.
 
-var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIservice) {
+var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice) {
 
 	$scope.createAnother = false;
 	
-	$scope.record = {sampleType: "",
+	$scope.record = {
+			sampleType: "",
 			referenceNumber: "", 
 			originLocation: "",
 			sampleDate: "", 
@@ -216,10 +262,80 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, sampleTypes, catsAPIse
 			remarks: "",
 			ramanAnalysis: "",
 			ftirAnalysis: "",
-			gcmsChromatagrams: ""};
+			gcmsChromatagrams: "",
+			catslayer:[{id: "1", layerType: "", groundType:"", catsbinder: [], colour: "", pigment: "", dye: "", active: true}],
+			catsanalysis:[{id: "1", catsanalysisType: "", catsanalysisDescription:"", active: true}],
+			relatedartworks:[{id: "1", refnumber: "",  title: "Title", artist: "", technique: "", dimensions: "", productiondate: "", owner: "", active: true}]
+	};
 	
-	$scope.sampleTypes = sampleTypes;
+	$scope.sampleTypes = lists.sampleTypes;
+	$scope.groundTypes = lists.groundTypes;
+	$scope.colours = lists.colours;
+	$scope.layerTypes = lists.layerTypes;
+	$scope.catsbinders = lists.catsbinders;
+	$scope.test = lists.test;
+	$scope.analysisTypes = lists.analysisTypes;
+	$scope.artworks = lists.artworks;
+
+		
+	/*START tabs for paint layers*/
+    var setAllInactive = function() {
+        angular.forEach($scope.record.catslayer, function(catslayer) {
+            catslayer.active = false;
+        });
+    };
 	
+    var addNewLayer = function() {
+    	var id = $scope.record.catslayer.length + 1;
+        $scope.record.catslayer.push({id: id, layerType: "", groundType:"", catsbinder: [], colour: "", pigment: "", dye: "",  active: true});
+    };
+
+    $scope.addLayer = function () {
+        setAllInactive();
+        addNewLayer();
+    };
+   
+    $scope.removeLayerTab = function (index) {
+        $scope.record.catslayer.splice(index, 1);
+    };
+    /*END tabs for paint layers*/
+    
+	/*START tabs for analysis*/
+    var setAllAnalysisInactive = function() {
+        angular.forEach($scope.record.catsanalysis, function(catsanalysis) {
+        	catsanalysis.active = false;
+        });
+    };
+	
+    var addNewAnalysis = function() {
+    	var id = $scope.record.catsanalysis.length + 1;
+        $scope.record.catsanalysis.push({id: id, catsanalysisType: "", catsanalysisDescription:"", active: true});
+    };
+
+    $scope.addAnalysis = function () {
+        setAllAnalysisInactive();
+        addNewAnalysis();
+    };
+    /*END tabs for paint layers*/    
+    
+	/*START tabs for artworks*/
+    var setAllArtworksInactive = function() {
+        angular.forEach($scope.record.relatedartworks, function(relatedartworks) {
+        	relatedartworks.active = false;
+        });
+    };
+	
+    var addNewArtwork = function() {
+    	var id = $scope.record.relatedartworks.length + 1;
+        $scope.record.relatedartworks.push({id: id, refnumber: "",  title: "", artist: "", technique: "", dimensions: "", productiondate: "", owner: "", active: true});
+    };
+    
+    $scope.addArtwork = function () {
+        setAllArtworksInactive();
+        addNewArtwork();
+    };
+    /*END tabs for artworks*/    
+    
 	$scope.selected = {
 		sampleType: $scope.sampleTypes[0]
 	};

@@ -7,13 +7,14 @@ angular.module('myApp', [
   'myApp.filters',
   'myApp.services',
   'myApp.directives',
-  'ngRoute'
+  'ngRoute',
+  'ui.multiselect'
 ]).
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.
     when('/browse', {
       templateUrl: 'partials/browse',
-      controller: 'ModalDemoCtrl'
+      controller: 'BrowseCtrl'
     }).
     when('/view', {
       templateUrl: 'partials/view',
