@@ -63,7 +63,7 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Binders
 														div.col-sm-8.control_label.multi
-															multiselect(multiple="true", ng-model="catslayer.catsbinder", options="c.name for c in catsbinders",
+															catsmultiselect(multiple="true", ng-model="catslayer.catsbinder", options="c.name group by c.grp for c in catsbinders",
 															ms-header="Select binders").multi
 												div.group.col-sm-6
 													div.form-group
@@ -126,7 +126,10 @@ div#searchContainer
 				tab(heading="Analysis")
 					div.row.embeddedTab
 						tabset
-							tab(ng-repeat="catsanalysis in record.catsanalysis", heading="{{catsanalysis.catsanalysisType.name}}" +  " Analysis", active="catsanalysis.active")
+							tab(ng-repeat="catsanalysis in record.catsanalysis", active="catsanalysis.active")
+								tab-heading
+									{{catsanalysis.catsanalysisType.name}} Analysis 
+									a(ng-click="removeAnalysisTab($index)", href=''): i.glyphicon.glyphicon-remove
 								div.embeddedTab
 									div.row
 										div.group.col-sm-6

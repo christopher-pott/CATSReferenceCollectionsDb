@@ -107,7 +107,7 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 			 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
 		});
 	};
-	
+
 	$scope.getSample = function() {
 		$scope.record = {sampleType: {id: "paint", name: "Paint"},
 				referenceNumber: "777", 
@@ -150,54 +150,63 @@ controller('DatepickerCntrl', function ($scope) {
 controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 
 	$scope.lists = {};
-	$scope.lists.test = [
-                        {  name: "Opera"          },
-                        {   name: "Internet Explorer" },
-                        {  name: "Firefox"  },
-                        { name: "Safari" },
-                        {     name: "Chrome"  }
-                    ]; 
+
 	$scope.lists.layerTypes = [{id: '1', name: 'Ground'},
 	  	                      {id: '2', name: 'Imprimatura'},
-	  	                      {id: '2', name: 'Varnish'},
-	  	                      {id: '3', name: 'Paint'}];
+	  	                      {id: '3', name: 'Varnish'},
+	  	                      {id: '4', name: 'Paint'}];
+
+	$scope.lists.analysisTypes = [{id: '1', name: 'C14'},
+		  	                      {id: '2', name: 'FTIR'},
+		  	                      {id: '3', name: 'GC-MS'},
+		  	                      {id: '4', name: 'HPLC'},
+		  	                      {id: '5', name: 'IRR'},
+		  	                      {id: '6', name: 'Microscopy'},
+		  	                      {id: '7', name: 'Photographic'},
+		  	                      {id: '8', name: 'Polar. Micro.'},
+		  	                      {id: '9', name: 'Raman'},
+		  	                      {id: '10', name: 'SEM/EDX'},
+		  	                      {id: '11', name: 'Visual'},
+		  	                      {id: '12', name: 'X-radiography'},
+		  	                      {id: '13', name: 'XRF'},
+		  	                      {id: '14', name: 'Other'}];	
 	
-	$scope.lists.analysisTypes = [{id: '1', name: 'C14', grp:'group A'},
-		  	                      {id: '2', name: 'FTIR', grp:'group B'},
-		  	                      {id: '2', name: 'GC-MS', grp:'group B'},
-		  	                      {id: '2', name: 'HPLC', grp:'group B'},
-		  	                      {id: '2', name: 'Microsopic', grp:'group B'},
-		  	                      {id: '2', name: 'Photographic', grp:'group B'},
-		  	                      {id: '2', name: 'Polar. Micro.', grp:'group B'},
-		  	                      {id: '2', name: 'Raman', grp:'group B'},
-		  	                      {id: '2', name: 'SEM/EDX', grp:'group B'},
-		  	                      {id: '2', name: 'Visual', grp:'group B'},
-		  	                      {id: '2', name: 'XRF', grp:'group B'},
-		  	                      {id: '3', name: 'Other', grp:'group A'}];	
-	
+	$scope.lists.fibreTypes = [{id: '1', name: 'Cellulose (wooden)'},
+	   	                      {id: '2', name: 'Cotton'},
+	  	                      {id: '3', name: 'Hemp'},
+	  	                      {id: '4', name: 'Linen'},
+	  	                      {id: '5', name: 'Synthetic'},
+	  	                      {id: '6', name: 'Other'}];	
+
+	$scope.lists.glueTypes = [{id: '1', name: 'Animal'},
+	  	                      {id: '2', name: 'Synthetic'},
+	  	                      {id: '3', name: 'Vegetable'}];	
+
 	$scope.lists.groundTypes = [{id: 'onelayer', name: '1-layer'},
 	                      {id: 'twolayer', name: '2-layer'},
-	                      {id: 'colour', name: 'colour'}];
-	
+	                      {id: 'colour', name: 'Colour'}];
+
 	$scope.lists.artworks = [{id: '1', name: 'KMS8050'},
 	  	                      {id: '2', name: 'KKShm2345 verso'},
 	  	                      {id: '3', name: 'DEP620'}];
 
-	
-	$scope.lists.catsbinders = [{id: '1', name: 'binder 1', grp:'group A'},
-	  	                      {id: '2', name: 'binder two', grp:'group B'},
-	  	                      {id: '3', name: 'binder three', grp:'group B'},
-	  	                      {id: '4', name: 'binder four', grp:'group B'},	
-	  	                      {id: '5', name: 'binder 5', grp:'group A'}];
-	
+	$scope.lists.catsbinders = [{id: '1', name: 'Casin', dkname: 'kasein', grp:'Others'},
+	  	                      {id: '2', name: 'Emulsion', dkname: 'emulsion', grp:'Others'},
+	  	                      {id: '3', name: 'Animal glue', dkname: 'lim animalisk', grp:'Glue'},
+	  	                      {id: '4', name: 'Vegetable glue', dkname: 'lim vegetabilsk', grp:'Glue'},
+	  	                      {id: '5', name: 'Linseed oil', dkname: 'linolie', grp:'Oil'},	
+	  	                      {id: '6', name: 'Poppy oil', dkname: 'valmulie', grp:'Oil'},
+	  	                      {id: '7', name: 'Walnut oil', dkname: 'valnøddolie', grp:'Oil'},
+	  	                      {id: '8', name: 'Resin', dkname: 'harpiks', grp:'Oil'},
+	  	                      {id: '9', name: 'Synthetic', dkname: 'syntetisk', grp:'Oil'}];
+
 	$scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
+	                      {id: 'material', name: 'Material Sample'},
+	                      {id: 'photograph', name: 'Media (photography)'},
 	                      {id: 'paint', name: 'Paint Cross Section'},
-	                      {id: 'material', name: 'Material'},
 	                      {id: 'pigment', name: 'Pigment'},
-	                      {id: 'stretcher', name: 'Stretcher'},
-	                      {id: 'xray', name: 'Xray'},
-	                      {id: 'photograph', name: 'photograph'},
-	                      {id: 'infrared', name: 'infrared'}];
+	                      {id: 'stretcher', name: 'Stretcher/Strainer'},
+	                      {id: 'xray', name: 'X-radiography'}];
 	
 	$scope.lists.colours =
 		[{id: '1', name: 'white', namedk:'(hvid)', type:'Other', ticked:'false'},
@@ -316,6 +325,10 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice)
     $scope.addAnalysis = function () {
         setAllAnalysisInactive();
         addNewAnalysis();
+    };
+    
+    $scope.removeAnalysisTab = function (index) {
+        $scope.record.catsanalysis.splice(index, 1);
     };
     /*END tabs for paint layers*/    
     

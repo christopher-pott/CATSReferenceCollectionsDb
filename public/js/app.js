@@ -8,7 +8,8 @@ angular.module('myApp', [
   'myApp.services',
   'myApp.directives',
   'ngRoute',
-  'ui.multiselect'
+  'ui.multiselect',
+  'ui.catsmultiselect'
 ]).
 config(function ($routeProvider, $locationProvider) {
   $routeProvider.
