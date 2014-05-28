@@ -63,7 +63,7 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Binders
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="catslayer.catsbinder", options="c.name group by c.grp for c in catsbinders",
+															catsmultiselect(multiple="true", ng-model="catslayer.catsbinder", options="c.name c.dkname group by c.grp for c in catsbinders",
 															ms-header="Select binders").multi
 												div.group.col-sm-6
 													div.form-group
