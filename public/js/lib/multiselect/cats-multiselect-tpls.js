@@ -13,33 +13,28 @@ angular.module('ui.catsmultiselect', [
 	//  \s+for\s+   matches " for "
 	//  (?:([\$\w][\$\w\d]*)) matches the item name
 	 
-	//                    00000111110
-	  var TYPEAHEAD_REGEXP = /^\s*(.*?)(?:\s(.*?))?(?:\s+group\s+by\s+(.*?))?\s+for\s+(?:([\$\w][\$\w\d]*))\s+in\s+(.*)$/;
-	 // var TYPEAHEAD_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*?))?\s+for\s+(?:([\$\w][\$\w\d]*))\s+in\s+(.*)$/;
-  //  var TYPEAHEAD_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+grouped\s+as\s+\((.*?\s+in\s+.*?)\))?\s+for\s+(?:([\$\w][\$\w\d]*))\s+in\s+(.*)$/;
-   // var TYPEAHEAD_GROUP_REGEGXP = /^\s*(?:([\$\w][\$\w\d]*))\s+in\s+(.*)$/;
+	//                     0000011111022222222000000000000000000000033333000000000000004444444444444444000000000055550
+	var TYPEAHEAD_REGEXP = /^\s*(.*?)(?:\s(.*?))?(?:\s+group\s+by\s+(.*?))?\s+for\s+(?:([\$\w][\$\w\d]*))\s+in\s+(.*)$/;
 
     return {
     	parse: function (input) {
     		
     		// https://gist.github.com/guillaume86/5638205   
-    		// angular-bootstrap-typeahead.js
-    		
-    		//input is the HTML input element. 'match' 
+    		// angular-bootstrap-typeahead.js    		
 
     		var match = input.match(TYPEAHEAD_REGEXP), modelMapper, viewMapper, source;
     		if (!match) {
     			throw new Error(
-    					"Expected typeahead specification in form of '_modelValue_ (as _label_)? (group by _group_)? for _item_ in _collection_'" +
+    					"Expected typeahead specification in form of '_modelValue_ (_translation_)? (group by _group_)? for _item_ in _collection_'" +
     					" but got '" + input + "'.");
     		}
-
     		//$parse converts an Angular expression into a function (think "getter")
     		return {
-    			itemName: match[4],       //the name for the item
-    			source: $parse(match[5]), //the source list of objects for the select
+    			itemName: match[4],             //the alias for the item
+    			grpName: match[3],              //the alias of the group
+    			source: $parse(match[5]),       //the source list of objects for the select
     			viewMapper: $parse(match[1]),   //main label
-    			modelMapper: $parse(match[2]),  //secondlabel
+    			modelMapper: $parse(match[2]),  //danish translation
     			groupMapper: $parse(match[3])   //group
     		};
     	}
@@ -130,33 +125,39 @@ angular.module('ui.catsmultiselect', [
                 local[parsedResult.itemName] = model[i];
             	var grpName = parsedResult.groupMapper(local);
             	
-            	if (grpName != undefined){ //deal with others later
-	            	var grpIndex = -1;
-	            	
-	            	//indexOf this group
-	            	for(var ix = 0, len = scope.groups.length; ix < len; ix++) {
-	            	    if (scope.groups[ix].name === grpName) {
-	            	    	grpIndex = ix;
-	            	        break;
-	            	    }
-	            	}
-	            	//create new group
-	            	if (grpIndex < 0 ){
-	            		var grp = {name: "", items: []};
-	            		grp.name = grpName;
-	            		grpIndex = scope.groups.push(grp) - 1;
-	            		//scope.groups[grpIndex].items = [];
-	            	}
-	            	var tag = parsedResult.viewMapper(local);
-	            	if(parsedResult.modelMapper(local) != undefined) {tag += " (" + parsedResult.modelMapper(local) + ")"}
-	            	//add item
-	                scope.groups[grpIndex].items.push({
-	                  label: tag,
-	                  model: model[i],
-	                  checked: false,
-	                  group: parsedResult.groupMapper(local)
-	                });
+            	if (!grpName){ 
+            		grpName = ''; //create an empty group for orphans
+            		local[parsedResult.itemName][parsedResult.grpName] = grpName;
             	}
+            	
+            	var grpIndex = -1;
+            	
+            	//indexOf this group
+            	for(var ix = 0, len = scope.groups.length; ix < len; ix++) {
+            	    if (scope.groups[ix].name === grpName) {
+            	    	grpIndex = ix;
+            	        break;
+            	    }
+            	}
+            	//create new group
+            	if (grpIndex < 0 ){
+            		var grp = {name: "", items: []};
+            		grp.name = grpName;
+            		grpIndex = scope.groups.push(grp) - 1;
+            		//scope.groups[grpIndex].items = [];
+            	}
+            	var tag = parsedResult.viewMapper(local);
+            	var translation = parsedResult.modelMapper(local);
+            	if(translation) {
+            		tag += " (" + parsedResult.modelMapper(local) + ")";
+            	}
+            	//add item
+                scope.groups[grpIndex].items.push({
+                  label: tag,
+                  model: model[i],
+                  checked: false,
+                  group: parsedResult.groupMapper(local)
+                });
             }
           }
 
@@ -343,29 +344,46 @@ angular.module('catsmultiselect.tpl.html', [])
 
       "<div class=\"btn-group\">\n" +
       "  <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
-      "    {{header}} <span class=\"caret\"></span>\n" +
+      "    {{header}} \n" +
+//      "    {{header}} <span class=\"caret\"></span>\n" +
       "  </button>\n" +
       "  <ul class=\"dropdown-menu\">\n" +
-      "    <li>\n" +
-      "      <input class=\"form-control input-sm\" type=\"text\" ng-model=\"searchText.label\" autofocus=\"autofocus\" placeholder=\"Filter\" />\n" +
-      "    </li>\n" +
-      "    <li ng-show=\"multiple\" role=\"presentation\" class=\"\">\n" +
-      "      <button class=\"btn btn-default\" ng-click=\"checkAll()\" type=\"button\"><i class=\"glyphicon glyphicon-ok\"></i> Check all</button>\n" +
-      "      <button class=\"btn btn-default\" ng-click=\"uncheckAll()\" type=\"button\"><i class=\"glyphicon glyphicon-remove\"></i> Uncheck all</button>\n" +
-      "    </li>\n" +
-      "    <ul ng-repeat=\"g in groups\">\n" +
-      "       <label>" +
+      "  <div class=\"row uigroup\">" +
+      "    <div ng-show=\"multiple\" role=\"presentation\" class=\"col col-sm-8\">\n" +
+      "      <button class=\"btn btn-link btn-xs\" ng-click=\"checkAll()\" type=\"button\"><i class=\"glyphicon glyphicon-ok\"></i> Check all</button>\n" +
+      "      <button class=\"btn btn-link btn-xs\" ng-click=\"uncheckAll()\" type=\"button\"><i class=\"glyphicon glyphicon-remove\"></i> Uncheck all</button>\n" +
+      "    </div>" +
+//      "    <div ng-show=\"multiple\" role=\"presentation\" class=\"col col-sm-4\">\n" +
+//      "      <button class=\"btn btn-link btn-xs\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-plus\"></i> New item </button>\n" +
+//      "    </div>" +      
+      "  </div>" +
+      "  <div class=\"row uigroup\">" + 
+      "    <div class=\"col col-sm-8\">\n" +
+      "      <input class=\"form-control\" type=\"text\" ng-model=\"searchText.$\" autofocus=\"autofocus\" placeholder=\"Filter\" />\n" +
+      "    </div>" +      
+      "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
+      "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-plus\"></i> New </button>\n" +
+      "    </div>" +
+      "  </div>" +
+      "  <div class=\"row uigroup\">" + 
+      "    <div class=\"col col-sm-1\">\n" +
+      "    </div>" +
+      "    <div class=\"col col-sm-10\">\n" +
+      "    <ul ng-repeat=\"g in groups | filter:searchText\">\n" +
+      "       <label ng-show=\"g.name != false\">" +
       "        {{g.name}}\n" +
       "       </label>" +
       "      <li ng-repeat=\"i in g.items | filter:searchText\">\n" +
       "       <label style=\"font-weight: normal\">" +
-      "        <input type=\"checkbox\" ng-disabled=\"empty\" ng-checked=\"i.checked\" ng-click=\"select(i)\"/>" +
+      "        <input type=\"checkbox\" ng-disabled=\"empty\" ng-checked=\"i.checked\" ng-click=\"select(i)	\"/>" +
 //      "        <a ng-click=\"select(i)\">\n" +
 //      "          <i class=\"glyphicon\" ng-class=\"{'glyphicon-check': i.checked, 'glyphicon-unchecked': !i.checked}\"></i></a>\n" +
       "        <span> {{i.label}}</span>\n" +
       "       </label>" +
       "      </li>\n" +
       "    </ul>\n" +
+      "    </div>" +    
+      "  </div>" +      
       "  </ul>\n" +
       "</div>");
   }]);

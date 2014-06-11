@@ -1,14 +1,14 @@
 div#viewContainer
 	div(ng-controller="CarouselImageCtrl").row
 		div.col-sm-6
-			div.row 
-				div.col-sm-4
-					label Sample type
-				div.col-sm-4{{record.sampleType.name}}
 			div.row
 				div.col-sm-4
 					label Reference number
 				div.col-sm-4{{record.referenceNumber}}
+			div.row 
+				div.col-sm-4
+					label Sample type
+				div.col-sm-4{{record.sampleType.name}}
 			div.row
 				div.col-sm-4
 					label Sample origin
@@ -19,12 +19,12 @@ div#viewContainer
 				div.col-sm-4{{record.sampleDate | date:'dd-MM-yyyy'}}
 			div.row
 				div.col-sm-4
-					label Employee
-				div.col-sm-4{{record.employee}}
+					label Institution
+				div.col-sm-4{{record.owner.name}}
 			div.row
 				div.col-sm-4
-					label Institution
-				div.col-sm-4{{record.owner}}
+					label Employee
+				div.col-sm-4{{record.employee}}
 			div.row
 				div.col-sm-4
 					label Sample location
@@ -33,35 +33,118 @@ div#viewContainer
 				div.col-sm-4
 					label Remarks
 				div.col-sm-8{{record.remarks}}
-			div.row
-				label.col-sm-4.control_label Analysis
-				div.col-sm-4
-					div(ng-switch on="record.ramanAnalysis")
-						div(ng-switch-when="true") Raman
-					div(ng-switch on="record.ftirAnalysis")
-						div(ng-switch-when="true") FTIR
-					div(ng-switch on="record.gcmsChromatagrams")
-						div(ng-switch-when="true") GC-MS Chrom.
-		
 			div(ng-switch on="record.sampleType.id")
+				div(ng-switch-when="fibre")
+					div.row	
+						div.col-sm-4
+							label Fibre type
+						div.col-sm-4
+							span(ng-repeat="item in record.fibreType")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row	
+						div.col-sm-4
+							label Fibre Glue
+						div.col-sm-4
+							span(ng-repeat="item in record.fibreGlue")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row
+						label.col-sm-4.control_label Fibre checkboxes
+						div.col-sm-4
+							div(ng-switch on="record.fibreLigin")
+								div(ng-switch-when="true") Ligin
+							div(ng-switch on="record.fibreAlum")
+								div(ng-switch-when="true") Alum
+							div(ng-switch on="record.fibreFiller")	
+								div(ng-switch-when="true") Filler
+				div(ng-switch-when="material")
+					div.row	
+						div.col-sm-4
+							label Material type
+						div.col-sm-4
+							span(ng-repeat="item in record.materialType")
+								{{item.name}}{{$last ? '' : ', '}}
+				div(ng-switch-when="photograph")
+					div.row	
+						div.col-sm-4
+							label Media type
+						div.col-sm-4{{record.mediaType.name}}
+					div.row	
+						div.col-sm-4
+							label Media film
+						div.col-sm-4{{record.mediaFilm.name}}
+					div.row	
+						div.col-sm-4
+							label Media format
+						div.col-sm-4{{record.mediaFormat.name}}
+					div.row	
+						div.col-sm-4
+							label Media filter
+						div.col-sm-4{{record.mediaFilter.name}}
+					div.row	
+						div.col-sm-4
+							label Media lighting
+						div.col-sm-4
+							span(ng-repeat="item in record.mediaLighting")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row	
+						div.col-sm-4
+							label Media scope
+						div.col-sm-4
+							span(ng-repeat="item in record.mediaScope")
+								{{item.name}}{{$last ? '' : ', '}}
 				div(ng-switch-when="paint")
 					div.row
 						div.col-sm-4
-							label Ground type
-						div.col-sm-4
-							span(ng-repeat="item in record.groundType")
-								{{item.name}}{{$last ? '' : ', '}}
-					div.row
-						div.col-sm-4
 							label Paint layer description
-						div.col-sm-4{{record.paintLayerDescription}}
-				div(ng-switch-when="fibre")
-					div.row
-						div.col-sm-4
-							label Filler
-						div.col-sm-2
-							div(ng-switch on="record.filler")
-								div(ng-switch-when="true") Yes
+						div.col-sm-8{{record.paintLayerDescription}}
+					div(ng-repeat="item in record.paintLayer")
+						div.row
+							div.col-sm-4
+								label {{item.layerType.name}} Layer
+						div.row(ng-show="item.layerType.name == 'Ground'")
+							div.col-sm-4
+								label.sub Ground type
+							div.col-sm-8
+								span(ng-repeat="gt in item.paintGroundType")
+									{{gt.name}}{{$last ? '' : ', '}}
+						div.row
+							div.col-sm-4
+								label.sub Binders
+							div.col-sm-8
+								span(ng-repeat="binder in item.paintBinder")
+									{{binder.name}}{{$last ? '' : ', '}}
+						div.row
+							div.col-sm-4
+								label.sub Colours
+							div.col-sm-8
+								span(ng-repeat="colour in item.colour")
+									{{colour.name}}{{$last ? '' : ', '}}
+						div.row
+							div.col-sm-4
+								label.sub Dyes
+							div.col-sm-8
+								span(ng-repeat="dye in item.dye")
+									{{dye.name}}{{$last ? '' : ', '}}
+						div.row
+							div.col-sm-4
+								label.sub Pigments
+							div.col-sm-8
+								span(ng-repeat="pigment in item.pigment")
+									{{pigment.name}}{{$last ? '' : ', '}}
+			div(ng-repeat="item in record.sampleAnalysis")
+				div.row
+					div.col-sm-4
+						label {{item.sampleAnalysisType.name}} Analysis
+				div.row
+					div.col-sm-4
+						label.sub Description
+					div.col-sm-8
+						{{item.sampleAnalysisDescription}}
+				div.row
+					div.col-sm-4
+						label.sub Results
+					div.col-sm-8
+						{{item.sampleAnalysisResults}}
 		div(style="height: 600px").col-sm-5
 			carousel(interval="myInterval")
 				slide(ng-repeat="slide in slides", active="slide.active")

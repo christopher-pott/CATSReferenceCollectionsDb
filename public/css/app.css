@@ -78,7 +78,7 @@
 catsmultiselect .dropdown-menu{
     padding-left: 5px; 
     padding-right: 5px;
-    min-width: 360px;
+    min-width: 340px;
 }
 
 catsmultiselect .dropdown-menu > li > a {
@@ -86,11 +86,16 @@ catsmultiselect .dropdown-menu > li > a {
     cursor:pointer;
 }
 /*style multiselect like bootstrap*/
-catsmultiselect .btn-group button {
+catsmultiselect .btn-group button.dropdown-toggle{
 /* 	width: 100%; */
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset;
+/* 	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset; */
 	color: #555;
 	white-space: normal;
+	width: 100%;
+	text-align: left;
+}
+catsmultiselect .btn-group {
+	width: 100%;
 }
 catsmultiselect ul {
 	list-style-type: none;
@@ -106,6 +111,10 @@ catsmultiselect .checkbox{
 	min-height: 0px;
 	padding: 0px;
 	margin: 0px;
+}
+
+label.sub {
+	font-weight:normal; !important)
 }
 /* .group{ */
 /* 	border:1px solid; */
