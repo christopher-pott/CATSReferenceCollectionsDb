@@ -169,13 +169,13 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Dimensions
 											div.col-sm-8
-												input(type="text", ng-model="record.dimensions").form-control
+												input(type="text", ng-model="record.stretcherDimensions").form-control
 									div.group.col-sm-6
 										div.form-group 
 											label.col-sm-4.control_label Production date
 											div(ng-controller="DatepickerCntrl").col-sm-8
 												div.input-group
-													input(type="text", datepicker-popup="{{format}}", ng-model="record.productionDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+													input(type="text", datepicker-popup="{{format}}", ng-model="record.stretcherProductionDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 													span.input-group-btn
 														button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 								div.row
@@ -183,19 +183,20 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Source
 											div.col-sm-8
-												input(type="text", ng-model="record.source").form-control
+												input(type="text", ng-model="record.stretcherSource").form-control
 							div(ng-switch-when="pigment")
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Colour Classification
 											div.col-sm-8
-												input(type="text", ng-model="record.pigmentColourClass").form-control
+												catsmultiselect(ng-model="record.pigmentColourClass", options="c.name c.dkname group by c.grp for c in colours",
+													ms-header="Select colours").multi
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Source/Manufacturer
 											div.col-sm-8
-												input(type="text", ng-model="record.pigmentSourcer").form-control
+												input(type="text", ng-model="record.pigmentSource").form-control
 								div.row
 									div.group.col-sm-6
 										div.form-group
@@ -223,14 +224,13 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Name
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.pigmentName", options="c.name c.dkname group by c.grp for c in pigmentNames",
+												catsmultiselect(ng-model="record.pigmentName", options="c.name c.dkname group by c.grp for c in pigments",
 												ms-header="Select name").multi	
 									div.group.col-sm-6
 										div.form-group
-											label.col-sm-4.control_label Other Name
+											label.col-sm-4.control_label Other Names
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.pigmentOtherName", options="c.name c.dkname group by c.grp for c in pigmentNames",
-												ms-header="Select name").multi
+												input(type="text", ng-model="record.pigmentOtherName").form-control
 								div.row
 									div.group.col-sm-6
 										div.form-group
@@ -271,7 +271,7 @@ div#searchContainer
 									tabset
 										tab(ng-repeat="xrayGroup in record.xrayGroup", active="xrayGroup.active")
 											tab-heading
-												| Group {{$index}} 
+												| Parameters {{$index + 1}} 
 												a(ng-click="removeXrayTab($index)", href=''): i.glyphicon.glyphicon-remove
 											div.embeddedTab
 												div.group.col-sm-6
@@ -446,7 +446,7 @@ div#searchContainer
 					td{{res.sample_record.owner.name}}
 					td{{res.sample_record.sampleLocation}}
 					td{{res.sample_record.sampleDate  | date:'dd-MM-yyyy'}}
-					td: button(ng-click="registerClicked()", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td: button(ng-click="registerClicked(res.sample_record)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
 					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 

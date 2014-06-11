@@ -4,7 +4,8 @@ div#viewContainer
 			div.row
 				div.col-sm-4
 					label Reference number
-				div.col-sm-4{{record.referenceNumber}}
+				div.col-sm-4
+					label {{record.referenceNumber}}
 			div.row 
 				div.col-sm-4
 					label Sample type
@@ -47,15 +48,21 @@ div#viewContainer
 						div.col-sm-4
 							span(ng-repeat="item in record.fibreGlue")
 								{{item.name}}{{$last ? '' : ', '}}
-					div.row
-						label.col-sm-4.control_label Fibre checkboxes
+					div(ng-show="record.fibreLigin == true").row
 						div.col-sm-4
-							div(ng-switch on="record.fibreLigin")
-								div(ng-switch-when="true") Ligin
-							div(ng-switch on="record.fibreAlum")
-								div(ng-switch-when="true") Alum
-							div(ng-switch on="record.fibreFiller")	
-								div(ng-switch-when="true") Filler
+							label Ligin
+						div.col-sm-8
+							|Yes
+					div(ng-show="record.fibreAlum == true").row
+						div.col-sm-4
+							label Alum
+						div.col-sm-8
+							|Yes
+					div(ng-show="record.fibreFiller == true").row
+						div.col-sm-4
+							label Filler
+						div.col-sm-8
+							|Yes
 				div(ng-switch-when="material")
 					div.row	
 						div.col-sm-4
@@ -93,9 +100,14 @@ div#viewContainer
 							span(ng-repeat="item in record.mediaScope")
 								{{item.name}}{{$last ? '' : ', '}}
 				div(ng-switch-when="paint")
+					div(ng-show="record.paintPriming == true").row
+						div.col-sm-4
+							label Priming
+						div.col-sm-8
+							|Yes
 					div.row
 						div.col-sm-4
-							label Paint layer description
+							label Paint layers description
 						div.col-sm-8{{record.paintLayerDescription}}
 					div(ng-repeat="item in record.paintLayer")
 						div.row
@@ -131,6 +143,125 @@ div#viewContainer
 							div.col-sm-8
 								span(ng-repeat="pigment in item.pigment")
 									{{pigment.name}}{{$last ? '' : ', '}}
+				div(ng-switch-when="pigment")
+					div.row	
+						div.col-sm-4
+							label Colour Classification
+						div.col-sm-4{{record.pigmentColourClass.name}}
+					div.row	
+						div.col-sm-4
+							label Source
+						div.col-sm-4{{record.pigmentSource}}
+					div.row	
+						div.col-sm-4
+							label Production no./Batch no.
+						div.col-sm-4{{record.pigmentProdNumber}}
+					div.row	
+						div.col-sm-4
+							label Secondary provenance
+						div.col-sm-4{{record.pigmentSecondryProvenance}}
+					div.row	
+						div.col-sm-4
+							label Place of origin
+						div.col-sm-4{{record.pigmentOrigin}}
+					div.row	
+						div.col-sm-4
+							label Chemical composition
+						div.col-sm-4{{record.pigmentComposition}}
+					div.row	
+						div.col-sm-4
+							label Pigment name
+						div.col-sm-4{{record.pigmentName.name}}
+					div.row	
+						div.col-sm-4
+							label Other names
+						div.col-sm-4{{record.pigmentOtherName}}
+					div.row	
+						div.col-sm-4
+							label Form
+						div.col-sm-4{{record.pigmentForm.name}}
+					div.row	
+						div.col-sm-4
+							label Production date
+						div.col-sm-4{{record.productionDate | date:'dd-MM-yyyy'}}
+					div.row	
+						div.col-sm-4
+							label Container
+						div.col-sm-4{{record.pigmentContainer.name}}
+				div(ng-switch-when="stretcher")
+					div.row	
+						div.col-sm-4
+							label Stretcher type
+						div.col-sm-4
+							span(ng-repeat="item in record.stretcherType")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row	
+						div.col-sm-4
+							label Material type
+						div.col-sm-4
+							span(ng-repeat="item in record.stretcherMaterialType")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row	
+						div.col-sm-4
+							label Condition
+						div.col-sm-4{{record.stretcherCondition.name}}
+					div.row	
+						div.col-sm-4
+							label Joint technique
+						div.col-sm-4
+							span(ng-repeat="item in record.stretcherJointTechnique")
+								{{item.name}}{{$last ? '' : ', '}}
+					div.row	
+						div.col-sm-4
+							label Dimensions
+						div.col-sm-4{{record.stretcherDimensions}}
+					div.row	
+						div.col-sm-4
+							label Production date
+						div.col-sm-4{{record.stretcherProductionDate | date:'dd-MM-yyyy'}}
+					div.row	
+						div.col-sm-4
+							label Source
+						div.col-sm-4{{record.stretcherSource}}
+				div(ng-switch-when="xray")
+					div.row	
+						div.col-sm-4
+							label Xray type
+						div.col-sm-4{{record.xrayType.name}}
+					div.row	
+						div.col-sm-4
+							label Xray film type
+						div.col-sm-4{{record.xrayFilmType.name}}
+					div(ng-repeat="item in record.xrayGroup")
+						div.row
+							div.col-sm-4
+								label Xray parameters {{$index + 1}}
+								span(ng-show="item.test == true") 
+									label (test) 
+						div.row	
+							div.col-sm-4
+								label.sub Kv
+							div.col-sm-4{{item.kv}}
+						div.row	
+							div.col-sm-4
+								label.sub mA
+							div.col-sm-4{{item.ma}}
+						div.row	
+							div.col-sm-4
+								label.sub Time
+							div.col-sm-4{{item.time}}
+						div.row	
+							div.col-sm-4
+								label.sub Focus
+							div.col-sm-4{{item.focus}}
+						div.row	
+							div.col-sm-4
+								label.sub Distance
+							div.col-sm-4{{item.distance}}
+						div.row	
+							div.col-sm-4
+								label.sub Filter
+							div.col-sm-4{{item.filter.name}}
 			div(ng-repeat="item in record.sampleAnalysis")
 				div.row
 					div.col-sm-4

@@ -49,8 +49,9 @@ controller('SearchController', function ($scope, catsAPIservice, state, $modal, 
         	}
         }
     );
-	$scope.registerClicked = function() {
+	$scope.registerClicked = function(sample) {
 		state.registerRequested = true;
+		state.sample = sample;
 	};
 }).
 controller('BrowseController', function ($scope) {
@@ -150,6 +151,7 @@ controller('DatepickerCntrl', function ($scope) {
 controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 
 	$scope.lists = {};
+	$scope.lists.record = state.sample;
 
 	$scope.lists.layerTypes = [{id: '1', name: 'Ground', dkname:'', grp:''},
 	  	                      {id: '2', name: 'Imprimatura', dkname:'', grp:''},
@@ -419,6 +421,7 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
         // This is the change handler
         function(newValue, oldValue) {
         	if ( newValue === true ) {
+        		$scope.lists.record = state.sample;
         		$scope.open('lg');
         		state.registerRequested = false;
         	}
@@ -479,6 +482,7 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice)
 	$scope.mediaFilters = lists.mediaFilters;
 	$scope.mediaLightings = lists.mediaLightings;
 	$scope.mediaScopes = lists.mediaScopes;
+	$scope.record = lists.record;
 		
 	/*START tabs for paint layers*/
     var setAllInactive = function() {
