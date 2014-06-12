@@ -2,7 +2,7 @@ div#searchContainer
 	script(ng-controller="RegisterCtrl", type="text/ng-template")#myModalContent
 		form(ng-submit="register()", role="form").form-horizontal
 			div.modal-header
-				h3.modal-title Register a new reference sample
+				h3.modal-title Reference sample registration
 			tabset(justified="true")
 				tab(heading="Metadata")
 					div.modal-body
@@ -403,7 +403,7 @@ div#searchContainer
 				button(type="submit").btn.btn-primary
 					span.glyphicon.glyphicon-save
 						|Save
-				button(ng-click="cancel()").btn.btn-warning 
+				button(type="button", ng-click="cancel()").btn.btn-warning 
 					span.glyphicon.glyphicon-ban-circle 
 						|Cancel
 	div.group.row
@@ -446,9 +446,9 @@ div#searchContainer
 					td{{res.sample_record.owner.name}}
 					td{{res.sample_record.sampleLocation}}
 					td{{res.sample_record.sampleDate  | date:'dd-MM-yyyy'}}
-					td: button(ng-click="registerClicked(res.sample_record)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td: button(ng-click="registerClicked(res.sample_id, res.sample_record)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
-					td: button(popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td: button(ng-click="deleteClicked(res.sample_id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 
 	div.group.row
 		div.col-sm-10

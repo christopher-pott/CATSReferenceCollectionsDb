@@ -49,10 +49,16 @@ controller('SearchController', function ($scope, catsAPIservice, state, $modal, 
         	}
         }
     );
-	$scope.registerClicked = function(sample) {
+	$scope.registerClicked = function(sampleId, sample) {
 		state.registerRequested = true;
 		state.sample = sample;
+		state.sampleId = sampleId;
 	};
+	$scope.deleteClicked = function(sampleId) {
+		catsAPIservice.delete(sampleId).success(function (response) {
+			 $scope.alerts.push({ type: 'success', msg: 'Record deleted' });
+		});
+	};	
 }).
 controller('BrowseController', function ($scope) {
 	// write Ctrl here
@@ -98,7 +104,8 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 				ftirAnalysis: "",
 				gcmsChromatagrams: ""};
 	}else{
-		$scope.record = state.sample;  
+		$scope.record = state.sample;
+		$scope.sampleId = state.sampleId;
 	}
 
 	$scope.register = function() {
@@ -151,7 +158,7 @@ controller('DatepickerCntrl', function ($scope) {
 controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 
 	$scope.lists = {};
-	$scope.lists.record = state.sample;
+//	$scope.lists.record = state.sample;
 
 	$scope.lists.layerTypes = [{id: '1', name: 'Ground', dkname:'', grp:''},
 	  	                      {id: '2', name: 'Imprimatura', dkname:'', grp:''},
@@ -422,6 +429,7 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
         function(newValue, oldValue) {
         	if ( newValue === true ) {
         		$scope.lists.record = state.sample;
+        		$scope.lists.sampleId = state.sampleId;
         		$scope.open('lg');
         		state.registerRequested = false;
         	}
@@ -483,6 +491,7 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice)
 	$scope.mediaLightings = lists.mediaLightings;
 	$scope.mediaScopes = lists.mediaScopes;
 	$scope.record = lists.record;
+	$scope.sampleId = lists.sampleId;
 		
 	/*START tabs for paint layers*/
     var setAllInactive = function() {
@@ -572,14 +581,26 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice)
 		sampleType: $scope.sampleTypes[0]
 	};
 	$scope.register = function () {
-		catsAPIservice.create($scope.record).success(function (response) {
-			alert('Record saved');
-			if ($scope.createAnother === false){
-				$modalInstance.close($scope.selected.sampleType);
-			}
-		//	$scope.alert = { type: 'success', msg: 'Record saved' };
-		//	 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
-		});
+		
+		if($scope.sampleId){
+			catsAPIservice.update($scope.sampleId, $scope.record).success(function (response) {
+				alert('Record updated');
+				if ($scope.createAnother === false){
+					$modalInstance.close($scope.selected.sampleType);
+				}
+			//	$scope.alert = { type: 'success', msg: 'Record saved' };
+			//	 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
+			});
+		}else{
+			catsAPIservice.create($scope.record).success(function (response) {
+				alert('Record saved');
+				if ($scope.createAnother === false){
+					$modalInstance.close($scope.selected.sampleType);
+				}
+			//	$scope.alert = { type: 'success', msg: 'Record saved' };
+			//	 $scope.alerts.push({ type: 'success', msg: 'Record saved' });
+			});
+		}
 	};
 
 	$scope.ok = function () {

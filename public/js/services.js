@@ -21,6 +21,22 @@ serviceMod.factory('catsAPIservice', function($http) {
 					'Content-Type' : 'application/json'
 				}
 			});
+		},
+		update : function(id, sampleData) {
+			return $http({
+				url : 'sample?id=' + id,
+				method : "PUT",
+				data : sampleData,
+				headers : {
+					'Content-Type' : 'application/json'
+				}
+			});
+		},
+		delete : function(id) {
+			return $http({
+				url : 'sample?id=' + id,
+				method : "DELETE"
+			});
 		}
 	};
 });

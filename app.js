@@ -119,6 +119,53 @@ app.post('/sample', function(req, res) {
 	});		
 });
 
+app.put('/sample', function(req, res) {
+	
+	var sampleId = req.query.id;
+	var sample = req.body;
+	
+	console.log("PUT request : update sample (id : " + sampleId + ")");
+	
+	if (sampleId){
+		db.query('UPDATE samples SET sample_record = $2 WHERE sample_id = $1', [sampleId, JSON.stringify(sample)], function(err, result) {
+		    if(err) {
+		      return console.error('error updating sample', err);
+		    }
+		    if(result.rows){
+		    	console.log(result);
+		    	res.send(result);
+		    }
+		});		
+	}
+});
+
+//DELETE will fail with 404 if the browser uses CORS and 
+//sends an OPTIONS request which doesn't get answered
+app.options('/sample', function(req, res){
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'DELETE');
+	res.end();
+});
+
+app.delete('/sample', function(req, res){
+	
+	var sampleId = req.query.id;
+	
+	console.log("DELETE request : delete sample (id : " + sampleId + ")");
+	
+	if (sampleId){
+		db.query('DELETE FROM samples WHERE sample_id = $1', [sampleId], function(err, result) {
+		    if(err) {
+		      return console.error('error deleting sample', err);
+		    }
+		    if(result.rows){
+		    	console.log(result);
+		    	res.send(result);
+		    }
+		});
+	}
+});
+
 //redirect all others to the index (HTML5 history)
 app.get('*', routes.index);
 /**
