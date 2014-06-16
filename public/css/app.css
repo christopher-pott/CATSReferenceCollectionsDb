@@ -75,18 +75,18 @@
 .glyphicon:before{
     font-family:'Glyphicons Halflings';
 }
-catsmultiselect .dropdown-menu{
+catsartistselect .dropdown-menu, catsmultiselect .dropdown-menu{
     padding-left: 5px; 
     padding-right: 5px;
     min-width: 340px;
 }
 
-catsmultiselect .dropdown-menu > li > a {
+catsartistselect .dropdown-menu > li > a, catsmultiselect .dropdown-menu > li > a {
     padding: 3px 10px;
     cursor:pointer;
 }
 /*style multiselect like bootstrap*/
-catsmultiselect .btn-group button.dropdown-toggle{
+catsartistselect .btn-group button.dropdown-toggle, catsmultiselect .btn-group button.dropdown-toggle{
 /* 	width: 100%; */
 /* 	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset; */
 	color: #555;
@@ -94,10 +94,10 @@ catsmultiselect .btn-group button.dropdown-toggle{
 	width: 100%;
 	text-align: left;
 }
-catsmultiselect .btn-group {
+catsartistselect .btn-group, catsmultiselect .btn-group {
 	width: 100%;
 }
-catsmultiselect ul {
+catsartistselect ul, catsmultiselect ul {
 	list-style-type: none;
 	padding: 0;
 }	
@@ -106,7 +106,7 @@ catsmultiselect ul {
 /* 	border-bottom: 1px solid #E5E5E5; */
  	margin-bottom: 10px 
 }
-catsmultiselect .checkbox{
+catsartistselect .checkbox, catsmultiselect .checkbox{
 	display: inline;
 	min-height: 0px;
 	padding: 0px;

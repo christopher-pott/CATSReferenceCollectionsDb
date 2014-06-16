@@ -76,7 +76,7 @@ app.get('/search', function(req, res) {
 		var owner = req.query.owner;
 		var partialterm = req.query.partialterm;
 		if (owner){
-			db.query("SELECT * FROM samples WHERE sample_record->>'owner' = $1", [owner], function(err, result) {
+			db.query("SELECT DISTINCT ON (samples.sample_id) samples.* FROM samples WHERE sample_record->>'owner' = $1", [owner], function(err, result) {
 			    if(err) {
 			      return console.error('error running query', err);
 			    }
@@ -91,7 +91,7 @@ app.get('/search', function(req, res) {
 		else if (partialterm){
 			console.log("partial term request on " + partialterm);
 			var pt = '%' +  partialterm + '%';
-			db.query("SELECT samples.* FROM samples, json_each_text(samples.sample_record) AS data WHERE value LIKE $1", [pt], function(err, result) {
+			db.query("SELECT DISTINCT ON (samples.sample_id) samples.* FROM samples, json_each_text(samples.sample_record) AS data WHERE value LIKE $1", [pt], function(err, result) {
 			    if(err) {
 			      return console.error('error running query', err);
 			    }
