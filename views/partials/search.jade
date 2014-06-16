@@ -486,7 +486,7 @@ div#searchContainer
 					th Delete
 			tbody
 				tr(ng-repeat="res in searchResultsList")
-					td: a(ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
+					td: a(href= "", ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
 					td{{res.sample_record.sampleType.name}}
 					td{{res.sample_record.owner.name}}
 					td{{res.sample_record.sampleLocation}}

@@ -42,7 +42,7 @@
 	color : white;
 	vertical-align : top;
 }
-.titlearea h2 {
+.titlearea h2, .titlearea h3  {
 	margin-left: 20px;
 }
 .titlearea form {
@@ -55,6 +55,11 @@
 }
 .titlearea .login {
 	padding-top: 20px;
+}
+.titlearea .login button{
+	background-color: #212121;
+	color: white;
+	border-color: #212121;
 }
 .titlearea img {
 	margin-right: 20px;
