@@ -64,6 +64,46 @@ app.get('/time', function(req, res) {
 	});
 });
 
+/* Proxy to SMKs collectionspace solr instance as browser rejects
+ * cross origin requests. Response can be chunked, so we pipe
+ * everything back to the client.
+ * */
+app.get('/searchsmk', function(req, res) {
+	//searchsmk?id=KMS1
+	//http://csdev-seb:8180/solr-example/preprod_all_dk/select?q=id%3AKMS8050&wt=json&indent=true
+	var id = req.query.id;	
+	var options = {
+			  host: 'csdev-seb',
+			  port: 8180,
+			  path: '/solr-example/preprod_all_dk/select?q=id_s%3A%22' + id + '%22&wt=json&indent=true',
+			  method: 'GET'	
+			};
+
+	 var proxy = http.request(options, function (resp) {
+	    resp.pipe(res, {
+	      end: true
+	    });
+	  });
+
+	  req.pipe(proxy, {
+	    end: true
+	  });
+		  
+//	http.get(options, function(resp){
+//		var body;
+//		resp.setEncoding('utf8');
+//		resp.on('data', function(chunk){
+//			body += chunk;
+//		})
+//		res.on('end', function () {
+//			console.log(body);
+//			res.send(body);
+//        })		
+//	}).on("error", function(e){
+//		console.log("Got error: " + e.message);
+//	})
+});
+
 /*
  * Some basic searching using sql/json : consider using the proper 
  * text search or solr instead
@@ -165,6 +205,63 @@ app.delete('/sample', function(req, res){
 		});
 	}
 });
+
+app.post('/artwork', function(req, res) {
+	console.log("create artwork request");
+	var artwork = req.body;
+	db.query('INSERT INTO artworks (artwork_id, artwork_record) VALUES (uuid_generate_v4(), $1)', 
+			 [JSON.stringify(artwork)], function(err, result) {
+	    if(err) {
+	      return console.error('error creating artwork', err);
+	    }
+	    if(result.rows){
+	    	console.log(result);
+	    	res.send(result);
+	    }
+	});
+});
+
+app.get('/artwork', function(req, res) {
+	console.log("retrieve artwork request");
+	var artwork = req.body;
+	var artworkInventoryNum = req.query.id;
+	db.query("SELECT DISTINCT ON (artworks.artwork_id) artworks.* FROM artworks WHERE artwork_record->>'inventoryNum' = $1",
+			 [artworkInventoryNum], function(err, result) {	
+	    if(err) {
+	      return console.error('error retrieving artwork', err);
+	    }
+	    if(result.rows){
+	    	console.log(result);
+	    	res.send(result);
+	    }
+	});
+});
+
+//app.post('/sampleartwork', function(req, res) {
+//	console.log("create artwork request");
+//	var sampleartwork = req.body,
+//        sample = sampleartwork.sample,
+//	    artwork = sampleartwork.artwork,
+//        artworkId = req.query.id;	
+//	
+//	id = (id) ? id : 'uuid_generate_v4()';
+//	
+//	
+//	var query =  'BEGIN;' +
+//	             'INSERT INTO artwork (artwork_id, artwork_record) VALUES ($2, $1)'
+//	
+//	
+//	//Check for already existing object number	
+//	db.query('INSERT INTO artwork (artwork_id, artwork_record) VALUES ($2, $1)', [JSON.stringify(artwork), id], function(err, result) {
+//	    if(err) {
+//	      return console.error('error creating artwork', err);
+//	    }
+//	    if(result.rows){
+//	    	console.log(result);
+//	    	res.send(result);
+//	    }
+//	});		
+//});
 
 //redirect all others to the index (HTML5 history)
 app.get('*', routes.index);

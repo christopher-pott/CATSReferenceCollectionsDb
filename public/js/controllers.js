@@ -74,6 +74,10 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 	// Retrieve the sample details from the state service
 	$scope.record = state.sample;
 	$scope.sampleId = state.sampleId;
+	$scope.statusMeta = {
+		    isFirstOpen: true,
+		    isFirstDisabled: false
+		  };
 
 }).
 controller('DatepickerCntrl', function ($scope) {
@@ -98,51 +102,53 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 
 	$scope.lists = {};
 
-	$scope.lists.artworks = 
-		[{id: '1', inventoryNum: 'KMS1', title: 'Fall of the Titans', dimensions: '239 x 307', technique: 'Pen and black ink', productionDate: '1588-1590', productionDateStart: '01-01-1588', productionDateEnd: '31-12-1590', artist: 'Cornelis Cornelisz. van Haarlem', owner: '' },
-		 {id: '2', inventoryNum: 'KKS1', title: 'Louise Marie Neergaard', dimensions: '210 x 172', technique: 'Pen and black ink', productionDate: '23-05-1841', productionDateStart: '23-05-1841', productionDateEnd: '23-05-1841', artist: 'Johan Thomas Lundbye', owner: ''}];
+//	$scope.lists.artworks = 
+//		[{id: '1', inventoryNum: 'KMS1', title: 'Fall of the Titans', dimensions: '239 x 307', technique: 'Oil on canvas', productionDate: '1588-1590', productionDateEarliest: '01-01-1588', productionDateLatest: '31-12-1590', artist: 'Cornelis Cornelisz. van Haarlem', owner: '' },
+//		 {id: '2', inventoryNum: 'KKS1', title: 'Louise Marie Neergaard', dimensions: '210 x 172', technique: 'Pen and black ink', productionDate: '23-05-1841', productionDateEarliest: '23-05-1841', productionDateLatest: '23-05-1841', artist: 'Johan Thomas Lundbye', owner: ''}];
+	
+	$scope.lists.artworks = {};
 	
 	$scope.lists.layerTypes = 
 		[{id: '1', name: 'Ground', dkname:'', grp:''},
 		 {id: '2', name: 'Imprimatura', dkname:'', grp:''},
-		 {id: '3', name: 'Varnish', dkname:'', grp:''},
-		 {id: '4', name: 'Paint', dkname:'', grp:''}];
+		 {id: '3', name: 'Paint', dkname:'', grp:''},
+		 {id: '4', name: 'Varnish', dkname:'', grp:''}];
 
 	$scope.lists.analysisTypes = 
-		[{id: '1', name: 'C14'},
-		 {id: '2', name: 'FTIR'},
-		 {id: '3', name: 'GC-MS'},
-		 {id: '4', name: 'HPLC'},
-		 {id: '5', name: 'IRR'},
-		 {id: '6', name: 'Microscopy'},
-		 {id: '7', name: 'Photographic'},
-		 {id: '8', name: 'Polar. Micro.'},
-		 {id: '9', name: 'Raman'},
-		 {id: '10', name: 'SEM/EDX'},
-		 {id: '11', name: 'Visual'},
-		 {id: '12', name: 'X-radiography'},
-		 {id: '13', name: 'XRF'},
-		 {id: '14', name: 'Other'}];
+		[{id: '1', name: 'Automated thread count'},
+		 {id: '2', name: 'C14'},
+		 {id: '3', name: 'Dendrochronology'},
+		 {id: '4', name: 'FTIR'},
+		 {id: '5', name: 'GC-MS'},
+		 {id: '6', name: 'HPLC'},
+		 {id: '7', name: 'IRR'},
+		 {id: '8', name: 'Microscopy'},
+		 {id: '9', name: 'Other'},
+		 {id: '10', name: 'Photographic'},
+		 {id: '11', name: 'Polar. Micro.'},
+		 {id: '12', name: 'Raman'},
+		 {id: '13', name: 'SEM/EDX'},
+		 {id: '14', name: 'Visual'},
+		 {id: '15', name: 'Weave mapping'},
+		 {id: '16', name: 'Wood identification'},
+		 {id: '17', name: 'X-radiography'},
+		 {id: '18', name: 'XRF'}];
 
-	$scope.lists.fibreTypes = [{id: '1', name: 'Cellulose (wooden)'},
-	                           {id: '2', name: 'Cotton'},
-	                           {id: '3', name: 'Hemp'},
-	                           {id: '4', name: 'Linen'},
-	                           {id: '5', name: 'Synthetic'},
-	                           {id: '6', name: 'Blend'},
-	                           {id: '7', name: 'Other'}];	
+	$scope.lists.fibreTypes = [{id: '1', name: 'blend'},
+	                           {id: '2', name: 'cellulose (wooden)'},
+	                           {id: '3', name: 'cotton'},
+	                           {id: '4', name: 'hemp'},
+	                           {id: '5', name: 'linen'},
+	                           {id: '6', name: 'other'},
+	                           {id: '7', name: 'synthetic'}];	
 
-	$scope.lists.fibreGlueTypes = [{id: '1', name: 'Animal'},
-	                               {id: '2', name: 'Synthetic'},
-	                               {id: '3', name: 'Vegetable'}];	
+	$scope.lists.fibreGlueTypes = [{id: '1', name: 'animal'},
+	                               {id: '2', name: 'synthetic'},
+	                               {id: '3', name: 'vegetable'}];	
 
 	$scope.lists.sampleOwners = [{id: '1', name: 'National Museum of Denmark'},
 	                             {id: '2', name: 'School of Conservation'},
 	                             {id: '3', name: 'Statens Museum for Kunst (SMK)'}];
-
-	$scope.lists.groundTypes = [{id: 'onelayer', name: '1-layer'},
-	                            {id: 'twolayer', name: '2-layer'},
-	                            {id: 'colour', name: 'Colour'}];
 
 	$scope.lists.materialTypes = 
 		[{id: '1', name: 'glass', dkname:'glas', grp:''},
@@ -198,23 +204,24 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		 {id: '2', name: 'walnut', dkname:'valnøddetræ', grp:'Wood'},
 		 {id: '2', name: 'willow', dkname:'piletræ', grp:'Wood'}]; 	
 
-	$scope.lists.paintBinders = [{id: '1', name: 'Casin', dkname: 'kasein', grp:''},
-	                             {id: '2', name: 'Emulsion', dkname: 'emulsion', grp:''},
-	                             {id: '3', name: 'Animal glue', dkname: 'lim animalisk', grp:'Glue'},
-	                             {id: '4', name: 'Vegetable glue', dkname: 'lim vegetabilsk', grp:'Glue'},
-	                             {id: '5', name: 'Linseed oil', dkname: 'linolie', grp:'Oil'},	
-	                             {id: '6', name: 'Poppy oil', dkname: 'valmulie', grp:'Oil'},
-	                             {id: '7', name: 'Walnut oil', dkname: 'valnøddolie', grp:'Oil'},
-	                             {id: '8', name: 'Resin', dkname: 'harpiks', grp:'Oil'},
-	                             {id: '9', name: 'Synthetic', dkname: 'syntetisk', grp:'Oil'}];
+	$scope.lists.paintBinders = [{id: '1', name: 'casin', dkname: 'kasein', grp:''},
+	                             {id: '2', name: 'emulsion', dkname: 'emulsion', grp:''},
+	                             {id: '3', name: 'glue', dkname: 'lim', grp:'Glue'},
+	                             {id: '4', name: 'animal glue', dkname: 'lim animalisk', grp:'Glue'},
+	                             {id: '5', name: 'vegetable glue', dkname: 'lim vegetabilsk', grp:'Glue'},
+	                             {id: '6', name: 'oil', dkname: 'olie', grp:'Oil'},
+	                             {id: '7', name: 'linseed oil', dkname: 'linolie', grp:'Oil'},
+	                             {id: '8', name: 'poppy oil', dkname: 'valmulie', grp:'Oil'},
+	                             {id: '9', name: 'walnut oil', dkname: 'valnøddolie', grp:'Oil'},
+	                             {id: '10', name: 'resin', dkname: 'harpiks', grp:''},
+	                             {id: '11', name: 'synthetic', dkname: 'syntetisk', grp:''}];
 
-	$scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)'},
-	                            {id: 'material', name: 'Material Sample'},
-	                            {id: 'photograph', name: 'Media (photography)'},
-	                            {id: 'paint', name: 'Paint Cross Section'},
-	                            {id: 'pigment', name: 'Pigment'},
-	                            {id: 'stretcher', name: 'Stretcher/Strainer'},
-	                            {id: 'xray', name: 'X-radiography'}];
+	$scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
+	                            {id: 'material', name: 'Material Sample', grp:'Physical samples'},
+	                            {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
+	                            {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
+	                            {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
+	                            {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
 
 	$scope.lists.mediaTypes = [{id: '1', name: 'black-and-white negative film', grp:''},
 	                           {id: '2', name: 'dias', grp:''},
@@ -285,8 +292,9 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		[{id: '1', name: 'bridle joint', dkname: 'slids'},
 		 {id: '2', name: 'mitered bridle joint', dkname: 'slids med gering'},
 		 {id: '3', name: 'lap joint', dkname: 'bladsamling'},
-		 {id: '4', name: 'with reinforcement', dkname: 'med forstærkningsplade'},
-		 {id: '5', name: 'other', dkname: 'anden'}];
+		 {id: '4', name: 'pinned', dkname: 'med dyveler'},
+		 {id: '5', name: 'with reinforcement', dkname: 'med forstærkningsplade'},
+		 {id: '6', name: 'other', dkname: 'anden'}];
 
 	$scope.lists.stretcherMaterialTypes = 
 		[{id: '1', name: 'hardwood', dkname: 'løvtræ'},
@@ -297,7 +305,8 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		 {id: '2', name: 'crystal', dkname: 'krystal'},
 		 {id: '3', name: 'flakes', dkname: 'flager'},
 		 {id: '4', name: 'powder', dkname: 'pulver'},
-		 {id: '5', name: 'stone', dkname: 'sten'}];
+		 {id: '5', name: 'stone', dkname: 'sten'},
+		 {id: '6', name: 'bound to textile', dkname: 'tekstil'}];
 
 	$scope.lists.pigmentContainers = 
 		[{id: '1', name: 'glass container', dkname: 'glasbeholder'},
@@ -324,8 +333,8 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		 {id: '3', name: 'lamp black', dkname:'trækulsort', grp:''},
 		 {id: '4', name: 'lead white', dkname:'blyhvidt', grp:''},
 		 {id: '5', name: 'plaster', dkname:'gips', grp:''},
-		 {id: '6', name: 'red ocher', dkname:'rød okker', grp:'Soil colours'},
-		 {id: '7', name: 'yellow ocher', dkname:'gul okker', grp:'Soil colours'},
+		 {id: '6', name: 'red ocher', dkname:'rød okker', grp:'Earth colours'},
+		 {id: '7', name: 'yellow ocher', dkname:'gul okker', grp:'Earth colours'},
 		 {id: '8', name: 'titanium white', dkname:'titanhvidt', grp:''},
 		 {id: '9', name: 'vine black', dkname:'sodsort', grp:''},
 		 {id: '10', name: 'zinc white', dkname:'zinkhvidt', grp:''}];
@@ -339,7 +348,6 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		 {id: '6', name: 'krap', dkname:'krap', grp:'Organic red'},
 		 {id: '7', name: 'unknown organic red', dkname:'rød organisk - ubestemt', grp:'Organic red'},
 		 {id: '8', name: 'unknown organic yellow', dkname:'gul organisk - ubestemt', grp:'Organic yellow'}];
-
 
 	// open the modal dialog
 	$scope.open = function (size) {
@@ -401,15 +409,14 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 			ramanAnalysis: "",
 			ftirAnalysis: "",
 			gcmsChromatagrams: "",
-			paintLayer:[{id: "1", layerType: "", groundType:"", paintBinder: [], colour: "", pigment: "", dye: "", active: true}],
-			sampleAnalysis:[{id: "1", sampleAnalysisType: "", sampleAnalysisDescription:"", active: true}],
+			paintLayer:[{id: "1", layerType: "", paintBinder: [], colour: "", pigment: "", dye: "", active: true}],
+			sampleAnalysis:[{id: "1", type: "", description:"", referenceNumber:"", date:"", employee:"", owner:"", originLocation:"", location:"", results:"", active: true}],
 			relatedartworks:[{id: "1", refnumber: "",  title: "Title", artist: "", technique: "", dimensions: "", productiondate: "", owner: "", active: true}],
 			xrayGroup:[{id: "1", kv: "", ma:"", time: "", focus: "", distance: "", filter: "", test: false, active: true}]
 		};
 	}
 	$scope.artwork = {};
 	$scope.sampleTypes = lists.sampleTypes;
-	$scope.groundTypes = lists.groundTypes;
 	$scope.colours = lists.colours;
 	$scope.pigments = lists.pigments;
 	$scope.dyes = lists.dyes;		
@@ -447,7 +454,7 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 
 	var addNewLayer = function() {
 		var id = $scope.record.paintLayer.length + 1;
-		$scope.record.paintLayer.push({id: id, layerType: "", groundType:"", paintBinderbinder: [], colour: "", pigment: "", dye: "",  active: true});
+		$scope.record.paintLayer.push({id: id, layerType: "", paintBinderbinder: [], colour: "", pigment: "", dye: "",  active: true});
 	};
 
 	$scope.addLayer = function () {
@@ -525,8 +532,27 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 	$scope.selected = {
 			sampleType: $scope.sampleTypes[0]
 	};
+	$scope.addArtwork = function (artwork) {
+		if(artwork.artwork_id){
+//			catsAPIservice.update($scope.saaaampleId, $scope.record).success(function (response) {
+//				alert('Record updated');
+//				if ($scope.createAnother === false){
+//					$modalInstance.close($scope.selected.sampleType);
+//				}
+//				// $scope.alert = { type: 'success', msg: 'Record saved' };
+//				// $scope.alerts.push({ type: 'success', msg: 'Record saved' });
+//			});
+		}else{
+			catsAPIservice.createArtwork(artwork)
+				.success(function (response) {
+					alert('Artwork saved');
+				})
+				.error(function (err) {
+					alert(err);
+				});
+		}
+	};
 	$scope.register = function () {
-
 		if($scope.sampleId){
 			catsAPIservice.update($scope.sampleId, $scope.record).success(function (response) {
 				alert('Record updated');
@@ -537,7 +563,7 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 				// $scope.alerts.push({ type: 'success', msg: 'Record saved' });
 			});
 		}else{
-			catsAPIservice.create($scope.record).success(function (response) {
+			catsAPIservice.createSample($scope.record).success(function (response) {
 				alert('Record saved');
 				if ($scope.createAnother === false){
 					$modalInstance.close($scope.selected.sampleType);
@@ -548,7 +574,6 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 		}
 		state.searchRequested = true; // Refresh search
 	};
-
 	$scope.ok = function () {
 		$modalInstance.close($scope.selected.sampleType);
 		state.searchRequested = true; // Refresh search

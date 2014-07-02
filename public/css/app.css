@@ -69,6 +69,10 @@
 .embeddedTab {
 	padding: 20px;	
 }
+.paintLayersTab {
+	border: 2px solid #E5E5E5;
+	border-radius: 5px;
+}
 /*removes grey background form carousel*/
 #viewContainer .carousel-control.left, #viewContainer .carousel-control.right{
  background-image: none;
@@ -108,7 +112,8 @@ catsartistselect ul, catsmultiselect ul {
 }	
 /*lines between form elements*/
 .uigroup {
-/* 	border-bottom: 1px solid #E5E5E5; */
+/* 	padding-top: 15px; */
+/*  	border-bottom: 1px solid #E5E5E5;  */
  	margin-bottom: 10px 
 }
 catsartistselect .checkbox, catsmultiselect .checkbox{
@@ -117,9 +122,24 @@ catsartistselect .checkbox, catsmultiselect .checkbox{
 	padding: 0px;
 	margin: 0px;
 }
-
+/*These three are just to remove styling from bootstrap accordion*/
+.panel {
+    background-color: white;
+    border: none;
+    box-shadow: none;
+}
+.panel-default > 	.panel-heading {
+    background-color: white;
+    border-color: #DDD;
+    padding: 0px;
+}
+.panel-group .panel-heading + .panel-collapse .panel-body {
+    border-top: 0px;
+}
+/*to indent sub labels*/
 label.sub {
-	font-weight:normal; !important)
+	padding-left: 20px;
+	font-weight:normal; !important
 }
 /* .group{ */
 /* 	border:1px solid; */

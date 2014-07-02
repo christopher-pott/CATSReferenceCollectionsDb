@@ -3,6 +3,7 @@ angular.module('ui.catsartistselect', [
 ])
 
   //from bootstrap-ui typeahead parser
+  //define 'parse' service
   .factory('catsoptionParser', ['$parse', function ($parse) {
     //  ^        start of line
 	//  \s*     zero or more whitespace
@@ -40,10 +41,22 @@ angular.module('ui.catsartistselect', [
     	}
     };
   }])
+  .factory('apiService', ['$http', function ($http) {
+ 
+    return {
+		getCorpusArtworkById : function(id) {
+ 			var url = "searchsmk?id=" + id;
+    		return $http.get(url);
+        },
+        getCatsArtworkById : function(id) {
+			var url = "artwork?id=" + id;
+			return $http.get(url);
+		}
+    };
+  }])
+  .directive('catsartistselect', ['$http', '$parse', '$document', '$compile', '$interpolate', 'catsoptionParser', 'apiService',
 
-  .directive('catsartistselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser',
-
-    function ($parse, $document, $compile, $interpolate, catsoptionParser) {
+    function ($http, $parse, $document, $compile, $interpolate, catsoptionParser, apiService) {
       return {
         restrict: 'E',
         require: 'ngModel',
@@ -53,7 +66,7 @@ angular.module('ui.catsartistselect', [
             parsedResult = catsoptionParser.parse(exp),
             isMultiple = attrs.multiple ? true : false,
             required = false,
-            scope = originalScope.$new(),
+            scope = originalScope.$new(), /*creates a child scope*/
             changeHandler = attrs.change || angular.noop;
 
           scope.items = [];
@@ -61,6 +74,7 @@ angular.module('ui.catsartistselect', [
           scope.header = 'Select';
           scope.multiple = isMultiple;
           scope.disabled = false;
+          scope.loading = false;
 
           originalScope.$on('$destroy', function () {
             scope.$destroy();
@@ -93,12 +107,13 @@ angular.module('ui.catsartistselect', [
           //watch option changes for options that are populated dynamically
           //disabled by CPO
           scope.$watch(function () {
+        	 /* pass the context (originalScope) to the getter we defined earlier*/
             return parsedResult.source(originalScope);
           }, function (newVal) {
             if (angular.isDefined(newVal))
               parseModel();
           }, true);
-
+          
           //watch model change
           scope.$watch(function () {
             return modelCtrl.$modelValue;
@@ -126,7 +141,7 @@ angular.module('ui.catsartistselect', [
             	var grpName = parsedResult.groupMapper(local);
             	
             	if (!grpName){ 
-            		grpName = ''; //create an empty group for orphans
+            		grpName = 'Results from CATS'; //create an empty group for orphans
             		local[parsedResult.itemName][parsedResult.grpName] = grpName;
             	}
             	
@@ -288,9 +303,78 @@ angular.module('ui.catsartistselect', [
             } else {
               selectMultiple(item);
             }
-          }
-        }
-      };
+          };
+          
+          scope.searchSmk = function (id) {
+   			scope.loading = true; /*show spinner*/
+   			apiService.getCorpusArtworkById(id)
+	    		.success(function (resp) {
+	   	 			scope.loading = false; /*hide spinner*/
+	     			var artwork = {};
+	    			var solrResp = resp.response;
+	    			if (solrResp.numFound === 1){ /*there can be only one*/
+		    			var doc = solrResp.docs[0];
+		    			artwork.corpusId = doc.csid;
+		    			artwork.inventoryNum = doc.id;
+		    			artwork.title = doc.title_first;
+		    			artwork.productionDateEarliest = (doc.object_production_date_earliest) ? doc.object_production_date_earliest : "";
+		    			artwork.productionDateLatest = (doc.object_production_date_latest) ? doc.object_production_date_latest : "";
+		    			for(i=0, artwork.artist = "";i<doc.artist_name.length;i++){
+		    				artwork.artist += doc.artist_name[i];
+		    				artwork.artist += (doc.artist_name.length-1 > i) ?  ", " : "";
+	    			    }
+		    			if(doc.heigth && doc.width && doc.widthunit){
+		    				artwork.dimensions = doc.heigth + " x " + doc.width + " " + doc.widthunit;
+		    			}
+		    			if(doc.prod_technique_en){
+		    				artwork.technique = doc.prod_technique_en;
+		    				if(doc.prod_technique_dk){
+		    					artwork.technique += " (" + doc.prod_technique_dk + ")";
+		    				}
+		    			}
+		    			artwork.owner = ""; /*not available yet from solr*/
+	    			}else if (solrResp.numFound === 0){
+	    				/*not found, message*/
+	    			}else{
+	    				/*more than one shouldn't happen*/
+	    			}
+	   				if (artwork && artwork.inventoryNum){
+	   		        	scope.groups[scope.groups.length] = 
+	   		        	{name:"Results from Corpus", 
+	   	                 items:[{label:artwork.inventoryNum + " " + artwork.title,
+	   	                         model:artwork}]
+	   					 };
+	   	            }
+	    		})
+	    		.error(function (response) {
+	              //  parseModel();
+	    	    })
+   		  };
+   			
+          scope.searchCats = function (id) {
+        	scope.toggleSelect();
+   			scope.loading = true; /*show spinner*/
+   			apiService.getCatsArtworkById(id)
+	    		.success(function (resp) {
+	   	 			scope.loading = false; /*hide spinner*/
+	     			var artwork = resp;
+	   				if (artwork){
+	   					scope.groups = [{name:  "Results from CATS", items:[]}];
+	   					for(i=0;i < artwork.rowCount;i++){
+	   						var record = artwork.rows[i].artwork_record;
+	   						scope.groups[0].items[i] = {label:record.inventoryNum + " " +  record.title, 
+	   								                    model:record
+	   						}
+	   					}
+	   	            }
+	    		})
+	    		.error(function (response) {
+	   	 			scope.loading = false; /*hide spinner*/
+	              //  parseModel();
+	    	    })
+       	   };
+         }
+      }
     }])
 
   .directive('catsartistselectPopup', ['$document', function ($document) {
@@ -320,6 +404,9 @@ angular.module('ui.catsartistselect', [
           element.removeClass('open');
           $document.unbind('click', clickHandler);
           scope.$apply();
+          
+//        call a service to check if this exact id number matches database
+//        this is the wrong place: the event is the button
         }
 
         scope.focus = function focus(){
@@ -344,10 +431,11 @@ angular.module('catsartistselect.tpl.html', [])
 
       "<div class=\"btn-group\">\n" +
       "  <div class=\"input-group\">" + 
-      "  <input class=\"searchInput form-control\" type=\"text\">\n" +
+      "  <input class=\"searchInput form-control\" ng-model=\"searchText.$\" type=\"text\" placeholder=\"Inventory number\">\n" +
       "  <span class=\"input-group-btn\">" +
 //      "    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
-      "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
+//      "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
+    "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"searchCats(searchText.$)\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
       "      <i class=\"glyphicon glyphicon-search\"></i>\n" +
 //      "      {{header}} \n" +
 //      "    {{header}} <span class=\"caret\"></span>\n" +
@@ -365,11 +453,13 @@ angular.module('catsartistselect.tpl.html', [])
 //      "    </div>" +      
       "  </div>" +
       "  <div class=\"row uigroup\">" + 
-      "    <div class=\"col col-sm-8\">\n" +
-      "      <input class=\"form-control\" type=\"text\" ng-model=\"searchText.$\" autofocus=\"autofocus\" placeholder=\"Filter\" />\n" +
-      "    </div>" +      
-      "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
-      "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-plus\"></i> New </button>\n" +
+//      "    <div class=\"col col-sm-8\">\n" +
+//      "      <input class=\"form-control\" type=\"text\" ng-model=\"searchText.$\" autofocus=\"autofocus\" placeholder=\"Filter\" />\n" +
+//      "    </div>" +      
+      "    <div class=\"col col-sm-12\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
+      "       Artwork {{searchText.$}} not found.\n" +
+      "       <button class=\"btn btn-default\" ng-click=\"searchSmk(searchText.$)\" type=\"button\"><i class=\"glyphicon glyphicon-search\"></i> Search SMK </button>\n" +
+      "       <div class=\"spinner\" ng-show=\"loading\">...loading...</div>" +
       "    </div>" +
       "  </div>" +
       "  <div class=\"row uigroup\">" + 

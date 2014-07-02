@@ -1,54 +1,59 @@
 div#searchContainer
 	script(ng-controller="RegisterCtrl", type="text/ng-template")#myModalContent
-		form(ng-submit="register()", role="form").form-horizontal
+		form(role="form").form-horizontal
 			div.modal-header
-				h3.modal-title Reference sample registration
+				h3.modal-title Reference collection registration
 			tabset(justified="true")
-				tab(heading="Metadata")
+				tab(heading="Sample metadata")
 					div.modal-body
 						div.row.uigroup
 							div.group.col-sm-6
 								div.form-group
-									label.col-sm-4.control_label Sample type
+									label.col-sm-4.control_label Collection type
 									div.col-sm-8
 										catsmultiselect(ng-model="record.sampleType", options="c.name c.dkname group by c.grp for c in sampleTypes",
-											ms-header="Select sample type")
+											ms-header="Select collection type")
 								div.form-group 
-									label.col-sm-4.control_label Ref. number
+									label.col-sm-4.control_label Sample Ref. number
 									div.col-sm-8
-										input(type="text", ng-model="record.referenceNumber", required).form-control
+										input(type="text", ng-model="record.referenceNumber", required, ng-readonly="record.sampleType.id == 'noninvasive'").form-control
 								div.form-group 
-									label.col-sm-4.control_label Sample origin
+									label.col-sm-4.control_label Sample location in artwork
 									div.col-sm-8
-										input(type="text", ng-model="record.originLocation").form-control
+										input(type="text", ng-model="record.originLocation", ng-readonly="record.sampleType.id == 'noninvasive'").form-control
 								div.form-group 
-									label.col-sm-4.control_label Sample date
+									label.col-sm-4.control_label Sample creation date
 									div(ng-controller="DatepickerCntrl").col-sm-8
 										div.input-group
-											input(type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+											input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 											span.input-group-btn
-												button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+												button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
 								div.form-group 
 									label.col-sm-4.control_label Employee
 									div.col-sm-8
-										input(type="text", ng-model="record.employee").form-control
+										input(type="text", ng-model="record.employee", ng-readonly="record.sampleType.id == 'noninvasive'").form-control
 							div.group.col-sm-6
 								div.form-group 
 									label.col-sm-4.control_label Institution
 									div.col-sm-8
 										catsmultiselect(ng-model="record.owner", options="c.name c.dkname group by c.grp for c in sampleOwners",
-											ms-header="Select sample owner")
+											ms-header="Select item owner", disabled="record.sampleType.id == 'noninvasive'")
 								div.form-group 
-									label.col-sm-4.control_label Sample location
+									label.col-sm-4.control_label Sample storage location
 									div.col-sm-8
-										input(type="text", ng-model="record.sampleLocation").form-control
+										input(type="text", ng-model="record.sampleLocation", ng-readonly="record.sampleType.id == 'noninvasive'").form-control
 								div.form-group 
 									label.col-sm-4.control_label Remarks
 									div.col-sm-8
 										textarea(rows="3", ng-model="record.remarks").form-control
+						div.row.uigroup
+							div.group.col-sm-12(ng-show="record.sampleType.name && record.sampleType.id != 'noninvasive'")
+									div.form-group 
+										div.col-sm-8
+											h4 {{record.sampleType.name}} metadata
 						div(ng-switch on="record.sampleType.id")
 							div(ng-switch-when="paint")
-								div.row.uigroup
+								div.row.uigroup.paintLayersTab
 									tabset
 										tab(ng-repeat="paintLayer in record.paintLayer", active="paintLayer.active")
 											tab-heading
@@ -66,11 +71,6 @@ div#searchContainer
 														div.col-sm-8.control_label.multi
 															catsmultiselect(multiple="true", ng-model="paintLayer.paintBinder", options="c.name c.dkname group by c.grp for c in paintBinders",
 															ms-header="Select binders").multi
-													div(ng-show="paintLayer.layerType.name == 'Ground'").form-group
-														label.col-sm-4.control_label Ground type
-														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="paintLayer.paintGroundType", options="c.name c.dkname group by c.grp for c in groundTypes",
-															ms-header="Select ground type").multi
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Colours
@@ -90,6 +90,7 @@ div#searchContainer
 										tab(select="addLayer()")
 											tab-heading
 												i.glyphicon.glyphicon-plus
+								br
 								div.row
 									div.group.col-sm-12
 										div.form-group 
@@ -123,8 +124,8 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label 
 											div.col-sm-8
-												label.checkbox-inline.control_label Ligin
-													input(type="checkbox", ng-model="record.fibreLigin")
+												label.checkbox-inline.control_label Lignin
+													input(type="checkbox", ng-model="record.fibreLignin")
 												label.checkbox-inline.control_label Alum
 													input(type="checkbox", ng-model="record.fibreAlum")
 												label.checkbox-inline.control_label Filler
@@ -171,19 +172,28 @@ div#searchContainer
 											div.col-sm-8
 												input(type="text", ng-model="record.stretcherDimensions").form-control
 									div.group.col-sm-6
-										div.form-group 
-											label.col-sm-4.control_label Production date
-											div(ng-controller="DatepickerCntrl").col-sm-8
-												div.input-group
-													input(type="text", datepicker-popup="{{format}}", ng-model="record.stretcherProductionDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
-													span.input-group-btn
-														button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-								div.row
-									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Source
 											div.col-sm-8
 												input(type="text", ng-model="record.stretcherSource").form-control
+								div.row
+									div.group.col-sm-6
+										div.form-group 
+											label.col-sm-4.control_label Production date earliest/single
+											div(ng-controller="DatepickerCntrl").col-sm-8
+												div.input-group
+													input(type="text", datepicker-popup="{{format}}", ng-model="record.stretcherProductionDateEarliest", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+													span.input-group-btn
+														button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+									div.group.col-sm-6
+										div.form-group 
+											label.col-sm-4.control_label Production date latest
+											div(ng-controller="DatepickerCntrl").col-sm-8
+												div.input-group
+													input(type="text", datepicker-popup="{{format}}", ng-model="record.stretcherProductionDateLatest", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+													span.input-group-btn
+														button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+
 							div(ng-switch-when="pigment")
 								div.row
 									div.group.col-sm-6
@@ -364,22 +374,159 @@ div#searchContainer
 									div.row
 										div.group.col-sm-6
 											div.form-group
-												label.col-sm-4.control_label Analysis Method
+												label.col-sm-4.control_label Analysis Type
 												div.col-sm-8.control_label.multi
-													catsmultiselect(ng-model="sampleAnalysis.sampleAnalysisType", options="c.name for c in analysisTypes",
-													ms-header="Select analysis method").multi
+													catsmultiselect(ng-model="sampleAnalysis.type", options="c.name for c in analysisTypes",
+													ms-header="Select analysis type").multi
+									div.row
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Ref. number
+												div.col-sm-8
+													input(type="text", ng-model="sampleAnalysis.referenceNumber", required).form-control
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Date
+												div(ng-controller="DatepickerCntrl").col-sm-8
+													div.input-group
+														input(type="text", datepicker-popup="{{format}}", ng-model="sampleAnalysis.date", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+														span.input-group-btn
+															button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Employee
+												div.col-sm-8
+													input(type="text", ng-model="sampleAnalysis.employee").form-control
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Institution
+												div.col-sm-8
+													catsmultiselect(ng-model="sampleAnalysis.owner", options="c.name c.dkname group by c.grp for c in sampleOwners",
+														ms-header="Select item owner")
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Location in artwork
+												div.col-sm-8
+													input(type="text", ng-model="sampleAnalysis.originLocation").form-control
+										div.group.col-sm-6
+											div.form-group 
+												label.col-sm-4.control_label Report location
+												div.col-sm-8
+													input(type="text", ng-model="sampleAnalysis.location").form-control
 									div.row
 										div.group.col-sm-12
 											div.form-group 
-												label.col-sm-2.control_label Description
+												label.col-sm-2.control_label Method/Description
 												div.col-sm-10
-													textarea(rows="7", ng-model="sampleAnalysis.sampleAnalysisDescription").form-control
+													textarea(rows="5", ng-model="sampleAnalysis.description").form-control
 									div.row
 										div.group.col-sm-12
 											div.form-group 
 												label.col-sm-2.control_label Results
 												div.col-sm-10
-													textarea(rows="5", ng-model="sampleAnalysis.sampleAnalysisResults").form-control
+													textarea(rows="3", ng-model="sampleAnalysis.results").form-control
+									div(ng-switch on="sampleAnalysis.type.name")
+										div(ng-switch-when="X-radiography")
+											div.row.uigroup
+												div.group.col-sm-12
+													div.form-group 
+														div.col-sm-8
+															h4 {{sampleAnalysis.type.name}} metadata
+											div.row
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Type
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.xrayType", options="c.name c.dkname group by c.grp for c in xrayTypes",
+															ms-header="Select type").multi	
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Film Type
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.xrayFilmType", options="c.name c.dkname group by c.grp for c in xrayFilmTypes",
+															ms-header="Select film type").multi	
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Kv
+														div.col-sm-8
+															input(type="text", ng-model="sampleAnalysis.xrayKv").form-control
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Time
+														div.col-sm-8
+															input(type="text", ng-model="sampleAnalysis.xrayTime").form-control
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label mA
+														div.col-sm-8
+															input(type="text", ng-model="sampleAnalysis.xrayMa").form-control
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Focus
+														div.col-sm-8
+															input(type="text", ng-model="sampleAnalysis.xrayFocus").form-control
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Distance
+														div.col-sm-8
+															input(type="text", ng-model="sampleAnalysis.xrayDistance").form-control
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Filter
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.xrayFilter", options="c.name c.dkname group by c.grp for c in xrayFilters",
+															ms-header="Select filter").multi
+												div.group.col-sm-6
+													div.form-group 
+														label.col-sm-4.control_label 
+														div.col-sm-8
+															label.checkbox-inline.control_label Test
+																input(type="checkbox", ng-model="sampleAnalysis.xrayTest")
+										div(ng-switch-when="Photographic")
+											div.row.uigroup
+												div.group.col-sm-12
+													div.form-group 
+														div.col-sm-8
+															h4 {{sampleAnalysis.type.name}} metadata
+											div.row
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Type
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.mediaType", options="c.name c.dkname group by c.grp for c in mediaTypes",
+															ms-header="Select type").multi	
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Film
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.mediaFilm", options="c.name c.dkname group by c.grp for c in mediaFilms",
+															ms-header="Select film type").multi	
+											div.row
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Format
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.mediaFormat", options="c.name c.dkname group by c.grp for c in mediaFormats",
+															ms-header="Select format").multi	
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Filter
+														div.col-sm-8.control_label.multi
+															catsmultiselect(ng-model="sampleAnalysis.mediaFilter", options="c.name c.dkname group by c.grp for c in mediaFilters",
+															ms-header="Select filter").multi													
+											div.row
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Lighting
+														div.col-sm-8.control_label.multi
+															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaLighting", options="c.name c.dkname group by c.grp for c in mediaLightings",
+															ms-header="Select lighting").multi	
+												div.group.col-sm-6
+													div.form-group
+														label.col-sm-4.control_label Scope
+														div.col-sm-8.control_label.multi
+															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaScope", options="c.name c.dkname group by c.grp for c in mediaScopes",
+															ms-header="Select scope").multi
 							tab(select="addAnalysis()")
 								tab-heading
 									i.glyphicon.glyphicon-plus
@@ -390,51 +537,51 @@ div#searchContainer
 						div.row.uigroup
 							div.group.col-sm-12
 								div.form-group
-									div.col-sm-2
+									label.col-sm-2.control_label Inventory Num.
 									div.col-sm-4
 										catsartistselect(ng-model="artwork", options="c for c in artworks")
+									div.group.col-sm-2
+										button(type="button").btn.btn-default 
+											span.glyphicon.glyphicon-remove 
+												|Remove
+									div.group.col-sm-4
+										button(type="button", ng-click="addArtwork(artwork)").btn.btn-default 
+											span.glyphicon.glyphicon-plus 
+												|Add artwork
 						div.row.uigroup
-							div.group.col-sm-6
-								div.form-group
-									label.col-sm-4.control_label Id. Number
-									div.col-sm-8.control_label.multi
-										input(type="text", ng-model="artwork.id", ng-readonly="true").form-control
-							div.group.col-sm-6
-								button(type="button").btn.btn-default 
-									span.glyphicon.glyphicon-remove 
-										|Remove
-							div.group.col-sm-12	
-								div.form-group
-										label.col-sm-2.control_label Artist
-										div.col-sm-10
-											input(type="text", ng-model="artwork.artist").form-control
 							div.group.col-sm-12	
 								div.form-group 
 									label.col-sm-2.control_label Title
 									div.col-sm-10
 										input(type="text", ng-model="artwork.title").form-control
+							div.group.col-sm-12	
+								div.form-group
+										label.col-sm-2.control_label Artist
+										div.col-sm-10
+											input(type="text", ng-model="artwork.artist").form-control
+							div.group.col-sm-12
+								div.form-group
+									label.col-sm-2.control_label Technique/materials
+									div.col-sm-10
+										input(type="text", ng-model="artwork.technique").form-control
 							div.group.col-sm-6
 								div.form-group 
-									label.col-sm-4.control_label Production date start
+									label.col-sm-4.control_label Production date earliest/single
 									div(ng-controller="DatepickerCntrl").col-sm-8
 										div.input-group
-											input(type="text", datepicker-popup="{{format}}", ng-model="artwork.productionDateStart", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+											input(type="text", datepicker-popup="{{format}}", ng-model="artwork.productionDateEarliest", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 											span.input-group-btn
 												button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar							
 								div.form-group 
 									label.col-sm-4.control_label Dimensions
 									div.col-sm-8
 										input(type="text", ng-model="artwork.dimensions").form-control
-								div.form-group
-									label.col-sm-4.control_label Technique/materials
-									div.col-sm-8
-										input(type="text", ng-model="artwork.technique").form-control
 							div.group.col-sm-6
 								div.form-group 
-									label.col-sm-4.control_label Production date end
+									label.col-sm-4.control_label Production date latest
 									div(ng-controller="DatepickerCntrl").col-sm-8
 										div.input-group
-											input(type="text", datepicker-popup="{{format}}", ng-model="artwork.productionDateEnd", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+											input(type="text", datepicker-popup="{{format}}", ng-model="artwork.productionDateLatest", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 											span.input-group-btn
 												button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 								div.form-group 
@@ -445,7 +592,7 @@ div#searchContainer
 				p
 				label.col-sm-2.checkbox-inline.control_label Create another
 					input(type="checkbox", ng-model="createAnother")
-				button(type="submit").btn.btn-primary
+				button(type="button", ng-click="register()").btn.btn-primary
 					span.glyphicon.glyphicon-save
 						|Save
 				button(type="button", ng-click="cancel()").btn.btn-warning 
@@ -487,7 +634,7 @@ div#searchContainer
 			tbody
 				tr(ng-repeat="res in searchResultsList")
 					td: a(href= "", ng-click="viewSample(res.sample_record)") {{res.sample_record.referenceNumber}}
-					td{{res.sample_record.sampleType.name}}
+					td: a(href= "", ng-click="viewSample(res.sample_record)") {{res.sample_record.sampleType.name}}
 					td{{res.sample_record.owner.name}}
 					td{{res.sample_record.sampleLocation}}
 					td{{res.sample_record.sampleDate  | date:'dd/MM/yyyy'}}

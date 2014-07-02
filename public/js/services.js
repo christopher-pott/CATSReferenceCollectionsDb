@@ -2,8 +2,6 @@
 
 /* Services */
 
-// Demonstrate how to register services
-// In this case it is a simple value service.
 var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 
 serviceMod.factory('catsAPIservice', function($http) {
@@ -12,7 +10,7 @@ serviceMod.factory('catsAPIservice', function($http) {
 			var url = "search?type=sample&partialterm=" + term;
 			return $http.get(url);
 		},
-		create : function(postData) {
+		createSample : function(postData) {
 			return $http({
 				url : 'sample',
 				method : "POST",
@@ -37,6 +35,20 @@ serviceMod.factory('catsAPIservice', function($http) {
 				url : 'sample?id=' + id,
 				method : "DELETE"
 			});
+		},
+		createArtwork : function(postData) {
+			return $http({
+				url : 'artwork',
+				method : "POST",
+				data : postData,
+				headers : {
+					'Content-Type' : 'application/json'
+				}
+			});
+		},
+		readArtwork : function(id) {
+			var url = "artwork?id=" + id;
+			return $http.get(url);
 		}
 	};
 });
