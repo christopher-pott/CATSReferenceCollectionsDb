@@ -539,11 +539,11 @@ div#searchContainer
 								div.form-group
 									label.col-sm-2.control_label Inventory Num.
 									div.col-sm-4
-										catsartistselect(ng-model="artwork", options="c for c in artworks")
+										catsartistselect(ng-model="artwork")
 									div.group.col-sm-2
 										button(type="button").btn.btn-default 
 											span.glyphicon.glyphicon-remove 
-												|Remove
+												|Clear
 									div.group.col-sm-4
 										button(type="button", ng-click="addArtwork(artwork)").btn.btn-default 
 											span.glyphicon.glyphicon-plus 
