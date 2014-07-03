@@ -28,6 +28,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                scope.groups = [];
                scope.disabled = false;
                scope.loading = false;
+               scope.showSMKSearch = false;
 
                originalScope.$on('$destroy', function () {
                    scope.$destroy();
@@ -49,7 +50,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                }, function (newVal) {
                    scope.disabled = newVal;
                });
-
+               
                element.append($compile(popUpEl)(scope));
 
                function is_empty(obj) {
@@ -169,6 +170,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                            }
                            if(artwork.rowCount === 0){
                                scope.resultText = "No records found";
+                               scope.showSMKSearch = true;
                            }else{
                                scope.resultText = "";
                            }
@@ -192,6 +194,11 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                    $timeout(function() {getCats(id)}, 1000);
 
                };
+
+               scope.change = function () {
+                   scope.closeSelect();
+                   scope.showSMKSearch = false;
+               }
            }
        }
    }])
@@ -214,6 +221,13 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                        element.addClass('open');
                        $document.bind('click', clickHandler);
                        scope.focus();
+                   }
+               };
+               
+               scope.closeSelect = function () {
+                   if (element.hasClass('open')) {
+                       element.removeClass('open');
+                       $document.unbind('click', clickHandler);
                    }
                };
 
@@ -247,11 +261,9 @@ angular.module('catsartistselect.tpl.html', [])
 
             "<div class=\"btn-group\">\n" +
             "  <div class=\"input-group\">" + 
-            "  <input class=\"searchInput form-control\" ng-model=\"searchText.$\" type=\"text\" placeholder=\"Inventory number\">\n" +
+            "  <input class=\"searchInput form-control\" ng-change=\"change()\" ng-model=\"searchText\" type=\"text\" placeholder=\"Inventory number\">\n" +
             "  <span class=\"input-group-btn\">" +
-//          "    <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
-//          "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
-            "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"searchCats(searchText.$)\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
+            "    <button type=\"button\" class=\"btn btn-default\" ng-click=\"searchCats(searchText)\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
             "      <i class=\"glyphicon glyphicon-search\"></i>\n" +
             "    </button>\n" +
             "  </span>" +
@@ -294,7 +306,7 @@ angular.module('catsartistselect.tpl.html', [])
             "    <div class=\"col col-sm-12\">\n" +
             "      <div class=\"modal-footer\">" +
             "         <img class=\"spinner\" ng-show=\"loading\" src=\"images/ajax-loader.gif \"></img>" +
-            "         <button class=\"btn btn-primary\" ng-click=\"searchSmk(searchText.$)\" type=\"button\"><i class=\"glyphicon glyphicon-search\"></i> Search SMK </button>\n" +
+            "         <button class=\"btn btn-primary\" ng-show=\"showSMKSearch\" ng-click=\"searchSmk(searchText)\" type=\"button\"><i class=\"glyphicon glyphicon-search\"></i> Search SMK </button>\n" +
             "         <button class=\"btn btn-warning\" ng-click=\"cancel()\" type=\"button\"><i class=\"glyphicon glyphicon-ban-circle\"></i> Cancel </button>\n" +
             "      </div>" + 
             "   </div>" +
