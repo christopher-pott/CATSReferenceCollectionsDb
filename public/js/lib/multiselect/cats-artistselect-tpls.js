@@ -94,6 +94,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                    apiService.getCorpusArtworkById(id)
                    .success(function (resp) {
                        scope.loading = false; /*hide spinner*/
+                       scope.resultText = "";
                        var artwork = {};
                        var solrResp = resp.response;
                        if (solrResp.numFound === 1){ /*there can be only one*/

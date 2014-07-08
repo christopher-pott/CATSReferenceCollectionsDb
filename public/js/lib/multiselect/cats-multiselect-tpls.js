@@ -197,7 +197,8 @@ angular.module('ui.catsmultiselect', [
           scope.valid = function validModel() {
             if(!required) return true;
             var value = modelCtrl.$modelValue;
-            return (angular.isArray(value) && value.length > 0) || (!angular.isArray(value) && value != null);
+            return (angular.isArray(value) && value.length > 0) || (!angular.isArray(value) 
+                    && value != null && value != "");
           };
 
           function selectSingle(item) {
@@ -343,9 +344,10 @@ angular.module('catsmultiselect.tpl.html', [])
     $templateCache.put('catsmultiselect.tpl.html',
 
       "<div class=\"btn-group\">\n" +
-      "  <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'error': !valid()}\">\n" +
+      "  <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'has-error': !valid()}\" \n" +
+      "     popover=\"This field is required\", popover-placement=\"right\", popover-trigger=\"mouseenter\">\n" +
       "    {{header}} \n" +
-//      "    {{header}} <span class=\"caret\"></span>\n" +
+//      "    {{header}} <span class=\"caret\"></span>\n" +  
       "  </button>\n" +
       "  <ul class=\"dropdown-menu\">\n" +
       "  <div class=\"row uigroup\">" +

@@ -1,22 +1,22 @@
 div#searchContainer
 	script(ng-controller="RegisterCtrl", type="text/ng-template")#myModalContent
-		form(role="form").form-horizontal
+		form(role="form", name="form", novalidate, ng-class="{submitted:submitted}").form-horizontal
 			div.modal-header
 				h3.modal-title Reference collection registration
 			tabset(justified="true")
-				tab(heading="Sample metadata")
+				tab(heading="Sample metadata", active="mainTabs.tabOneState")
 					div.modal-body
 						div.row.uigroup
 							div.group.col-sm-6
 								div.form-group
 									label.col-sm-4.control_label Collection type
 									div.col-sm-8
-										catsmultiselect(ng-model="record.sampleType", options="c.name c.dkname group by c.grp for c in sampleTypes",
+										catsmultiselect(ng-model="record.sampleType", required, options="c.name c.dkname group by c.grp for c in sampleTypes",
 											ms-header="Select collection type")
 								div.form-group 
 									label.col-sm-4.control_label Sample Ref. number
 									div.col-sm-8
-										input(type="text", ng-model="record.referenceNumber", required, ng-readonly="record.sampleType.id == 'noninvasive'").form-control
+										input(type="text", ng-model="record.referenceNumber", ng-required="record.sampleType.id !== 'noninvasive'", required, ng-readonly="record.sampleType.id === 'noninvasive'").form-control
 								div.form-group 
 									label.col-sm-4.control_label Sample location in artwork
 									div.col-sm-8
@@ -362,13 +362,12 @@ div#searchContainer
 												catsmultiselect(multiple="true", ng-model="record.mediaScope", options="c.name c.dkname group by c.grp for c in mediaScopes",
 												ms-header="Select scope").multi
 							div
-								alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)") {{alert.msg}}
 				tab(heading="Analysis")
 					div.row.embeddedTab
 						tabset
 							tab(ng-repeat="sampleAnalysis in record.sampleAnalysis", active="sampleAnalysis.active")
 								tab-heading
-									{{sampleAnalysis.sampleAnalysisType.name}} Analysis 
+									{{sampleAnalysis.type.name}} Analysis 
 									a(ng-click="removeAnalysisTab($index)", href=''): i.glyphicon.glyphicon-remove
 								div.embeddedTab
 									div.row
@@ -383,7 +382,7 @@ div#searchContainer
 											div.form-group 
 												label.col-sm-4.control_label Ref. number
 												div.col-sm-8
-													input(type="text", ng-model="sampleAnalysis.referenceNumber", required).form-control
+													input(type="text", ng-model="sampleAnalysis.referenceNumber").form-control
 										div.group.col-sm-6
 											div.form-group 
 												label.col-sm-4.control_label Date
@@ -541,11 +540,11 @@ div#searchContainer
 									div.col-sm-4
 										catsartistselect(ng-model="artwork")
 									div.group.col-sm-2
-										button(type="button").btn.btn-default 
+										button(type="button", ng-click="artwork = {}").btn.btn-default 
 											span.glyphicon.glyphicon-remove 
 												|Clear
 									div.group.col-sm-4
-										button(type="button", ng-click="addArtwork(artwork)").btn.btn-default 
+										button(type="button", ng-click="addArtwork(artwork)", ng-show="false").btn.btn-default 
 											span.glyphicon.glyphicon-plus 
 												|Add artwork
 						div.row.uigroup
@@ -588,11 +587,12 @@ div#searchContainer
 									label.col-sm-4.control_label Owner
 									div.col-sm-8
 										input(type="text", ng-model="artwork.owner").form-control
+			alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation {{alert.msg}}
 			div.modal-footer
 				p
 				label.col-sm-2.checkbox-inline.control_label Create another
 					input(type="checkbox", ng-model="createAnother")
-				button(type="button", ng-click="register()").btn.btn-primary
+				button(type="button", ng-click="register(form.$invalid)").btn.btn-primary
 					span.glyphicon.glyphicon-save
 						|Save
 				button(type="button", ng-click="cancel()").btn.btn-warning 

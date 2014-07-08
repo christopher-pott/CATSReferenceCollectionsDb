@@ -1,5 +1,12 @@
 /* app css stylesheet */
 
+/*red error border*/
+form.submitted .has-error, form.submitted .ng-invalid {
+/*   border-color: red; */
+    border-color: rgba(229, 103, 23, 0.8);
+    box-shadow: 0 1px 1px rgba(229, 103, 23, 0.075) inset, 0 0 8px rgba(229, 103, 23, 0.6);
+    outline: 0 none;
+}
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;
@@ -150,3 +157,24 @@ label.sub {
 /* 	margin-top:15px; */
 /* 	width: 800px; */
 /* } */
+
+.animation.ng-enter,
+.animation.ng-leave{
+  -webkit-transition: 1s;
+}
+
+.animation.ng-enter {
+  opacity: 0;
+}
+
+.animation.ng-leave {
+  opacity: 1;
+}
+
+.animation.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+.animation.ng-leave.ng-leave-active {
+  opacity: 0;
+}

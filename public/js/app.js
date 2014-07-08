@@ -8,6 +8,7 @@ angular.module('myApp', [
   'myApp.services',
   'myApp.directives',
   'ngRoute',
+  'ngAnimate',
   'ui.multiselect',
   'ui.catsmultiselect',
   'ui.catsartistselect'

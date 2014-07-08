@@ -349,6 +349,10 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 		 {id: '7', name: 'unknown organic red', dkname:'rød organisk - ubestemt', grp:'Organic red'},
 		 {id: '8', name: 'unknown organic yellow', dkname:'gul organisk - ubestemt', grp:'Organic yellow'}];
 
+	$scope.lists.mainTabs = { tabOneState : true};
+	$scope.lists.submitted = false;
+	$scope.lists.alerts = [];
+	    
 	// open the modal dialog
 	$scope.open = function (size) {
 		var modalInstance = $modal.open({
@@ -389,7 +393,7 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state) {
 // dependency.
 // It is not the same as the $modal service used above.
 
-var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice, state) {
+var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state) {
 
 	$scope.createAnother = false;
 
@@ -444,7 +448,10 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 	$scope.mediaScopes = lists.mediaScopes;
 	$scope.sampleId = lists.sampleId;
 	$scope.artworks = lists.artworks;
-
+	$scope.mainTabs = lists.mainTabs;
+	$scope.submitted = lists.submitted;
+	$scope.alerts = lists.alerts;
+    
 	/* START tabs for paint layers */
 	var setAllInactive = function() {
 		angular.forEach($scope.record.paintLayer, function(paintLayer) {
@@ -511,26 +518,29 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 	};
 	/* END tabs for paint layers */    
 
-	/* START tabs for artworks */
-	var setAllArtworksInactive = function() {
-		angular.forEach($scope.record.relatedartworks, function(relatedartworks) {
-			relatedartworks.active = false;
-		});
-	};
-
-	var addNewArtwork = function() {
-		var id = $scope.record.relatedartworks.length + 1;
-		$scope.record.relatedartworks.push({id: id, refnumber: "",  title: "", artist: "", technique: "", dimensions: "", productiondate: "", owner: "", active: true});
-	};
-
-	$scope.addArtwork = function () {
-		setAllArtworksInactive();
-		addNewArtwork();
-	};
-	/* END tabs for artworks */    
+//	/* START tabs for artworks */
+//	var setAllArtworksInactive = function() {
+//		angular.forEach($scope.record.relatedartworks, function(relatedartworks) {
+//			relatedartworks.active = false;
+//		});
+//	};
+//
+//	var addNewArtwork = function() {
+//		var id = $scope.record.relatedartworks.length + 1;
+//		$scope.record.relatedartworks.push({id: id, refnumber: "",  title: "", artist: "", technique: "", dimensions: "", productiondate: "", owner: "", active: true});
+//	};
+//
+//	$scope.addArtwork = function () {
+//		setAllArtworksInactive();
+//		addNewArtwork();
+//	};
+//	/* END tabs for artworks */    
 
 	$scope.selected = {
 			sampleType: $scope.sampleTypes[0]
+	};
+	$scope.clearArtwork = function () {
+	    $scope.artwork = {};
 	};
 	$scope.addArtwork = function (artwork) {
 		if(artwork.artwork_id){
@@ -552,22 +562,49 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, lists, catsAPIservice,
 				});
 		}
 	};
-	$scope.register = function () {
+	
+    var invalidAlert = function() {
+        $scope.alerts.push({type: 'danger', msg: 'Save failed. Please fill out all required fields and try again.'});
+        $timeout(function(){
+            $scope.alerts.splice(0, 1);
+        }, 5000);
+    };
+    
+    var recordSaved = function(message) {
+        $scope.alerts.push({type: 'success', msg: message});
+        $timeout(function(){
+            $scope.alerts.splice(0, 1);
+            if ($scope.createAnother === false){
+                $modalInstance.close($scope.selected.sampleType);
+            }
+        }, 3000);
+    };
+
+    $scope.closeAlert = function(index) {
+      $scope.alerts.splice(index, 1);
+    };
+      
+	$scope.register = function (formInvalid) {
+	   
+	    /*we only want to show red border after save attempt*/
+	    $scope.submitted = true;
+	    
+	    /*validate form*/
+	    if (formInvalid){
+//	        alert('Missing fields!');
+	        invalidAlert();
+	        $scope.mainTabs.tabOneState = true;
+	        return;
+	    }
 		if($scope.sampleId){
 			catsAPIservice.update($scope.sampleId, $scope.record).success(function (response) {
-				alert('Record updated');
-				if ($scope.createAnother === false){
-					$modalInstance.close($scope.selected.sampleType);
-				}
+			    recordSaved('Record  updated');
 				// $scope.alert = { type: 'success', msg: 'Record saved' };
 				// $scope.alerts.push({ type: 'success', msg: 'Record saved' });
 			});
 		}else{
 			catsAPIservice.createSample($scope.record).success(function (response) {
-				alert('Record saved');
-				if ($scope.createAnother === false){
-					$modalInstance.close($scope.selected.sampleType);
-				}
+			    recordSaved('Record saved'); //alert('Record saved');
 				// $scope.alert = { type: 'success', msg: 'Record saved' };
 				// $scope.alerts.push({ type: 'success', msg: 'Record saved' });
 			});
