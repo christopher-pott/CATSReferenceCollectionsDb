@@ -45,7 +45,7 @@ form.submitted .has-error, form.submitted .ng-invalid {
 .titlearea{
 	background: @gray-lighter;
 }
-#viewContainer, #searchContainer, #browseContainer {
+#viewContainer, #searchContainer {
 	margin: 20px;
 }
 .titlearea {
@@ -152,29 +152,21 @@ label.sub {
 	padding-left: 20px;
 	font-weight:normal; !important
 }
-/* .group{ */
-/* 	border:1px solid; */
-/* 	margin-top:15px; */
-/* 	width: 800px; */
-/* } */
 
+/*fade animations for bootstrap alerts*/
 .animation.ng-enter,
 .animation.ng-leave{
   -webkit-transition: 1s;
 }
-
 .animation.ng-enter {
   opacity: 0;
 }
-
 .animation.ng-leave {
   opacity: 1;
 }
-
 .animation.ng-enter.ng-enter-active {
   opacity: 1;
 }
-
 .animation.ng-leave.ng-leave-active {
   opacity: 0;
 }

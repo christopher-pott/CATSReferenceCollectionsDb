@@ -288,6 +288,36 @@ div#viewContainer
 								label Results
 							div.col-sm-8
 								{{item.results}}
+				accordion(close-others="false")
+					accordion-group(heading="Artwork", is-open="status.open", ng-repeat="item in record.sampleAnalysis")
+						div.row(ng-show="record.artwork.inventoryNum")
+							div.col-sm-4
+								label Inv. number
+							div.col-sm-4{{record.artwork.inventoryNum}}
+						div.row(ng-show="record.artwork.title")
+							div.col-sm-4
+								label Title
+							div.col-sm-4{{record.artwork.title}}
+						div.row(ng-show="record.artwork.artist")
+							div.col-sm-4
+								label Artist(s)
+							div.col-sm-4{{record.artwork.artist}}
+						div.row(ng-show="record.artwork.technique")
+							div.col-sm-4
+								label  Technique/materials
+							div.col-sm-4{{record.artwork.technique}}
+						div.row(ng-show="record.artwork.productionDateEarliest")
+							div.col-sm-4
+								label Production date earliest/single
+							div.col-sm-4{{record.artwork.productionDateEarliest | date:'dd/MM/yyyy'}}
+						div.row(ng-show="record.artwork.productionDateLatest")
+							div.col-sm-4
+								label Production date latest
+							div.col-sm-4{{record.artwork.productionDateLatest | date:'dd/MM/yyyy'}}
+						div.row(ng-show="record.artwork.owner")
+							div.col-sm-4
+								label Owner
+							div.col-sm-4{{record.artwork.owner}}
 		div(style="height: 600px").col-sm-5
 			carousel(interval="myInterval")
 				slide(ng-repeat="slide in slides", active="slide.active")

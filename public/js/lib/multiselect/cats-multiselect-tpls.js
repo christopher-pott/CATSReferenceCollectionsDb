@@ -35,7 +35,7 @@ angular.module('ui.catsmultiselect', [
     			source: $parse(match[5]),       //the source list of objects for the select
     			viewMapper: $parse(match[1]),   //main label
     			modelMapper: $parse(match[2]),  //danish translation
-    			groupMapper: $parse(match[3])   //group
+    			groupMapper: $parse(match[4] + '.' + match[3])   //group
     		};
     	}
     };
@@ -344,8 +344,8 @@ angular.module('catsmultiselect.tpl.html', [])
     $templateCache.put('catsmultiselect.tpl.html',
 
       "<div class=\"btn-group\">\n" +
-      "  <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'has-error': !valid()}\" \n" +
-      "     popover=\"This field is required\", popover-placement=\"right\", popover-trigger=\"mouseenter\">\n" +
+      "  <button type=\"button\" class=\"btn btn-default dropdown-toggle\" ng-click=\"toggleSelect()\" ng-disabled=\"disabled\" ng-class=\"{'has-error': !valid()}\">\n" +
+//      "     popover=\"This field is required\", popover-placement=\"right\", popover-trigger=\"mouseenter\">\n" +
       "    {{header}} \n" +
 //      "    {{header}} <span class=\"caret\"></span>\n" +  
       "  </button>\n" +

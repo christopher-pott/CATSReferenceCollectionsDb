@@ -7,7 +7,7 @@ routes = require('./routes'),
 api = require('./routes/api'),
 http = require('http'),
 path = require('path'),
-db = require("./db");
+db = require("./db_pg");
 
 var app = module.exports = express();
 
@@ -239,6 +239,10 @@ app.get('/artwork', function(req, res) {
         }
     });
 });
+
+/**
+ * RECORD operations
+ */
 
 //app.post('/sampleartwork', function(req, res) {
 //console.log("create artwork request");

@@ -7,7 +7,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                return $http.get(url);
            },
            getCatsArtworkById : function(id) {
-               var url = "artwork?id=" + id;
+               var url = "artwork?invNum=" + id;
                return $http.get(url);
            }
        };
@@ -16,20 +16,24 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                                    function ($http, $parse, $document, $compile, $interpolate, apiService, $timeout) {
        return {
            restrict: 'E',
-           require: 'ngModel',
+           require: 'ngModel', 
+           /*Use the controller for ngModel directive ('ngModelController'). 
+             This particular controller will enable us to set the value using $setViewValue.
+             The controller is passed as the 4th argument to the linking function  */
            link: function (originalScope, element, attrs, modelCtrl) {
-
+               /*link is used instead of a controller*/
                var exp = attrs.options,
                    required = false,
                    scope = originalScope.$new(), /*creates a child scope*/
                    changeHandler = attrs.change || angular.noop;
 
+               /*'scope' in link is the same as '$scope' in a controller*/
                scope.items = [];
                scope.groups = [];
                scope.disabled = false;
                scope.loading = false;
                scope.showSMKSearch = false;
-
+               
                originalScope.$on('$destroy', function () {
                    scope.$destroy();
                });
@@ -67,6 +71,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                           (!angular.isArray(value) && value != null);
                };
 
+               /*select() is called when a checkbox is clicked*/
                scope.select = function (item) {
                    var value;
                    if (!item.checked) {
@@ -82,6 +87,11 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                        })
                    })
                    modelCtrl.$setViewValue(value);
+        
+                   //attempt to fix updating artwork
+//                   originalScope.$apply(function() {
+//                       modelCtrl.$setViewValue(value);
+//                   });                  
                    scope.toggleSelect();
                };
 
@@ -102,25 +112,17 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                            artwork.corpusId = doc.csid;
                            artwork.inventoryNum = doc.id;
                            artwork.title = doc.title_first;
+                           var earliest = new Date(doc.object_production_date_earliest);
+                           
                            artwork.productionDateEarliest = (doc.object_production_date_earliest) ?
                                                           doc.object_production_date_earliest : "";
                            artwork.productionDateLatest = (doc.object_production_date_latest) ?
                                                            doc.object_production_date_latest : "";
-                           for(i=0, artwork.artist = "";i<doc.artist_name.length;i++){
-                               artwork.artist += doc.artist_name[i];
-                               artwork.artist += (doc.artist_name.length-1 > i) ?  ", " : "";
-                           }
-                           if(doc.heigth && doc.width && doc.widthunit){
-                               artwork.dimensions = doc.heigth + " x " + doc.width + " " + 
-                                                    doc.widthunit;
-                           }
-                           if(doc.prod_technique_en){
-                               artwork.technique = doc.prod_technique_en;
-                               if(doc.prod_technique_dk){
-                                   artwork.technique += " (" + doc.prod_technique_dk + ")";
-                               }
-                           }
-                           artwork.owner = ""; /*not available yet from solr*/
+                           artwork.artist = doc.artists_data;   
+                           artwork.dimensions = doc.dimension_netto;
+                           artwork.technique = doc.prod_technique;
+                           artwork.owner = doc.owner;
+                           
                        }else if (solrResp.numFound === 0){
                            scope.resultText = "No SMK records found";
                        }else{
@@ -161,15 +163,15 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                             */
                            //scope.artworkId = artwork.rows[0].artwork_id;
 
-                           /* copy the record to groups*/
+                           /* copy the record to groups : this will populate the list shown to the user*/
                            scope.groups = [{name:  "Results from CATS", items:[]}];
-                           for(i=0;i < artwork.rowCount;i++){
-                               var record = artwork.rows[i].artwork_record;
+                           for(i=0;i < artwork.length;i++){
+                               var record = artwork[i];
                                scope.groups[0].items[i] = {label:record.inventoryNum + " " +  record.title, 
                                        model:record
                                }
                            }
-                           if(artwork.rowCount === 0){
+                           if(artwork.length === 0){
                                scope.resultText = "No records found";
                                scope.showSMKSearch = true;
                            }else{
@@ -187,7 +189,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                scope.searchCats = function (id) {
                    scope.toggleSelect();
                    scope.loading = true; /*show spinner*/
-                   scope.groups = []; /*reset results*/
+                   scope.groups = [];    /*reset results*/
                    scope.resultText = "Searching CATS...";
 
                    /* adding some time here enables us to check the "loading" icon*/
@@ -197,6 +199,15 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                };
 
                scope.change = function () {
+
+                   /* Every time the inventory number changes, make sure it's
+                    * reflected. And reset all the other fields, so a user cannot change 
+                    * an inventory number once the artwork has an _id.
+                    * */
+                   var value = {};
+                   value.inventoryNum = scope.searchText;
+                   modelCtrl.$setViewValue(value);
+                   
                    scope.closeSelect();
                    scope.showSMKSearch = false;
                }
@@ -232,6 +243,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                    }
                };
 
+               /*click 'search' or 'searchsmk'*/
                function clickHandler(event) {
                    if (elementMatchesAnyInArray(event.target, element.find(event.target.tagName)))
                        return;

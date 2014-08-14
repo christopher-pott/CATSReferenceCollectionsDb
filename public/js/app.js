@@ -14,10 +14,14 @@ angular.module('myApp', [
   'ui.catsartistselect'
 ]).
 config(function ($routeProvider, $locationProvider) {
+    
+    /* controllers can be defined here OR using ng-controller directive in the view (jade file),
+     * but not both places
+     * */
   $routeProvider.
     when('/browse', {
       templateUrl: 'partials/browse',
-      controller: 'BrowseCtrl'
+      controller: 'BrowseController'
     }).
     when('/view', {
       templateUrl: 'partials/view',
