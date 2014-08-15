@@ -656,7 +656,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
             $scope.mainTabs.tabOneState = true; 
             return;
         }
-        if ($scope.record.artwork.inventoryNum){
+        if ($scope.record.artwork && $scope.record.artwork.inventoryNum){
             saveArtworkAndSample();
         }else{
             $scope.record.artwork_id = "";
