@@ -34,6 +34,13 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                scope.loading = false;
                scope.showSMKSearch = false;
                
+               /* As search box doubles as Inventory Number, we need to explicitly
+                * set the existing value */
+               var existingArtwork = scope.$eval(attrs.ngModel);
+               if (existingArtwork && existingArtwork.inventoryNum){
+                   scope.searchText = existingArtwork.inventoryNum;
+               }
+               
                originalScope.$on('$destroy', function () {
                    scope.$destroy();
                });

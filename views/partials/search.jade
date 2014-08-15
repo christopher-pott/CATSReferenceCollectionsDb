@@ -540,11 +540,11 @@ div#searchContainer
 									div.col-sm-4
 										catsartistselect(ng-model="record.artwork")
 									div.group.col-sm-2
-										button(type="button", ng-click="artwork = {}").btn.btn-default 
+										button(type="button", ng-click="clearArtwork()", ng-show="false").btn.btn-default 
 											span.glyphicon.glyphicon-remove 
 												|Clear
 									div.group.col-sm-4
-										button(type="button", ng-click="addArtwork(record.artwork)", ng-show="true").btn.btn-default 
+										button(type="button", ng-click="addArtwork(record.artwork)", ng-show="false").btn.btn-default 
 											span.glyphicon.glyphicon-plus 
 												|Add artwork
 						div.row.uigroup

@@ -544,11 +544,13 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     };
     /* END tabs for paint layers */
 
-    $scope.selected = {
-            sampleType: $scope.sampleTypes[0]
-    };
+    $scope.selected = {sampleType: $scope.sampleTypes[0]};
+
+    /* This function is used for testing, if the button is enabled in search.jade (ng-show="true")
+     * then we can clear artworks
+     * */
     $scope.clearArtwork = function () {
-        $scope.artwork = {};
+        $scope.record.artwork = {};
     };
 
     /* This function is used for testing, if the button is enabled in search.jade (ng-show="true")
@@ -611,7 +613,15 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     
     var saveSample = function (record) {
         
-        catsAPIservice.createSample(record)
+        /* we copy to 'rec' because if we just use the original
+         * ($scope.record) then the fields disappear immediately in the UI whilst the status
+         * indicator times out. (We delete the artwork fields because we don't
+         * want to send them to the sample record as well)
+         * */
+        var rec = JSON.parse(JSON.stringify(record)); /*quick cheat to copy a simple json object*/
+        delete rec.artwork;
+        
+        catsAPIservice.createSample(rec)
         .success(function (response) {
             recordSaved('Record saved');
         })
@@ -625,16 +635,8 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
 
         catsAPIservice.createArtwork($scope.record.artwork)
             .success(function (response) {
-
-                /* quick way to copy a simple json object. If we just use the original
-                 * ($scope.record) then the fields disappear immediately in the UI whilst the status
-                 * indicator times out. (We delete the artwork fields because we don't
-                 * want to send them to the sample record as well)
-                 * */
-                var rec = JSON.parse(JSON.stringify($scope.record));
-                delete rec.artwork;
-                rec.artwork_id = response._id; /*id of artwork we've just created, or updated*/
-                saveSample(rec);
+                $scope.record.artwork_id = response._id; /*id of artwork we've just created, or updated*/
+                saveSample($scope.record);
             })
             .error(function (err) {
                 saveFailed('Save Artwork & Sample failed. Please contact support.');
@@ -657,6 +659,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
         if ($scope.record.artwork.inventoryNum){
             saveArtworkAndSample();
         }else{
+            $scope.record.artwork_id = "";
             saveSample($scope.record);
         }
     };
