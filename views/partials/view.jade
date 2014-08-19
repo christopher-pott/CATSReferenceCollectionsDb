@@ -182,10 +182,14 @@ div#viewContainer
 								div.col-sm-4
 									label Dimensions
 								div.col-sm-4{{record.stretcherDimensions}}
-							div.row(ng-show="record.stretcherProductionDate")
+							div.row(ng-show="record.stretcherProductionDateEarliest")
 								div.col-sm-4
-									label Production date
-								div.col-sm-4{{record.stretcherProductionDate | date:'dd/MM/yyyy'}}
+									label Production date earliest/single
+								div.col-sm-4{{record.stretcherProductionDateEarliest | date:'dd/MM/yyyy'}}
+							div.row(ng-show="record.stretcherProductionDateLatest")
+								div.col-sm-4
+									label Production date latest
+								div.col-sm-4{{record.stretcherProductionDateLatest | date:'dd/MM/yyyy'}}
 							div.row(ng-show="record.stretcherSource")
 								div.col-sm-4
 									label Source

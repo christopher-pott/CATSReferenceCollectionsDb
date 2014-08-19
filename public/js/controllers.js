@@ -16,18 +16,30 @@ controller('AppCtrl', function ($scope, $http, state, $location) {
     };
 
 }).
-controller('SearchController', function ($scope, catsAPIservice, state, $modal, $log, $location) {
+controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
     // These must be read here, otherwise the list will be empty when
     // the browser 'back' button is pressed after viewing a single record
     $scope.searchResultsList = state.resultList;
+    $scope.searchResultsListSize = state.resultListSize;
     $scope.searchTerm = state.searchTerm;
 
-    // Call the simple partial search service
+    // Call the partial search service
     $scope.search = function() {
         catsAPIservice.search(state.searchTerm).success(function (response) {
             $scope.searchResultsList = response;
             state.resultList = response;
+            $scope.searchCount();
+        });
+    };
+    
+    // Call the partial search service
+    $scope.searchCount = function() {
+        catsAPIservice.searchSize(state.searchTerm).success(function (response) {
+            $scope.searchResultsListSize = response;
+            state.resultListSize = response;
+        }).error(function (err) {
+            $scope.searchResultsListSize = 0;
         });
     };
 
@@ -54,21 +66,80 @@ controller('SearchController', function ($scope, catsAPIservice, state, $modal, 
     );
 
     $scope.registerClicked = function(sample) {
+        
         state.registerRequested = true;
         state.sample = {};
-        //state.sampleId = "";
         if (sample){
             state.sample = sample;
-          //  state.sampleId = sample._id;
         } 
     };
 
+    /* Delete a single sample record
+     * */
     $scope.deleteClicked = function(sampleId) {
+        
         catsAPIservice.delete(sampleId).success(function (response) {
             state.searchRequested = true; // Refresh search
             alert('Record deleted');
         });
-    };	
+    };
+
+    /* Generates an excel formatted file (xlsx) containing the search results
+     * and triggers a file download
+     * */
+    var createExportDoc = function(searchTerm) {
+        
+        catsAPIservice.Excel(searchTerm).success(function (response) {
+
+            /*package the newly generated spreadsheet data as blob we can use for file download*/
+            var blob = new Blob([response],
+                    {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+            var objectUrl = URL.createObjectURL(blob);
+
+            /*create a reference and fake a click to start the download*/
+            var hiddenElement = document.createElement('a');
+            hiddenElement.setAttribute('href', objectUrl);
+            hiddenElement.setAttribute('download', "cats_export.xlxs");
+            hiddenElement.click();
+        });
+        //TODO: add failure case
+    }
+
+    /* Fetches artwork details for a list of samples and 
+     * adds them to the sample data. When all the responses
+     * have been received, creates an excel doc.
+     */
+    $scope.exportClicked = function(searchTerm) {
+        
+        createExportDoc(searchTerm);
+
+        
+//        /*create a new unit of work by creating a Deferred object*/
+//        var defer = $q.defer();
+//        var promises = [];
+//        
+//        angular.forEach(samples, function(value){
+//            if(value.artwork_id){
+//                promises.push(catsAPIservice.readArtwork(value.artwork_id)
+//                    .success(function (response) {
+//                        /*extra sanity check*/
+//                        if(value.artwork_id === response[0]._id){
+//                            value.artwork = response[0];
+//                        }
+//                    })
+//                    .error(function (err) {
+//                        //TODO: add failure case
+//                    })
+//                );
+//            }
+//        });
+//
+//        /*When all the responses are home, then build the report*/
+//        $q.all(promises).then(function(results){
+//            defer.resolve();
+//            createExportDoc(samples);
+//        });
+    }
 }).
 controller('BrowseController', function ($scope) {
 
@@ -78,14 +149,14 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
     /* Retrieve the sample details from the state service*/
     $scope.record = state.sample;
     
-    /* Retrieve the artwork details from database*/
+    /* Retrieve the artwork details from database - no longer needed
     if ($scope.record.artwork_id){
         catsAPIservice.readArtwork($scope.record.artwork_id)
         .success(function (response) {
             $scope.record.artwork = response[0];
-           // delete $scope.record.artwork_id; /*this is wrong ... why delete?*/
+           // delete $scope.record.artwork_id; /*this is wrong ... why delete?
         })
-    }
+    }*/
 
     $scope.statusMeta = {
             isFirstOpen: true,

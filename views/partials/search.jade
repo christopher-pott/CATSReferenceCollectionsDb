@@ -622,6 +622,7 @@ div#searchContainer
 			thead
 				tr
 					h3 Search Results
+					h4 The search returned {{searchResultsListSize}} result(s)
 					br
 				tr
 					th Reference number
@@ -649,7 +650,7 @@ div#searchContainer
 				span.glyphicon.glyphicon-print 
 					|Report
 		div.col-sm-1
-			button(popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
+			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
 
