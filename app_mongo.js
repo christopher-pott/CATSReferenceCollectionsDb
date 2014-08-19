@@ -272,6 +272,10 @@ app.get('/Excel', function(req, res){
                     type:'string',
                     width:20
                 },{
+                    caption:'Sample Analysis',
+                    type:'string',
+                    width:30
+                },{
                     caption:'Artwork Inventory Num.',
                     type:'string',
                     width:20
@@ -306,7 +310,7 @@ app.get('/Excel', function(req, res){
                     conf.rows[i][ii++] = (body[i].paintLayerDescription) ? body[i].paintLayerDescription : null;
                     conf.rows[i][ii++] = (body[i].paintLayer && body[i].paintLayer[0].layerType.name) ? 
                         body[i].paintLayer.map(function(elem){
-                            
+                            /*format all layer data for a single cell*/
                             var layer = "";
                             var binders = (elem.paintBinder) ? elem.paintBinder.map(function(elem){return elem.name;}).join(", ") : "";
                             var colours = (elem.colour) ? elem.colour.map(function(elem){return elem.name;}).join(", ") : "";
@@ -318,6 +322,7 @@ app.get('/Excel', function(req, res){
                                     "\n  Colours: " + colours +
                                     "\n  Pigments: " + pigments +
                                     "\n  Dyes: " + dyes;
+                            
                             return layer;
                         }).join("\n\n") : null;
 
@@ -343,6 +348,9 @@ app.get('/Excel', function(req, res){
                     conf.rows[i][ii++] = (body[i].stretcherProductionDateEarliest) ? body[i].stretcherProductionDateEarliest : null;
                     conf.rows[i][ii++] = (body[i].stretcherProductionDateLatest) ? body[i].stretcherProductionDateLatest : null;
                     conf.rows[i][ii++] = (body[i].stretcherSource) ? body[i].stretcherSource : null;
+
+                    /*analysis*/
+                    conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
 
                     /*artwork*/
                     conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ?
