@@ -92,23 +92,70 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         });
     };
 
+    /* Needed for older browsers which don't support click() on href's */
+    var fakeClick = function(anchorObj) {
+    	/*try to click*/
+    	if (anchorObj.click){
+    		anchorObj.click();
+    	}else if(document.createEvent) {
+    	/*don't ask (thankyou slashdot)*/	
+    	    var evt = document.createEvent("MouseEvents"); 
+    	    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
+    	    var allowDefault = anchorObj.dispatchEvent(evt);
+    	}
+    }
+    
     /* Generates an excel formatted file (xlsx) containing the search results
      * and triggers a file download
      * */
     var createExportDoc = function(searchTerm) {
+    	
+    	var blob = null;
+    	var docType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         
         catsAPIservice.Excel(searchTerm).success(function (response) {
 
             /*package the newly generated spreadsheet data as blob we can use for file download*/
-            var blob = new Blob([response],
-                    {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-            var objectUrl = URL.createObjectURL(blob);
-
-            /*create a reference and fake a click to start the download*/
+        	try{
+                blob = new Blob([response], {type: docType});
+    		}
+    		catch(e){
+    		    /* TypeError old chrome and FF*/
+    		    window.BlobBuilder = window.BlobBuilder || 
+    		                         window.WebKitBlobBuilder || 
+    		                         window.MozBlobBuilder || 
+    		                         window.MSBlobBuilder;
+    		    
+    		    if(e.name == 'TypeError' && window.BlobBuilder){
+    		        var bb = new BlobBuilder();
+    		        bb.append(response);
+    		        blob = bb.getBlob(docType);
+    		    }
+    		    else if(e.name == "InvalidStateError"){
+    		        /* InvalidStateError (tested on FF13 WinXP)*/
+    		        blob = new Blob( [response], {type : docType});
+    		    }
+    		    else{
+    		        /* TODO: handle error case  */
+    		    	alert("Your browser doesn't support this. " +
+    		    		  "Please try again with a more recent browser.");
+    		    }
+    		}
+    		try {
+    			var objectUrl = URL.createObjectURL(blob);
+		    }
+		    catch (e) {
+		    	/*try again, some browsers support this syntax instead*/
+		    	if(e.type == 'not_defined' && e.arguments[0] === 'URL'){
+		    		var objectUrl = webkitURL.createObjectURL(blob);
+		    	}
+		    }
+		    
+            /* Create a reference and fake a click to start the download */
             var hiddenElement = document.createElement('a');
             hiddenElement.setAttribute('href', objectUrl);
             hiddenElement.setAttribute('download', "cats_export.xlxs");
-            hiddenElement.click();
+            fakeClick(hiddenElement);
         });
         //TODO: add failure case
     }
