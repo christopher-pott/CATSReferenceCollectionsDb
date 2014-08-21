@@ -3,18 +3,26 @@
 /* Controllers */
 
 angular.module('myApp.controllers', ['ui.bootstrap']).
-controller('AppCtrl', function ($scope, $http, state, $location) {
+controller('AppCtrl', function ($scope, $http, state, $location, $modal) {
 
-    // Search button click directs over to the search controller
-    // and saves the search term to the state where it can be
-    // retrieved by the search controller when triggered by this
-    // change on the searchRequested flag
+    /* Search button click directs over to the search controller
+       and saves the search term to the state where it can be
+       retrieved by the search controller when triggered by this
+       change on the searchRequested flag */
     $scope.searchClicked = function(searchTerm) {
         $location.path('/search');
         state.searchTerm = searchTerm;
         state.searchRequested = true;
     };
 
+    /* Opens the user login modal window*/
+    $scope.loginUser = function () {
+        var loginModalInstance =  $modal.open({
+            size: 'sm',
+            templateUrl:'myLoginContent',
+            controller: loginModalInstanceCtrl
+        });
+    };
 }).
 controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
@@ -148,15 +156,6 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 
     /* Retrieve the sample details from the state service*/
     $scope.record = state.sample;
-    
-    /* Retrieve the artwork details from database - no longer needed
-    if ($scope.record.artwork_id){
-        catsAPIservice.readArtwork($scope.record.artwork_id)
-        .success(function (response) {
-            $scope.record.artwork = response[0];
-           // delete $scope.record.artwork_id; /*this is wrong ... why delete?
-        })
-    }*/
 
     $scope.statusMeta = {
             isFirstOpen: true,
@@ -453,7 +452,9 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
         });
     };
 
-    // this will call the open function
+    /* catch the registerRequested event and
+     * open the modal window
+     */
     $scope.$watch(
         // This is the listener function
         function() { return state.registerRequested; },
@@ -463,36 +464,75 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
                 if(state.sample){
                     /*existing sample record*/
                     $scope.lists.record = state.sample;
-                    if ($scope.lists.record.artwork_id){
-                        catsAPIservice.readArtwork($scope.lists.record.artwork_id)
-                        .success(function (response) {
-                            $scope.lists.record.artwork = response[0];
-                            delete $scope.lists.record.artwork_id; /*hmmmm, double check this*/
-
-                            $scope.open('lg');
-                            state.registerRequested = false;
-                        })
-                        .error(function (err) {
-                            alert(err);
-                        });
-                    }else{
-                        $scope.open('lg');
-                        state.registerRequested = false;
-                    }
-                }else{
-                    /*new sample record*/
-                    $scope.open('lg');
-                    state.registerRequested = false;
                 }
+                $scope.open('lg'); /*pass size*/
+                state.registerRequested = false;
             }
         }
     );
-});
+})
+
+var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, catsAPIservice) {
+
+    $scope.alerts = [];
+
+    $scope.login = function (form, email, password) {
+
+        /* show required fields only after a save attempt */
+        $scope.submitted = true;
+
+        if (form.$invalid){
+            missingAlert();
+            return;
+        }
+        
+        /*Perform authentication*/
+        catsAPIservice.login(email, password)
+        .success(function (response) {
+            loginSucccess("Login succeeded");
+        })
+        .error(function (err) {
+            errorAlert();
+        });
+    };
+
+    var loginSucccess = function(message) {
+
+        $scope.alerts.push({type: 'success', msg: message, icon: 'glyphicon glyphicon-ok'});
+
+        $timeout(function(){
+            $scope.alerts.splice(0, 1);
+            $modalInstance.close();
+        }, 3000);
+    };
+    
+    var missingAlert = function() {
+
+       $scope.alerts.push({type: 'danger', msg: 'Missing email or password', 
+                           icon: 'glyphicon glyphicon-warning-sign'});
+        $timeout(function(){
+            $scope.alerts.splice(0, 1);
+        }, 3000);
+    };
+    
+    var errorAlert = function() {
+
+        $scope.alerts.push({type: 'danger', msg: 'Wrong user or password', 
+                            icon: 'glyphicon glyphicon-warning-sign'});
+         $timeout(function(){
+             $scope.alerts.splice(0, 1);
+         }, 3000);
+     };
+
+    $scope.closeAlert = function(index) {
+
+        $scope.alerts.splice(index, 1);
+    };
+}
 
 // Please note that $modalInstance represents a modal window (instance)
 // dependency.
 // It is not the same as the $modal service used above.
-
 var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state) {
 
     if(lists.record._id) {
@@ -707,14 +747,14 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
         catsAPIservice.createArtwork($scope.record.artwork)
             .success(function (response) {
                 $scope.record.artwork_id = response._id; /*id of artwork we've just created, or updated*/
-                saveSample($scope.record);
+                saveSample($scope.record);  //TODO move to server
             })
             .error(function (err) {
                 saveFailed('Save Artwork & Sample failed. Please contact support.');
             });
     }
 
-    /* This persists a sample record and optionally an artwork
+    /* This saves a sample record and optionally an artwork
      * */
     $scope.register = function (formInvalid) {
 

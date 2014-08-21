@@ -14,9 +14,24 @@ block body
 							span.input-group-btn
 								button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
 			div.col-sm-2.login
-				button(popover="Login to register new samples", popover-trigger="mouseenter", popover-popup-delay="2000", popover-placement="bottom").btn.btn-default
+				button(ng-click="loginUser()", popover="Login to register new samples", popover-trigger="mouseenter", popover-popup-delay="2000", popover-placement="bottom").btn.btn-default
 					span.glyphicon.glyphicon-user 
 						|Login
+				script(type="text/ng-template")#myLoginContent
+					div.modal-header
+						h3 Login
+					div.modal-body
+						form(role="form", name="form", novalidate, ng-class="{submitted:submitted}")
+							div.form-group
+								label.control_label(for="email") Email
+								input(type="email", ng-model="email", ng-required="true", ng-model-options="{updateOn: 'blur'}",
+										required).form-control
+							div.form-group
+								label.control_label(for="password") Password
+								input(type="password", ng-model="password", ng-required="true", ng-model-options="{updateOn: 'blur'}",
+										required).form-control
+							alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
+							button(ng-click="login(form, email, password)", type="button").btn.btn-primary.btn-block Login
 			div.col-sm-1
 			div.col-sm-2
 				img(src="/images/logo2.jpg")

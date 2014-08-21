@@ -30,7 +30,7 @@ config(function ($routeProvider, $locationProvider) {
     when('/search', {
         templateUrl: 'partials/search',
         controller: 'SearchController'
-      }).
+    }).
     otherwise({
       redirectTo: '/browse'
     });

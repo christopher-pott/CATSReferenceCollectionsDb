@@ -9,9 +9,12 @@ var express = require('express'),
     http = require('http'),
     path = require('path'),
     db = require("./db_mongo"),
-    Q = require('q');
+    Q = require('q'),
+    passport = require('passport');
 
 var app = module.exports = express();
+
+var LocalStrategy = require('passport-local').Strategy;
 
 /**
  * Configuration
@@ -25,7 +28,99 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
+/*Passport middleware : must be before 'router'*/
+app.use(express.cookieParser());
+app.use(express.session({ secret: 'keyboard cat' }));
+app.use(passport.initialize());
+app.use(passport.session());
+/*End Passport middleware*/
 app.use(app.router);
+
+
+/*temporary setup without database*/
+var users = [
+             { id: 1, username: 'bob@example.com', password: 'secret' },
+             { id: 2, username: 'joe@example.com', password: 'birthday' }
+         ];
+
+function findById(id, fn) {
+  var idx = id - 1;
+  if (users[idx]) {
+    fn(null, users[idx]);
+  } else {
+    fn(new Error('User ' + id + ' does not exist'));
+  }
+}
+
+function findByUsername(username, fn) {
+  for (var i = 0, len = users.length; i < len; i++) {
+    var user = users[i];
+    if (user.username === username) {
+      return fn(null, user);
+    }
+  }
+  return fn(null, null);
+}
+
+///*Passport strategy (local)*/
+//passport.use(new LocalStrategy({
+//        usernameField: 'email',
+//        passwordField: 'password'
+//    },
+//    function(username, password, done) {
+//        User.findOne({ username: username }, function (err, user) {
+//            if (err) { return done(err); }
+//            if (!user) {
+//                return done(null, false, { message: 'Incorrect username.' });
+//            }
+//            if (!user.validPassword(password)) {
+//                return done(null, false, { message: 'Incorrect password.' });
+//            }
+//            return done(null, user);
+//        });
+//    }
+//));
+
+//Use the LocalStrategy within Passport.
+//Strategies in passport require a `verify` function, which accept
+//credentials (in this case, a username and password), and invoke a callback
+//with a user object.  In the real world, this would query a database;
+//however, in this example we are using a baked-in set of users.
+passport.use(new LocalStrategy( function(username, password, done) {
+
+    // asynchronous verification, for effect...
+    process.nextTick(function () {
+
+        // Find the user by username.  If there is no user with the given
+        // username, or the password is not correct, set the user to `false` to
+        // indicate failure and set a flash message.  Otherwise, return the
+        // authenticated `user`.
+        findByUsername(username, function(err, user) {
+            if (err) { return done(err); }
+            if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
+            if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
+            return done(null, user);
+         })
+        });
+    }
+));
+
+/*Passport sessions*/
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+//passport.deserializeUser(function(id, done) {
+//    User.findById(id, function(err, user) {
+//        done(err, user);
+//    });
+//});
+
+passport.deserializeUser(function(id, done) {
+    findById(id, function (err, user) {
+        done(err, user);
+    });
+});
 
 //development only
 if (app.get('env') === 'development') {
@@ -47,6 +142,46 @@ app.get('/partials/:name', routes.partials);
 
 //JSON API
 app.get('/api/name', api.name);
+
+app.post('/login', 
+        passport.authenticate('local'),
+        function(req, res) {
+            /*user is null if authentication failed*/
+            res.send(req.user); 
+        });
+
+/**
+ * Define a middleware function to be used for every secured routes 
+ * See description at: https://vickev.com/#!/article/authentication-in-single-page-applications-node-js-passportjs-angularjs
+ */
+//var auth = function(req, res, next){ 
+//    if (!req.isAuthenticated()){
+//        res.send(401); 
+//    }else{
+//        next(); 
+//    }
+//}
+//
+///**
+// * route to test if the user is logged in or not 
+// */
+//app.get('/loggedin', function(req, res) {
+//    res.send(req.isAuthenticated() ? req.user : '0');
+//});
+//
+///** 
+// * route to log in 
+// **/
+//app.post('/login', passport.authenticate('local'), function(req, res) {
+//    res.send(req.user); 
+//}); 
+//
+///**
+// * route to log out 
+// */ 
+//app.post('/logout', function(req, res){ 
+//    req.logOut(); res.send(200); 
+//});
 
 /**
  * Excel export (requires 'excel-export' module)
@@ -295,7 +430,7 @@ app.get('/Excel', function(req, res){
                     conf.rows[i][ii++] = (body[i].sampleLocation) ? body[i].sampleLocation : null;
                     conf.rows[i][ii++] = (body[i].remarks) ? body[i].remarks : null;
                     
-                    /*fibre fields*/
+                    /*paper fields*/
                     conf.rows[i][ii++] = (body[i].fibreType) ? body[i].fibreType.map(function(elem){return elem.name;}).join(", ") : null;
                     conf.rows[i][ii++] = (body[i].fibreGlue) ? body[i].fibreGlue.map(function(elem){return elem.name;}).join(", ") : null;
                     conf.rows[i][ii++] = (body[i].fibreLigin) ? true : null;
@@ -326,7 +461,7 @@ app.get('/Excel', function(req, res){
                             return layer;
                         }).join("\n\n") : null;
 
-                        /*pigment fields*/
+                    /*pigment fields*/
                     conf.rows[i][ii++] = (body[i].pigmentColourClass && body[i].pigmentColourClass.name) ? body[i].pigmentColourClass.name : null;
                     conf.rows[i][ii++] = (body[i].pigmentSource) ? body[i].pigmentSource : null;
                     conf.rows[i][ii++] = (body[i].pigmentProdNumber) ? body[i].pigmentProdNumber : null;
@@ -349,13 +484,11 @@ app.get('/Excel', function(req, res){
                     conf.rows[i][ii++] = (body[i].stretcherProductionDateLatest) ? body[i].stretcherProductionDateLatest : null;
                     conf.rows[i][ii++] = (body[i].stretcherSource) ? body[i].stretcherSource : null;
 
-                    /*analysis*/
+                    /*analysis field*/
                     conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
 
-                    /*artwork*/
-                    conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ?
-                                       body[i].artwork.inventoryNum : null;
-                    /*......etc......*/
+                    /*artwork field*/
+                    conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
                 }
                 var result = nodeExcel.execute(conf);
                 res.setHeader('Content-Type', 'application/vnd.openxmlformats');

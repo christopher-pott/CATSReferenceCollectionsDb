@@ -60,6 +60,12 @@ serviceMod.factory('catsAPIservice', function($http) {
                 method : "GET",
                 responseType: 'arraybuffer' /*important!*/
             });
+        },
+        login : function(email, password) {
+            return $http({
+                url : '/login?username=' + email + '&password=' + password,
+                method : "POST",
+            });
         }
 	};
 });
