@@ -639,7 +639,7 @@ div#searchContainer
 					td{{res.owner.name}}
 					td{{res.sampleLocation}}
 					td{{res.sampleDate  | date:'dd/MM/yyyy'}}
-					td: button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td: button(ng-show="loggedin()", ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
 					td: button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 

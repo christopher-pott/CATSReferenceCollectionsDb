@@ -50,6 +50,18 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
             $scope.searchResultsListSize = 0;
         });
     };
+    
+    //do this differently : ....or what
+    
+    $scope.loggedin = function() {
+    	catsAPIservice.loggedin().success(function (response) {
+    		var x =   response;
+            return x;
+        }).error(function (err) {
+            return false
+        });
+    	return x;
+    };
 
     // Clicking on a reference number will direct over to view mode
     // and save the sample details so the view controller can retrieve them

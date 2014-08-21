@@ -37,7 +37,22 @@ app.use(passport.session());
 app.use(app.router);
 
 
-/*temporary setup without database*/
+
+//development only
+if (app.get('env') === 'development') {
+  app.use(express.errorHandler());
+}
+
+//production only
+if (app.get('env') === 'production') {
+  // TODO
+}
+
+/**
+ * Passport authentication functions
+ **/
+
+/*temporary setup faking database*/
 var users = [
              { id: 1, username: 'bob@example.com', password: 'secret' },
              { id: 2, username: 'joe@example.com', password: 'birthday' }
@@ -62,39 +77,16 @@ function findByUsername(username, fn) {
   return fn(null, null);
 }
 
-///*Passport strategy (local)*/
-//passport.use(new LocalStrategy({
-//        usernameField: 'email',
-//        passwordField: 'password'
-//    },
-//    function(username, password, done) {
-//        User.findOne({ username: username }, function (err, user) {
-//            if (err) { return done(err); }
-//            if (!user) {
-//                return done(null, false, { message: 'Incorrect username.' });
-//            }
-//            if (!user.validPassword(password)) {
-//                return done(null, false, { message: 'Incorrect password.' });
-//            }
-//            return done(null, user);
-//        });
-//    }
-//));
-
-//Use the LocalStrategy within Passport.
-//Strategies in passport require a `verify` function, which accept
-//credentials (in this case, a username and password), and invoke a callback
-//with a user object.  In the real world, this would query a database;
-//however, in this example we are using a baked-in set of users.
+/*Passport strategy (local)*/
 passport.use(new LocalStrategy( function(username, password, done) {
 
-    // asynchronous verification, for effect...
+    // asynchronous verification, for effect... TODO: remove when database is used
     process.nextTick(function () {
 
-        // Find the user by username.  If there is no user with the given
-        // username, or the password is not correct, set the user to `false` to
-        // indicate failure and set a flash message.  Otherwise, return the
-        // authenticated `user`.
+        /* Find the user by username.  If there is no user with the given
+           username, or the password is not correct, set the user to `false` to
+           indicate failure and set a flash message.  Otherwise, return the
+           authenticated `user`*/
         findByUsername(username, function(err, user) {
             if (err) { return done(err); }
             if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
@@ -110,135 +102,45 @@ passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
 
-//passport.deserializeUser(function(id, done) {
-//    User.findById(id, function(err, user) {
-//        done(err, user);
-//    });
-//});
-
 passport.deserializeUser(function(id, done) {
     findById(id, function (err, user) {
         done(err, user);
     });
 });
 
-//development only
-if (app.get('env') === 'development') {
-    app.use(express.errorHandler());
-}
+/*Authentication Routes*/
 
-//production only
-if (app.get('env') === 'production') {
-    // TODO
-}
+/* login */
+app.post('/login', passport.authenticate('local'), function(req, res) {
+    /*user is null if authentication failed*/
+    res.send(req.user); 
+});
+
+/* log out */ 
+app.post('/logout', function(req, res){ 
+	req.logOut(); 
+	res.send(200); 
+});
+
+/* route to test if the user is logged in or not */
+app.get('/loggedin', function(req, res) {
+	res.send(req.isAuthenticated() ? req.user : '0');
+});
 
 /**
  * Define the Routes
  */
 
-//serve index and view partials
+/* index and view partials */
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 
-//JSON API
+/* JSON API */
 app.get('/api/name', api.name);
-
-app.post('/login', 
-        passport.authenticate('local'),
-        function(req, res) {
-            /*user is null if authentication failed*/
-            res.send(req.user); 
-        });
-
-/**
- * Define a middleware function to be used for every secured routes 
- * See description at: https://vickev.com/#!/article/authentication-in-single-page-applications-node-js-passportjs-angularjs
- */
-//var auth = function(req, res, next){ 
-//    if (!req.isAuthenticated()){
-//        res.send(401); 
-//    }else{
-//        next(); 
-//    }
-//}
-//
-///**
-// * route to test if the user is logged in or not 
-// */
-//app.get('/loggedin', function(req, res) {
-//    res.send(req.isAuthenticated() ? req.user : '0');
-//});
-//
-///** 
-// * route to log in 
-// **/
-//app.post('/login', passport.authenticate('local'), function(req, res) {
-//    res.send(req.user); 
-//}); 
-//
-///**
-// * route to log out 
-// */ 
-//app.post('/logout', function(req, res){ 
-//    req.logOut(); res.send(200); 
-//});
 
 /**
  * Excel export (requires 'excel-export' module)
  */
-//app.get('/Excel', function(req, res){
-//    var conf ={};
-//  // uncomment it for style example  
-//  // conf.stylesXmlFile = "styles.xml";
-//    conf.cols = [{
-//        caption:'string',
-//        captionStyleIndex: 1,        
-//        type:'string',
-//        beforeCellWrite:function(row, cellData){
-//             return cellData.toUpperCase();
-//        }
-//        , width:15
-//    },{
-//        caption:'date',
-//        type:'date',
-//        beforeCellWrite:function(){
-//            var originDate = new Date(Date.UTC(1899,11,30));
-//            return function(row, cellData, eOpt){
-//              // uncomment it for style example 
-//              // if (eOpt.rowNum%2){
-//                // eOpt.styleIndex = 1;
-//              // }  
-//              // else{
-//                // eOpt.styleIndex = 2;
-//              // }
-//              if (cellData === null){
-//                eOpt.cellType = 'string';
-//                return 'N/A';
-//              } else
-//                return (cellData - originDate) / (24 * 60 * 60 * 1000);
-//            } 
-//        }()
-//        , width:20.85
-//    },{
-//        caption:'bool',
-//        type:'bool'
-//    },{
-//        caption:'number',
-//        type:'number',
-//        width:30
-//    }];
-//    conf.rows = [
-//      ['pi', new Date(Date.UTC(2013, 4, 1)), true, 3.14159],
-//      ["e", new Date(2012, 4, 1), false, 2.7182],
-//      ["M&M<>'", new Date(Date.UTC(2013, 6, 9)), false, 1.61803],
-//      ["null date", null, true, 1.414]
-//    ];
-//  var result = nodeExcel.execute(conf);
-//  res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-//  res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
-//  res.end(result, 'binary');
-//});
-
 app.get('/Excel', function(req, res){
 
     /*Search without limits*/

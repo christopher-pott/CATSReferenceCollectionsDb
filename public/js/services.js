@@ -66,7 +66,11 @@ serviceMod.factory('catsAPIservice', function($http) {
                 url : '/login?username=' + email + '&password=' + password,
                 method : "POST",
             });
-        }
+        },
+		loggedin : function() {
+			var url = "/loggedin";
+			return $http.get(url);
+		}
 	};
 });
 
