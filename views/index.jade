@@ -19,7 +19,7 @@ block body
 						|Login
 				button(ng-show="loggedin", ng-click="logout()", popover="Logout", popover-trigger="mouseenter", popover-popup-delay="2000", popover-placement="bottom").btn.btn-default
 					span.glyphicon.glyphicon-user 
-						|Logout
+						|Logout {{email}}
 				script(type="text/ng-template")#myLoginContent
 					div.modal-header
 						h3 Login

@@ -5,24 +5,29 @@
 angular.module('myApp.controllers', ['ui.bootstrap']).
 controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPIservice) {
     
+	/*initialise login state*/
     catsAPIservice.loggedin().success(function (response) {
-        state.loggedin = !!response;
+        state.loggedin = (response == "0") ? false : true;
+        $scope.email = (response == "0") ? false : response.username;
+        state.email = $scope.email;
         $scope.loggedin = state.loggedin;
     }).error(function (err) {
         state.loggedin = false;
     });
-
     
-    /* Search button click directs over to the search controller
-       and saves the search term to the state where it can be
-       retrieved by the search controller when triggered by this
-       change on the searchRequested flag */
-    $scope.searchClicked = function(searchTerm) {
-        $location.path('/search');
-        state.searchTerm = searchTerm;
-        state.searchRequested = true;
-    };
-
+    /*update login button even when we're in another scope*/
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.loggedin; },
+        // This is the change handler
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+            	$scope.email = state.email;
+                $scope.loggedin = state.loggedin;
+            }
+        }
+    );
+    
     /* Opens the user login modal window*/
     $scope.loginUser = function () {
         var loginModalInstance =  $modal.open({
@@ -37,11 +42,20 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
         .success(function (response) {
             state.loggedin = false;
             $scope.loggedin = state.loggedin;
-            //loginSucccess("Logout succeeded");
         })
         .error(function (err) {
             errorAlert(err);
         });
+    };
+    
+    /* Search button click directs over to the search controller
+       and saves the search term to the state where it can be
+       retrieved by the search controller when triggered by this
+       change on the searchRequested flag */
+    $scope.searchClicked = function(searchTerm) {
+        $location.path('/search');
+        state.searchTerm = searchTerm;
+        state.searchRequested = true;
     };
 }).
 controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
@@ -130,11 +144,11 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
 
     /* Needed for older browsers which don't support click() on href's */
     var fakeClick = function(anchorObj) {
-    	/*try to click*/
+    	/*try to click()*/
     	if (anchorObj.click){
     		anchorObj.click();
     	}else if(document.createEvent) {
-    	/*don't ask (thankyou slashdot)*/	
+    	/*otherwise, try this (thankyou slashdot)*/	
     	    var evt = document.createEvent("MouseEvents"); 
     	    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
     	    var allowDefault = anchorObj.dispatchEvent(evt);
@@ -148,7 +162,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     	
     	var blob = null;
     	var docType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-        
+
         catsAPIservice.Excel(searchTerm).success(function (response) {
 
             /*package the newly generated spreadsheet data as blob we can use for file download*/
@@ -572,6 +586,7 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         /*Perform authentication*/
         catsAPIservice.login(email, password)
         .success(function (response) {
+        	state.email = response.username;
             state.loggedin = true;
             loginSucccess("Login succeeded");
         })

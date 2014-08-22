@@ -195,7 +195,7 @@ div#viewContainer
 									label Source
 								div.col-sm-4{{record.stretcherSource}}
 				accordion(close-others="false")
-					accordion-group(heading="Analysis {{$index + 1}} : {{item.type.name}}", is-open="status.open", ng-repeat="item in record.sampleAnalysis")
+					accordion-group(ng-show="item.type.name", heading="Analysis {{$index + 1}} : {{item.type.name}}", is-open="status.open", ng-repeat="item in record.sampleAnalysis")
 						div.row(ng-show="item.referenceNumber")
 							div.col-sm-4
 								label Ref. number

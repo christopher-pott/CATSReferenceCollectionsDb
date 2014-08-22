@@ -607,7 +607,7 @@ div#searchContainer
 				span.glyphicon.glyphicon-ban-circle 
 					|Reset
 		div.col-sm-1
-			button(ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
+			button(ng-show="loggedin", ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-plus 
 					|Register
 
@@ -630,8 +630,8 @@ div#searchContainer
 					th Institution
 					th Location
 					th Date
-					th Edit
-					th Delete
+					th(ng-show="loggedin") Edit
+					th(ng-show="loggedin") Delete
 			tbody
 				tr(ng-repeat="res in searchResultsList")
 					td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
@@ -641,7 +641,7 @@ div#searchContainer
 					td{{res.sampleDate  | date:'dd/MM/yyyy'}}
 					td: button(ng-show="loggedin", ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
-					td: button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td: button(ng-show="loggedin", ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 
 	div.group.row
 		div.col-sm-10

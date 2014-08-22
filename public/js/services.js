@@ -7,11 +7,11 @@ var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 serviceMod.factory('catsAPIservice', function($http) {
 	return {
 		search : function(term) {
-			var url = "newSearch?type=sample&pageSize=100&partialterm=" + term;
+			var url = "search?type=sample&pageSize=100&partialterm=" + term;
 			return $http.get(url);
 		},
         searchSize : function(term) {
-            var url = "newSearchSize?type=sample&partialterm=" + term;
+            var url = "searchSize?type=sample&partialterm=" + term;
             return $http.get(url);
         },		
 		createSample : function(postData) {
