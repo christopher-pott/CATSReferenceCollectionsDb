@@ -24,16 +24,6 @@ serviceMod.factory('catsAPIservice', function($http) {
 				}
 			});
 		},
-		update : function(id, sampleData) {
-			return $http({
-				url : 'sample?id=' + id,
-				method : "PUT",
-				data : sampleData,
-				headers : {
-					'Content-Type' : 'application/json'
-				}
-			});
-		},
 		delete : function(id) {
 			return $http({
 				url : 'sample?id=' + id,
@@ -67,6 +57,12 @@ serviceMod.factory('catsAPIservice', function($http) {
                 method : "POST",
             });
         },
+        logout : function() {
+            return $http({
+                url : '/logout',
+                method : "POST",
+            });
+        },        
 		loggedin : function() {
 			var url = "/loggedin";
 			return $http.get(url);

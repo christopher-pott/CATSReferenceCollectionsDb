@@ -324,7 +324,7 @@ app.get('/Excel', function(req, res){
                     /*shared fields */
                     conf.rows[i] = [];
                     conf.rows[i][ii++] = body[i].sampleType.name;
-                    conf.rows[i][ii++] = body[i].referenceNumber;
+                    conf.rows[i][ii++] = (body[i].referenceNumber) ? body[i].referenceNumber : null;
                     conf.rows[i][ii++] = (body[i].originLocation) ? body[i].originLocation : null;
                     conf.rows[i][ii++] = (body[i].sampleDate) ? body[i].sampleDate : null;
                     conf.rows[i][ii++] = (body[i].owner && body[i].owner.name) ? body[i].owner.name : null;
@@ -589,6 +589,10 @@ app.get('/newSearchSize', function(req, res) {
  */
 app.post('/sample', function(req, res) {
 
+    if (!req.isAuthenticated()){
+        res.send(401);
+    };
+
     var body = req.body;
 
     /* MongoDB creates _id as an ObjectID, but doesn't retrieve _id as an ObjectID, so
@@ -609,16 +613,6 @@ app.post('/sample', function(req, res) {
     });
 });
 
-app.put('/sample', function(req, res) {
-    
-    var sampleId = req.query.id;
-    var body = req.body;
-    /* if _id is present, record will be updated
-     * 
-     * NOTE: This command is dropped as post does an upsert
-     */
-});
-
 /*
  * Sample options : DELETE will fail with 404 if the browser uses CORS and
  * sends an OPTIONS request which doesn't get answered
@@ -630,6 +624,10 @@ app.options('/sample', function(req, res){
 });
 
 app.delete('/sample', function(req, res){
+    
+    if (!req.isAuthenticated()){
+        res.send(401);
+    };
 
     /* If successful returns the number of deleted records
      */
@@ -638,8 +636,7 @@ app.delete('/sample', function(req, res){
     db.samples.remove({"_id": id}, function(err, numberRemoved){
         if (err || !numberRemoved){
             console.log("delete failed");
-            res.send(err); //send calls res.end()
-//            throw err;
+            res.send(err);
         } else {
             console.log("delete successful");
             res.send(numberRemoved);
@@ -678,6 +675,10 @@ app.post('/artwork', function(req, res){
  * Returns the record _id.
  * */
 app.post('/artwork', function(req, res){
+
+    if (!req.isAuthenticated()){
+        res.send(401);
+    };
 
     var body = req.body;
 

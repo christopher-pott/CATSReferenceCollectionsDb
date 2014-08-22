@@ -3,8 +3,16 @@
 /* Controllers */
 
 angular.module('myApp.controllers', ['ui.bootstrap']).
-controller('AppCtrl', function ($scope, $http, state, $location, $modal) {
+controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPIservice) {
+    
+    catsAPIservice.loggedin().success(function (response) {
+        state.loggedin = !!response;
+        $scope.loggedin = state.loggedin;
+    }).error(function (err) {
+        state.loggedin = false;
+    });
 
+    
     /* Search button click directs over to the search controller
        and saves the search term to the state where it can be
        retrieved by the search controller when triggered by this
@@ -23,6 +31,18 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal) {
             controller: loginModalInstanceCtrl
         });
     };
+    
+    $scope.logout = function() {
+        catsAPIservice.logout()
+        .success(function (response) {
+            state.loggedin = false;
+            $scope.loggedin = state.loggedin;
+            //loginSucccess("Logout succeeded");
+        })
+        .error(function (err) {
+            errorAlert(err);
+        });
+    };
 }).
 controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
@@ -35,6 +55,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     // Call the partial search service
     $scope.search = function() {
         catsAPIservice.search(state.searchTerm).success(function (response) {
+            $scope.searchTerm = state.searchTerm;
             $scope.searchResultsList = response;
             state.resultList = response;
             $scope.searchCount();
@@ -53,16 +74,19 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     
     //do this differently : ....or what
     
-    $scope.loggedin = function() {
-    	catsAPIservice.loggedin().success(function (response) {
-    		var x =   response;
-            return x;
-        }).error(function (err) {
-            return false
-        });
-    	return x;
-    };
-
+    $scope.loggedin = state.loggedin;
+    
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.loggedin; },
+        // This is the change handler
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+                $scope.loggedin = state.loggedin;
+            }
+        }
+    );
+    
     // Clicking on a reference number will direct over to view mode
     // and save the sample details so the view controller can retrieve them
     $scope.viewSample = function(sample) {
@@ -548,11 +572,13 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         /*Perform authentication*/
         catsAPIservice.login(email, password)
         .success(function (response) {
+            state.loggedin = true;
             loginSucccess("Login succeeded");
         })
         .error(function (err) {
-            errorAlert();
+            errorAlert(err);
         });
+        
     };
 
     var loginSucccess = function(message) {
@@ -594,27 +620,25 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
 // It is not the same as the $modal service used above.
 var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state) {
 
+    var resetRecord = function() {
+        $scope.record = {};
+        
+        /*create initial tabs*/
+        $scope.record.paintLayer = [{id: "1", layerType: "", paintBinder: [], colour: "", 
+                                    pigment: "", dye: "", active: true}];
+        $scope.record.sampleAnalysis = [{id: "1", type: "", description:"", referenceNumber:"", 
+                                        date:"", employee:"", owner:"", originLocation:"", 
+                                        location:"", results:"", active: true}];
+        /*TODO: reset all list values too*/
+    };
+    
     if(lists.record._id) {
         $scope.record = lists.record;
     }
     else {	
-        $scope.record = {
-                sampleType: "",
-                referenceNumber: "", 
-                originLocation: "",
-                sampleDate: "", 
-                employee: "",
-                owner: "",
-                sampleLocation: "",
-                remarks: "",
-                ramanAnalysis: "",
-                ftirAnalysis: "",
-                gcmsChromatagrams: "",
-                paintLayer:[{id: "1", layerType: "", paintBinder: [], colour: "", pigment: "", dye: "", active: true}],
-                sampleAnalysis:[{id: "1", type: "", description:"", referenceNumber:"", date:"", employee:"", owner:"", originLocation:"", location:"", results:"", active: true}],
-                xrayGroup:[{id: "1", kv: "", ma:"", time: "", focus: "", distance: "", filter: "", test: false, active: true}]
-        };
+        resetRecord();
     }
+    
     $scope.artwork = lists.artwork;
     $scope.sampleTypes = lists.sampleTypes;
     $scope.colours = lists.colours;
@@ -770,7 +794,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
             else{
                 /* clear the form */
                 $scope.submitted = false;
-                $scope.record = {};
+                resetRecord();
                 /* TODO: and the rest.... */
             }
         }, 3000);
@@ -796,7 +820,9 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
             recordSaved('Record saved');
         })
         .error(function (err) {
-            saveFailed('Save Sample failed. Please contact support.');
+            var message = "Save Sample failed ";
+            message += (err) ? "(" + err + ")" : "";
+            saveFailed(message);
         });
         state.searchRequested = true; /*refresh search results*/
     };
@@ -809,7 +835,9 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
                 saveSample($scope.record);  //TODO move to server
             })
             .error(function (err) {
-                saveFailed('Save Artwork & Sample failed. Please contact support.');
+                var message = "Save Artwork & Sample failed ";
+                message += (err) ? "(" + err + ")" : "";
+                saveFailed(message);
             });
     }
 
