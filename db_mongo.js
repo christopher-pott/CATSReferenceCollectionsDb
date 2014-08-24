@@ -3,7 +3,7 @@
  */
 
 var databaseUrl = "cats";
-var collections = ["samples", "artworks"];
+var collections = ["samples", "artworks", "users"];
 var db = require("./node_modules/mongojs").connect(databaseUrl, collections);
 
 //Create text index on all fields in sample collection

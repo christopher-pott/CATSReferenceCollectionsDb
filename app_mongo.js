@@ -10,6 +10,8 @@ var express = require('express'),
     path = require('path'),
     db = require("./db_mongo"),
     Q = require('q'),
+    bcrypt = require('bcrypt-nodejs'),
+    SALT_WORK_FACTOR = 10,
     passport = require('passport');
 
 var app = module.exports = express();
@@ -49,54 +51,62 @@ if (app.get('env') === 'production') {
 
 var LocalStrategy = require('passport-local').Strategy;
 
-/*temporary setup faking database*/
-var users = [
-             { id: 1, username: 'bob@example.com', password: 'secret' },
-             { id: 2, username: 'joe@example.com', password: 'birthday' }
-            ];
+//Bcrypt middleware : return hashed password 
+function encrypt(password, next) {
+
+	/*if(!user.isModified('password')) return next();*/
+
+	bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
+		if(err) return next(err);
+
+		/*hash(pswd, salt, progress(), callback())*/
+		bcrypt.hash(password, salt, null, function(err, hash) { 
+			if(err) return next(err, null);
+			password = hash;
+			return next(null,password);
+		});
+	});
+};
 
 function findById(id, fn) {
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
+	
+    var _id = db.ObjectId(id); 	
+	
+	db.users.find({"_id": _id}).toArray(function(err, users) {
+		if(err | !users){return fn(err, null);}		
+		if(users){return fn(null, users[0]);}
+    });
 }
 
 function findByUsername(username, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    if (user.username === username) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
+
+	db.users.find({"username": username}).toArray(function(err, users) {
+		if(err | !users){return fn(err, null);}		
+		if(users){return fn(null, users[0]);}
+    });
 }
 
-/*Passport strategy (local)*/
+/*Passport strategy (local) Used when authenticating*/
 passport.use(new LocalStrategy( function(username, password, done) {
 
-    // asynchronous verification, for effect... TODO: remove when database is used
-    process.nextTick(function () {
-
-        /* Find the user by username.  If there is no user with the given
-           username, or the password is not correct, set the user to `false` to
-           indicate failure and set a flash message.  Otherwise, return the
-           authenticated `user`*/
-        findByUsername(username, function(err, user) {
-            if (err) { return done(err); }
-            if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
-            if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
-            return done(null, user);
-         })
-        });
-    }
-));
+    /* Find the user by username.  If there is no user with the given username
+       or the password is not correct then return an error, otherwise, return the
+       authenticated user*/
+    findByUsername(username, function(err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
+        
+        /* compare password with the hash */
+    	bcrypt.compare(password, user.password, function(err, isMatch) {
+    		if(err | !isMatch)  return done(null, false, { message: 'Incorrect password.' });
+    		return done(null, user);
+    	});
+ 	})
+}));
 
 /*Passport sessions*/
 passport.serializeUser(function(user, done) {
-    done(null, user.id);
+    done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
@@ -553,6 +563,8 @@ app.get('/searchSize', function(req, res) {
  */
 app.post('/sample', function(req, res) {
 
+	/*the owner or admin... how to check if the cookie matches the name?
+	 * let them change their own password when logged in : this is all*/
     if (!req.isAuthenticated()){
         res.send(401);
     };
@@ -604,6 +616,53 @@ app.delete('/sample', function(req, res){
         } else {
             console.log("delete successful");
             res.send(numberRemoved);
+        }
+    });
+});
+
+/*********************
+ * USER operations
+ *********************/
+
+/* Updates or inserts (upserts) a new user record in mongodb using mongojs.
+ * Returns the record _id.
+ * 
+ * Usage: '/user?username=' + email + '&password=' + password,
+ * */
+app.post('/user', function(req, res){
+	
+	/*for now, anyone can create users*/
+//    if (!req.isAuthenticated()){
+//        res.send(401);
+//    };
+
+    var username = req.query.username;
+    var password = req.query.password;
+
+    var options = {};
+    options.query = {'username' : username};  /*query by username*/
+    options.upsert = true;                    /*if query doesn't find a record then insert a new one */
+    options.new = true;                       /*return the modified document (not the original)*/
+    options.fields = {username: 1};           /*define fields for the returned document: just the id*/
+
+    password = encrypt(password,  function(err, hash) {
+    	
+    	/*called when encrypt resolved*/	
+        options.update = {$set: {"username": username, "password": hash}};   /*data to write to the record*/
+
+        if (err || !hash){
+            console.log("user " + username + " not saved");
+            throw err;
+        } else {
+        	db.users.findAndModify(options, function (err, record, lastErr) {
+    	        if (err || !record){
+    	            console.log("user " + username + " not saved");
+    	            throw err;
+    	        } else {
+    	            console.log('user upsert successful, username: ' + record.username);
+    	            res.send(record); /*or maybe just 200, or created whatever that is*/
+    	        }
+    	    });
         }
     });
 });
