@@ -629,11 +629,13 @@ app.delete('/sample', function(req, res){
  * 
  * Usage: curl -H "Content-Type: application/json" 
  *             --cookie "connect.sid=s%3AIzaNbY6BuBKwcZxkdKI73Mo4.S6hhH7mzJPooqfXPI4TPIdKZws3Cxq3lDYmL%2FEtqgNw" 
- *             -d '{"username":"cpo@smk.dk", "password":"bob"}' 
+ *             -d '{"username":"a_user@smk.dk", "password":"a_password"}' 
  *             http://localhost:3000/user
  *
  *             (To get the session cookie, first login)
- *             The first admin user needs 'somehow' creating in the database
+ *             
+ *             The first admin user needs creating in the database like this.....password is "admin"....change it!
+ *             db.users.update({username: "cpo@smk.dk"},{ "_id" : ObjectId("53fae078e001c8c6af798ecd"), "username" : "cpo@smk.dk", "password" : "$2a$10$j4GD2P.isxPBgMCcEiFrPOBbRl4uTpeG.qQKe.trtnNj1M1yrF.te", "role" : "admin" }, {upsert:"true"})
  * */
 app.post('/user', function(req, res){
 	
@@ -687,6 +689,42 @@ app.post('/user', function(req, res){
     	            res.send(record); /*or maybe just 200, or 201*/
     	        }
     	    });
+        }
+    });
+});
+
+/*
+ * Sample options : DELETE will fail with 404 if the browser uses CORS and
+ * sends an OPTIONS request which doesn't get answered
+ */
+app.options('/user', function(req, res){
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'DELETE');
+    res.end();
+});
+
+/*
+ * Delete a user profile
+ * Usage: user?username=someuser@smk.dk
+ */
+app.delete('/user', function(req, res){
+    
+    if (!req.isAuthenticated() || req.user.role != "admin"){
+        res.send(401);
+    };
+
+    /* If successful returns the number of deleted records
+     */
+    var username = req.query.username;
+    console.log("DELETE " + username);
+
+    db.users.remove({"username": username}, function(err, numberRemoved){
+        if (err || !numberRemoved){
+            console.log("delete failed");
+            res.send(err);
+        } else {
+            console.log("delete successful");
+            res.send(numberRemoved);
         }
     });
 });
