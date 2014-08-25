@@ -66,7 +66,17 @@ serviceMod.factory('catsAPIservice', function($http) {
 		loggedin : function() {
 			var url = "/loggedin";
 			return $http.get(url);
-		}
+		},
+	    updateUser : function(postData) {
+	            return $http({
+	                url : 'user',
+	                method : "POST",
+	                data : postData,
+	                headers : {
+	                    'Content-Type' : 'application/json'
+	                }
+	            });
+	        },
 	};
 });
 

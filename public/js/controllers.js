@@ -573,14 +573,21 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
 
     $scope.alerts = [];
 
-    $scope.login = function (form, email, password) {
+    $scope.login = function (form, email, password, newPassword, newPasswordRepeat, changePassword) {
 
         /* show required fields only after a save attempt */
         $scope.submitted = true;
 
         if (form.$invalid){
-            missingAlert();
+            loginAlert('Missing email or password');
             return;
+        }
+        
+        if(changePassword){
+            if(!newPassword || !newPasswordRepeat || newPassword != newPasswordRepeat){
+                loginAlert('Both new passwords must be the same');
+                return;
+            }
         }
         
         /*Perform authentication*/
@@ -588,12 +595,22 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         .success(function (response) {
         	state.email = response.username;
             state.loggedin = true;
+            
+            if(changePassword){
+                var data = {"username": email, "password": newPassword, "role":"default"};
+                catsAPIservice.updateUser(data)
+                .success(function (response) {
+                    loginSucccess("Password Changed");
+                })
+                .error(function (err) {
+                    loginAlert('Password not changed');
+                });
+            }
             loginSucccess("Login succeeded");
         })
         .error(function (err) {
-            errorAlert(err);
+            loginAlert('Wrong user or password');
         });
-        
     };
 
     var loginSucccess = function(message) {
@@ -606,18 +623,9 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         }, 3000);
     };
     
-    var missingAlert = function() {
+    var loginAlert = function(message) {
 
-       $scope.alerts.push({type: 'danger', msg: 'Missing email or password', 
-                           icon: 'glyphicon glyphicon-warning-sign'});
-        $timeout(function(){
-            $scope.alerts.splice(0, 1);
-        }, 3000);
-    };
-    
-    var errorAlert = function() {
-
-        $scope.alerts.push({type: 'danger', msg: 'Wrong user or password', 
+        $scope.alerts.push({type: 'danger', msg: message, 
                             icon: 'glyphicon glyphicon-warning-sign'});
          $timeout(function(){
              $scope.alerts.splice(0, 1);

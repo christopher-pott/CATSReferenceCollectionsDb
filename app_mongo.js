@@ -627,18 +627,42 @@ app.delete('/sample', function(req, res){
 /* Updates or inserts (upserts) a new user record in mongodb using mongojs.
  * Returns the record _id.
  * 
- * Usage: '/user?username=' + email + '&password=' + password,
+ * Usage: curl -H "Content-Type: application/json" 
+ *             --cookie "connect.sid=s%3AIzaNbY6BuBKwcZxkdKI73Mo4.S6hhH7mzJPooqfXPI4TPIdKZws3Cxq3lDYmL%2FEtqgNw" 
+ *             -d '{"username":"cpo@smk.dk", "password":"bob"}' 
+ *             http://localhost:3000/user
+ *
+ *             (To get the session cookie, first login)
+ *             The first admin user needs 'somehow' creating in the database
  * */
 app.post('/user', function(req, res){
 	
-	/*for now, anyone can create users*/
-//    if (!req.isAuthenticated()){
-//        res.send(401);
-//    };
+    if (!req.isAuthenticated()){  /*session cookie must be present*/
+        res.send(401); /*unauthorised*/
+    };
 
-    var username = req.query.username;
-    var password = req.query.password;
-
+    /* send user details in request body rather than as url parameters to avoid 
+     * server logging and browser history caching */
+    var username = req.body.username;
+    var password = req.body.password;
+    var role = req.body.role;
+    
+    /*missing name or password*/
+    if(!username || !password){
+        res.send(400); /*bad request*/
+    } 
+    
+    /*only admin can edit others passwords*/
+    if(req.user.username != username && req.user.role != "admin"){ 
+        res.send(401); /*unauthorised*/
+    };
+    
+    /*Only admin can alter role*/
+    if(req.user.role != "admin"){ 
+        role = "default";
+    };
+    
+    /*setup mongo findAndModify options*/
     var options = {};
     options.query = {'username' : username};  /*query by username*/
     options.upsert = true;                    /*if query doesn't find a record then insert a new one */
@@ -648,7 +672,7 @@ app.post('/user', function(req, res){
     password = encrypt(password,  function(err, hash) {
     	
     	/*called when encrypt resolved*/	
-        options.update = {$set: {"username": username, "password": hash}};   /*data to write to the record*/
+        options.update = {$set: {"username": username, "password": hash, "role": role}};   /*data to write to the record*/
 
         if (err || !hash){
             console.log("user " + username + " not saved");
@@ -660,7 +684,7 @@ app.post('/user', function(req, res){
     	            throw err;
     	        } else {
     	            console.log('user upsert successful, username: ' + record.username);
-    	            res.send(record); /*or maybe just 200, or created whatever that is*/
+    	            res.send(record); /*or maybe just 200, or 201*/
     	        }
     	    });
         }
