@@ -610,6 +610,10 @@ div#searchContainer
 			button(ng-show="loggedin", ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-plus 
 					|Register
+		div.col-sm-1
+			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
+				span.glyphicon.glyphicon-download 
+					|Export
 
 	div.group.row
 		p
@@ -625,8 +629,10 @@ div#searchContainer
 					h4 The search returned {{searchResultsListSize}} result(s)
 					br
 				tr
-					th Reference number
+					th Sample Ref num
+					th Artwork ref num
 					th Type
+					th Analysis
 					th Institution
 					th Location
 					th Date
@@ -635,22 +641,19 @@ div#searchContainer
 			tbody
 				tr(ng-repeat="res in searchResultsList")
 					td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
+					td{{res.artwork.inventoryNum}}
 					td: a(href= "", ng-click="viewSample(res)") {{res.sampleType.name}}
+					td
+						div(ng-repeat="analysis in res.sampleAnalysis") 
+								{{analysis.type.name}}
 					td{{res.owner.name}}
 					td{{res.sampleLocation}}
 					td{{res.sampleDate  | date:'dd/MM/yyyy'}}
-					td: button(ng-show="loggedin", ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td(ng-show="loggedin"): button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-edit 
-					td: button(ng-show="loggedin", ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+					td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 							span.glyphicon.glyphicon-remove 
 	div.group.row
 		div.col-sm-10
-		div.col-sm-1
-			button(popover="Generate a report of the search results in .pdf format", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
-				span.glyphicon.glyphicon-print 
-					|Report
-		div.col-sm-1
-			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
-				span.glyphicon.glyphicon-download 
-					|Export
+
 

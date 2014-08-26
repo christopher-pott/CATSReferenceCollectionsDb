@@ -28,19 +28,19 @@ block body
 							div.form-group
 								label.control_label(for="email") Email
 								input(type="email", ng-model="email", ng-required="true", ng-model-options="{updateOn: 'blur'}",
-										required).form-control
+										required, placeholder="Email").form-control
 							div.form-group
 								label.control_label(for="password") Password
 								input(type="password", ng-model="password", ng-required="true", ng-model-options="{updateOn: 'blur'}",
-										required).form-control
+										required, placeholder="Password").form-control
 							div.form-group(ng-show="changePassword")
 								label.control_label New Password
 								input(type="password", ng-model="newPassword", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
-										required).form-control
+										required, placeholder="New password").form-control
 							div.form-group(ng-show="changePassword")
 								label.control_label New Password (repeat)
 								input(type="password", ng-model="newPasswordRepeat", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
-										required).form-control
+										required, placeholder="New password (repeat)").form-control
 							alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
 							button(ng-click="login(form, email, password, newPassword, newPasswordRepeat, changePassword)", type="button").btn.btn-primary.btn-block Login
 					div.modal-footer

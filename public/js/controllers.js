@@ -836,7 +836,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
          * want to send them to the sample record as well)
          * */
         var rec = JSON.parse(JSON.stringify(record)); /*quick cheat to copy a simple json object*/
-        delete rec.artwork;
+     //   delete rec.artwork; now we'll keep it!!
         
         catsAPIservice.createSample(rec)
         .success(function (response) {

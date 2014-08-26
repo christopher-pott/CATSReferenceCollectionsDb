@@ -414,6 +414,8 @@ app.get('/Excel', function(req, res){
  * SEARCH operations
  **********************/
 /*
+ * Search Corpus(solr) for SMK artworks
+ * 
  * Proxy to SMKs collectionspace solr instance as browser rejects cross origin
  * requests. Response can be chunked, so we pipe all chunks back to the client.
  *
@@ -443,6 +445,8 @@ app.get('/searchsmk', function(req, res) {
 });
 
 /*
+ * Now redundant....
+ * 
  * For an array of samples, fetch the related artwork.
  * Uses promises to simulate a synchronous interface.
  */
@@ -501,24 +505,37 @@ app.get('/search', function(req, res) {
         if (partialterm){
             
             db.samples.find({
+                /* $text : performs a text search on the content of the fields indexed with a text index*/
                 "$text": {
+                    /*  $search: A string of terms that MongoDB parses and uses to query the text index. 
+                     *  MongoDB performs a logical OR search of the terms unless specified as a phrase.*/
                   "$search": partialterm
                 }
             })
             //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
             .limit(pageSize)
             .toArray(function(err, items) {
+                if(err | !items){
+                  /*this is called if any of the promises have failed */
+                  console.error(err);
+                  res.end();  /*?check*/
+                }else{
+                  console.log(items);
+                  res.send(items);
+                }
 
-                var results = getArtworks(items);
-
-                results.then(function(result){
-                    /*this is called when all promises in getArtworks have completed*/
-                    console.log(result);
-                    res.send(result);
-                }, function (err) {
-                    /*this is called if any of the promises have failed */
-                    console.error(err); 
-                });
+                res.send(items);
+                /*stop looking up artworks*/
+//                var results = getArtworks(items);
+//
+//                results.then(function(result){
+//                    /*this is called when all promises in getArtworks have completed*/
+//                    console.log(result);
+//                    res.send(result);
+//                }, function (err) {
+//                    /*this is called if any of the promises have failed */
+//                    console.error(err); 
+//                });
             });
         }
     }
@@ -545,10 +562,14 @@ app.get('/searchSize', function(req, res) {
                 }
             })
             .count(function(err, count) {
-                console.log("searchSize: " + count);
                 /* if you pass an integer, express framework will use it to set the
                  * HTTP status code. To avoid this, we need to cast it to a string */
-                res.send(count.toString());
+                if(err | !count){
+                    res.send("0");
+                }else{
+                    console.log("searchSize: " + count);
+                    res.send(count.toString());
+                }
             });
         }
     }
