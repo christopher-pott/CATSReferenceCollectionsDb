@@ -599,11 +599,23 @@ div#searchContainer
 					span.glyphicon.glyphicon-ban-circle 
 						|Cancel
 	div.group.row
-		div.col-sm-10
-			button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
+		// div.col-sm-10
+		div.form-group.col-sm-10
+			label.col-sm-2 Filter results by artwork production date
+			div(ng-controller="DatepickerCntrl").col-sm-2
+				div.input-group
+					input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="earliestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+					span.input-group-btn
+						button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
+			div(ng-controller="DatepickerCntrl").col-sm-2
+				div.input-group
+					input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", placeholder="Latest date", ng-model="latestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+					span.input-group-btn
+						button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
+		// button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-filter 
 					|Filter
-			button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
+		// button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-ban-circle 
 					|Reset
 		div.col-sm-1
@@ -611,16 +623,9 @@ div#searchContainer
 				span.glyphicon.glyphicon-plus 
 					|Register
 		div.col-sm-1
-			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
+			button(ng-click="exortClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
-
-	div.group.row
-		p
-	div.group.row
-		p
-	div.group.row
-		p
 	div.group.row
 		table.table.table-hover
 			thead
