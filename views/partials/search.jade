@@ -656,10 +656,10 @@ div#searchContainer
 						th(ng-show="loggedin") Edit
 						th(ng-show="loggedin") Delete
 				tbody
-					tr(ng-repeat="res in searchResultsList")
+					tr(ng-repeat="res in searchResultsList", ng-click="viewSample(res)")
 						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
 						td{{res.artwork.inventoryNum}}
-						td: a(href= "", ng-click="viewSample(res)") {{res.sampleType.name}}
+						td{{res.sampleType.name}}
 						td
 							div(ng-repeat="analysis in res.sampleAnalysis") 
 									{{analysis.type.name}}
