@@ -1,5 +1,10 @@
 /* app css stylesheet */
 
+/*show modals within accordions*/
+.panel-group .panel {
+    overflow: inherit;
+}
+
 /*red error border*/
 form.submitted .has-error, form.submitted .ng-invalid {
 /*   border-color: red; */

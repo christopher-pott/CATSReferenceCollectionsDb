@@ -599,65 +599,77 @@ div#searchContainer
 					span.glyphicon.glyphicon-ban-circle 
 						|Cancel
 	div.group.row
-		// div.col-sm-10
-		div.form-group.col-sm-10
-			label.col-sm-2 Filter results by artwork production date
-			div(ng-controller="DatepickerCntrl").col-sm-2
-				div.input-group
-					input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="earliestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
-					span.input-group-btn
-						button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
-			div(ng-controller="DatepickerCntrl").col-sm-2
-				div.input-group
-					input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", placeholder="Latest date", ng-model="latestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
-					span.input-group-btn
-						button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
+		accordion(close-others="false").col-sm-8.col-xs-12.col-lg-10
+			accordion-group(is-open="statusMeta.isFirstOpen")
+				accordion-heading
+					button(popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right").btn.btn-default
+						span.glyphicon.glyphicon-filter 
+							| Filter
+				div.row
+					div.form-group.row
+						label.col-sm-2.col-lg-1 Sample type
+						catsmultiselect(ng-model="searchSampleType", options="c.name c.dkname group by grp for c in sampleTypes",
+							ms-header="Sample type").col-lg-2.col-sm-3
+					div.form-group.row
+						label.col-sm-2.col-lg-1 Artwork date
+						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
+							div.input-group
+								input(type="text", datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="earliestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								span.input-group-btn
+									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
+							div.input-group
+								input(type="text", datepicker-popup="{{format}}", placeholder="Latest date", ng-model="latestSearchDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								span.input-group-btn
+									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
+		
 		// button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-filter 
 					|Filter
 		// button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-ban-circle 
 					|Reset
-		div.col-sm-1
+		div.col-lg-1.col-sm-2
 			button(ng-show="loggedin", ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-plus 
 					|Register
-		div.col-sm-1
-			button(ng-click="exortClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
+		div.col-lg-1.col-sm-2
+			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
 	div.group.row
-		table.table.table-hover
-			thead
-				tr
-					h3 Search Results
-					h4 The search returned {{searchResultsListSize}} result(s)
-					br
-				tr
-					th Sample Ref num
-					th Artwork ref num
-					th Type
-					th Analysis
-					th Institution
-					th Location
-					th Date
-					th(ng-show="loggedin") Edit
-					th(ng-show="loggedin") Delete
-			tbody
-				tr(ng-repeat="res in searchResultsList")
-					td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
-					td{{res.artwork.inventoryNum}}
-					td: a(href= "", ng-click="viewSample(res)") {{res.sampleType.name}}
-					td
-						div(ng-repeat="analysis in res.sampleAnalysis") 
-								{{analysis.type.name}}
-					td{{res.owner.name}}
-					td{{res.sampleLocation}}
-					td{{res.sampleDate  | date:'dd/MM/yyyy'}}
-					td(ng-show="loggedin"): button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
-							span.glyphicon.glyphicon-edit 
-					td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
-							span.glyphicon.glyphicon-remove 
+		div.col-lg-12.col-sm-11
+			h3 Search Results
+			h4(ng-show="searchResultsListSize == 1") The search returned {{searchResultsListSize}} result
+			h4(ng-show="searchResultsListSize != 1") The search returned {{searchResultsListSize}} results
+			table.table.table-hover(ng-show="searchResultsListSize")
+				thead
+					tr
+					tr
+						th Sample Ref num
+						th Artwork ref num
+						th Type
+						th Analysis
+						th Institution
+						th Location
+						th Date
+						th(ng-show="loggedin") Edit
+						th(ng-show="loggedin") Delete
+				tbody
+					tr(ng-repeat="res in searchResultsList")
+						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
+						td{{res.artwork.inventoryNum}}
+						td: a(href= "", ng-click="viewSample(res)") {{res.sampleType.name}}
+						td
+							div(ng-repeat="analysis in res.sampleAnalysis") 
+									{{analysis.type.name}}
+						td{{res.owner.name}}
+						td{{res.sampleLocation}}
+						td{{res.sampleDate  | date:'dd/MM/yyyy'}}
+						td(ng-show="loggedin"): button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+								span.glyphicon.glyphicon-edit 
+						td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+								span.glyphicon.glyphicon-remove 
 	div.group.row
 		div.col-sm-10
 
