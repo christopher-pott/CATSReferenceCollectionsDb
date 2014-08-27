@@ -293,7 +293,7 @@ div#viewContainer
 							div.col-sm-8
 								{{item.results}}
 				accordion(close-others="false")
-					accordion-group(heading="Artwork", is-open="status.open", ng-show="record.artwork.inventoryNum")
+					accordion-group(heading="Artwork", is-open="status.open", is-open="statusMeta.isFirstOpen", ng-show="record.artwork.inventoryNum")
 						div.row(ng-show="record.artwork.inventoryNum")
 							div.col-sm-4
 								label Inv. number

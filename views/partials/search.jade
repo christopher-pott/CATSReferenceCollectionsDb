@@ -634,7 +634,7 @@ div#searchContainer
 				span.glyphicon.glyphicon-plus 
 					|Register
 		div.col-lg-1.col-sm-2
-			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .csv file of the search results", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default
+			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .xlsx spreadsheet of the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="left").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
 	div.group.row
@@ -656,7 +656,7 @@ div#searchContainer
 						th(ng-show="loggedin") Edit
 						th(ng-show="loggedin") Delete
 				tbody
-					tr(ng-repeat="res in searchResultsList", ng-click="viewSample(res)")
+					tr(ng-repeat="res in searchResultsList")
 						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
 						td{{res.artwork.inventoryNum}}
 						td{{res.sampleType.name}}

@@ -503,7 +503,12 @@ app.get('/search', function(req, res) {
         var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
 
         if (partialterm){
-            
+        	/* db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
+        	 *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
+        	 *                        {"sampleType.name": sampletype},
+        	 *                        {"$text": {"$search": partialterm}}
+        	 *                       ]})
+        	 */
             db.samples.find({
                 /* $text : performs a text search on the content of the fields indexed with a text index*/
                 "$text": {
@@ -523,8 +528,6 @@ app.get('/search', function(req, res) {
                   console.log(items);
                   res.send(items);
                 }
-
-                res.send(items);
                 /*stop looking up artworks*/
 //                var results = getArtworks(items);
 //
