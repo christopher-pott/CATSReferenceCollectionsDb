@@ -149,13 +149,13 @@ app.get('/api/name', api.name);
 app.get('/Excel', function(req, res){
 
     /*Search without limits*/
-    var partialterm = req.query.partialterm;
+    var fulltext = req.query.fulltext;
 
-    if (partialterm){
+    if (fulltext){
       
         db.samples.find({
             "$text": {
-              "$search": partialterm
+              "$search": fulltext
             }
         })
    /*   .limit(pageSize)  :  no limit - for reports we need all results*/
@@ -445,10 +445,23 @@ app.get('/searchsmk', function(req, res) {
 });
 
 /*
- * Now redundant....
+ * Now REDUNDANT.... but kept because it may be useful later
+ * and it's an example of promises.
  * 
  * For an array of samples, fetch the related artwork.
  * Uses promises to simulate a synchronous interface.
+ * 
+ * Usage:
+ *               var results = getArtworks(items);
+ *
+ *                results.then(function(result){
+ *                    //this is called when all promises in getArtworks have completed
+ *                    console.log(result);
+ *                    res.send(result);
+ *                }, function (err) {
+ *                    //this is called if any of the promises have failed 
+ *                    console.error(err); 
+ *               });
  */
 function getArtworks(samples) {
     
@@ -490,7 +503,7 @@ function getArtworks(samples) {
  * Uses text index and mongo full text search to retrieve a list of samples
  * Also fetches and appends the related artworks.
  * 
- * Usage: 1. search?type=sample&partialterm=smk&pageNum=1&pageSize=50
+ * Usage: 1. search?type=sample&fulltext=blue&sampletype=Paint%20Cross%20Section&startDate=&endDate==&pageNum=1&pageSize=50
  */
 app.get('/search', function(req, res) {
 
@@ -498,56 +511,53 @@ app.get('/search', function(req, res) {
 
     if(searchType === 'sample'){
         
-        var partialterm = req.query.partialterm;
-//      var pageNum = req.query.pageNum;
+        var fullText = req.query.fulltext;
+        var sampleType = req.query.sampletype;
+        var startDate = req.query.startdate;
+        var endDate = req.query.enddate;
         var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
-
-        if (partialterm){
-        	/* db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
-        	 *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
-        	 *                        {"sampleType.name": sampletype},
-        	 *                        {"$text": {"$search": partialterm}}
-        	 *                       ]})
-        	 */
-            db.samples.find({
-                /* $text : performs a text search on the content of the fields indexed with a text index*/
-                "$text": {
-                    /*  $search: A string of terms that MongoDB parses and uses to query the text index. 
-                     *  MongoDB performs a logical OR search of the terms unless specified as a phrase.*/
-                  "$search": partialterm
-                }
-            })
-            //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
-            .limit(pageSize)
-            .toArray(function(err, items) {
-                if(err | !items){
-                  /*this is called if any of the promises have failed */
-                  console.error(err);
-                  res.end();  /*?check*/
-                }else{
-                  console.log(items);
-                  res.send(items);
-                }
-                /*stop looking up artworks*/
-//                var results = getArtworks(items);
-//
-//                results.then(function(result){
-//                    /*this is called when all promises in getArtworks have completed*/
-//                    console.log(result);
-//                    res.send(result);
-//                }, function (err) {
-//                    /*this is called if any of the promises have failed */
-//                    console.error(err); 
-//                });
-            });
+       /*var pageNum = req.query.pageNum;*/
+        var query = {};
+        var filters = [];
+        
+        /* Build the following query:
+         * 
+         * db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
+         *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
+         *                        {"sampleType.name": sampletype},
+         *                        {"$text": {"$search": fulltext}}
+         *                       ]})
+         */
+        if (fullText){filters.push({"$text" : {"$search": fullText}});}
+        if (sampleType){filters.push({"sampleType.name": sampleType});}
+        if (startDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
+        if (endDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
+        
+        /*apply AND operation if we have any filters*/
+        if(filters.length){
+            query.$and = filters;
         }
+
+        db.samples.find(query)
+        //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
+        .limit(pageSize)
+        .toArray(function(err, items) {
+            if(err | !items){
+              /*this is called if any of the promises have failed */
+              console.error(err);
+              res.end();  /*?check*/
+            }else{
+              console.log(items);
+              res.send(items);
+            }
+        });
     }
 });
 
 /*
  * Returns the size of the search results
  * 
- * Usage: 1. search?type=sample&partialterm=smk
+ * Usage: 1. search?type=sample&fulltext=smk
  */
 app.get('/searchSize', function(req, res) {
 
@@ -555,26 +565,35 @@ app.get('/searchSize', function(req, res) {
 
     if(searchType === 'sample'){
 
-        var partialterm = req.query.partialterm;
+        var fulltext = req.query.fulltext;
+        var query = {};
 
-        if (partialterm){
+        if (fulltext){
+            /* db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
+             *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
+             *                        {"sampleType.name": sampletype},
+             *                        {"$text": {"$search": fulltext}}
+             *                       ]})
+             */
 
-            db.samples.find({
+            query = {
                 "$text": {
-                  "$search": partialterm
+                  "$search": fulltext
                 }
-            })
-            .count(function(err, count) {
-                /* if you pass an integer, express framework will use it to set the
-                 * HTTP status code. To avoid this, we need to cast it to a string */
-                if(err | !count){
-                    res.send("0");
-                }else{
-                    console.log("searchSize: " + count);
-                    res.send(count.toString());
-                }
-            });
+            };
         }
+
+        db.samples.find(query)
+        .count(function(err, count) {
+            /* if you pass an integer, express framework will use it to set the
+             * HTTP status code. To avoid this, we need to cast it to a string */
+            if(err | !count){
+                res.send("0");
+            }else{
+                console.log("searchSize: " + count);
+                res.send(count.toString());
+            }
+        });
     }
 });
 

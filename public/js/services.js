@@ -6,12 +6,18 @@ var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 
 serviceMod.factory('catsAPIservice', function($http) {
 	return {
-		search : function(term) {
-			var url = "search?type=sample&pageSize=100&partialterm=" + term;
+		search : function(term, sampletype, startdate, enddate) {
+			var url = "search?type=sample&pageSize=100" 
+			        + ((!!term) ? "&fulltext=" + term : "") 
+                    + ((!!sampletype) ? "&sampletype=" + sampletype : "") 
+                    + ((!!startdate) ? "&startdate=" + startdate : "") 
+                    + ((!!enddate) ? "&enddate=" + enddate : "");
+                    
 			return $http.get(url);
 		},
         searchSize : function(term) {
-            var url = "searchSize?type=sample&partialterm=" + term;
+            var url = "searchSize?type=sample&fulltext=" 
+                    + ((!!term) ? term : "");
             return $http.get(url);
         },		
 		createSample : function(postData) {
@@ -46,7 +52,7 @@ serviceMod.factory('catsAPIservice', function($http) {
 		},
         Excel : function(term) {
             return $http({
-                url : "Excel?partialterm=" + term,
+                url : "Excel?fulltext=" + term,
                 method : "GET",
                 responseType: 'arraybuffer' /*important!*/
             });
