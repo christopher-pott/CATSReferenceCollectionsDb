@@ -52,7 +52,7 @@ serviceMod.factory('catsAPIservice', function($http) {
 		},
         Excel : function(term) {
             return $http({
-                url : "Excel?fulltext=" + term,
+                url : "Excel?fulltext=" + ((!!term) ? term : ""),
                 method : "GET",
                 responseType: 'arraybuffer' /*important!*/
             });

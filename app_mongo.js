@@ -70,10 +70,10 @@ function encrypt(password, next) {
 
 function findById(id, fn) {
 	
-    var _id = db.ObjectId(id); 	
+    var _id = db.ObjectId(id);
 	
 	db.users.find({"_id": _id}).toArray(function(err, users) {
-		if(err | !users){return fn(err, null);}		
+		if(err || !users){return fn(err, null);}
 		if(users){return fn(null, users[0]);}
     });
 }
@@ -81,7 +81,7 @@ function findById(id, fn) {
 function findByUsername(username, fn) {
 
 	db.users.find({"username": username}).toArray(function(err, users) {
-		if(err | !users){return fn(err, null);}		
+		if(err || !users){return fn(err, null);}
 		if(users){return fn(null, users[0]);}
     });
 }
@@ -98,7 +98,7 @@ passport.use(new LocalStrategy( function(username, password, done) {
         
         /* compare password with the hash */
     	bcrypt.compare(password, user.password, function(err, isMatch) {
-    		if(err | !isMatch)  return done(null, false, { message: 'Incorrect password.' });
+    		if(err || !isMatch)  return done(null, false, { message: 'Incorrect password.' });
     		return done(null, user);
     	});
  	})
@@ -150,264 +150,259 @@ app.get('/Excel', function(req, res){
 
     /*Search without limits*/
     var fulltext = req.query.fulltext;
+    var query = {};
 
     if (fulltext){
-      
-        db.samples.find({
-            "$text": {
-              "$search": fulltext
-            }
-        })
-   /*   .limit(pageSize)  :  no limit - for reports we need all results*/
-        .toArray(function(err, items) {
-
-            var results = getArtworks(items);
-
-            results.then(function(result){
-
-                /*build excel sheet*/
-                var body = result;
-                var conf ={};
-                conf.cols = [
-                {
-                    caption:'Sample Type',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Ref.num',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Sample origin',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Sample date',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Institution',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'Employee',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Sample location',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Remarks',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'Fibre type(s)',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'Fibre glue',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'(Fibre) Ligin',
-                    type:'string',
-                    width:10
-                },{
-                    caption:'(Fibre) Alum',
-                    type:'string',
-                    width:10
-                },{
-                    caption:'(Fibre) Filler',
-                    type:'string',
-                    width:10
-                },{
-                    caption:'Material type(s)',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'(Paint) Priming',
-                    type:'string',
-                    width:15
-                },{
-                    caption:'Paint layers description',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'Paint layers',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'(Pigment) Colour Classification',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Source',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Production no./Batch no.',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'(Pigment) Secondary provenance',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Place of origin',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Chemical composition',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Pigment name',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Other names',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Form',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Production date',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Pigment) Container',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Stretcher type',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Material type',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Condition',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Joint technique',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Dimensions',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Production earliest',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Production date latest',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'(Stretcher) Source',
-                    type:'string',
-                    width:20
-                },{
-                    caption:'Sample Analysis',
-                    type:'string',
-                    width:30
-                },{
-                    caption:'Artwork Inventory Num.',
-                    type:'string',
-                    width:20
-                }];
-
-                conf.rows = [];
-                for (i = 0; i<body.length; i++){
-                    var ii = 0;
-                    /*shared fields */
-                    conf.rows[i] = [];
-                    conf.rows[i][ii++] = body[i].sampleType.name;
-                    conf.rows[i][ii++] = (body[i].referenceNumber) ? body[i].referenceNumber : null;
-                    conf.rows[i][ii++] = (body[i].originLocation) ? body[i].originLocation : null;
-                    conf.rows[i][ii++] = (body[i].sampleDate) ? body[i].sampleDate : null;
-                    conf.rows[i][ii++] = (body[i].owner && body[i].owner.name) ? body[i].owner.name : null;
-                    conf.rows[i][ii++] = (body[i].employee) ? body[i].employee : null;
-                    conf.rows[i][ii++] = (body[i].sampleLocation) ? body[i].sampleLocation : null;
-                    conf.rows[i][ii++] = (body[i].remarks) ? body[i].remarks : null;
-                    
-                    /*paper fields*/
-                    conf.rows[i][ii++] = (body[i].fibreType) ? body[i].fibreType.map(function(elem){return elem.name;}).join(", ") : null;
-                    conf.rows[i][ii++] = (body[i].fibreGlue) ? body[i].fibreGlue.map(function(elem){return elem.name;}).join(", ") : null;
-                    conf.rows[i][ii++] = (body[i].fibreLigin) ? true : null;
-                    conf.rows[i][ii++] = (body[i].fibreAlum) ? true : null;
-                    conf.rows[i][ii++] = (body[i].fibreFiller) ? true : null;
-                    
-                    /*material fields*/
-                    conf.rows[i][ii++] = (body[i].materialType) ? body[i].materialType.map(function(elem){return elem.name;}).join(", ") : null;
-                    
-                    /*paint fields*/
-                    conf.rows[i][ii++] = (body[i].paintPriming) ? true : null;
-                    conf.rows[i][ii++] = (body[i].paintLayerDescription) ? body[i].paintLayerDescription : null;
-                    conf.rows[i][ii++] = (body[i].paintLayer && body[i].paintLayer[0].layerType.name) ? 
-                        body[i].paintLayer.map(function(elem){
-                            /*format all layer data for a single cell*/
-                            var layer = "";
-                            var binders = (elem.paintBinder) ? elem.paintBinder.map(function(elem){return elem.name;}).join(", ") : "";
-                            var colours = (elem.colour) ? elem.colour.map(function(elem){return elem.name;}).join(", ") : "";
-                            var pigments = (elem.pigment) ? elem.pigment.map(function(elem){return elem.name;}).join(", ") : "";
-                            var dyes = (elem.dye) ? elem.dye.map(function(elem){return elem.name;}).join(", ") : "";
-                            
-                            layer = elem.layerType.name + " layer" +
-                                    "\n  Binders: " + binders +
-                                    "\n  Colours: " + colours +
-                                    "\n  Pigments: " + pigments +
-                                    "\n  Dyes: " + dyes;
-                            
-                            return layer;
-                        }).join("\n\n") : null;
-
-                    /*pigment fields*/
-                    conf.rows[i][ii++] = (body[i].pigmentColourClass && body[i].pigmentColourClass.name) ? body[i].pigmentColourClass.name : null;
-                    conf.rows[i][ii++] = (body[i].pigmentSource) ? body[i].pigmentSource : null;
-                    conf.rows[i][ii++] = (body[i].pigmentProdNumber) ? body[i].pigmentProdNumber : null;
-                    conf.rows[i][ii++] = (body[i].pigmentSecondryProvenance) ? body[i].pigmentSecondryProvenance : null;
-                    conf.rows[i][ii++] = (body[i].pigmentOrigin) ? body[i].pigmentOrigin : null;
-                    conf.rows[i][ii++] = (body[i].pigmentComposition) ? body[i].pigmentComposition : null;
-                    conf.rows[i][ii++] = (body[i].pigmentName && body[i].pigmentName.name) ? body[i].pigmentName.name : null;
-                    conf.rows[i][ii++] = (body[i].pigmentOtherName) ? body[i].pigmentOtherName : null;
-                    conf.rows[i][ii++] = (body[i].pigmentForm && body[i].pigmentForm.name) ? body[i].pigmentForm.name : null;
-                    conf.rows[i][ii++] = (body[i].productionDate) ? body[i].productionDate : null;
-                    conf.rows[i][ii++] = (body[i].pigmentContainer && body[i].pigmentContainer.name) ? body[i].pigmentContainer.name : null;
-
-                    /*stretcher fields*/
-                    conf.rows[i][ii++] = (body[i].stretcherType) ? body[i].stretcherType.map(function(elem){return elem.name;}).join(", ") : null;
-                    conf.rows[i][ii++] = (body[i].stretcherMaterialType) ? body[i].stretcherMaterialType.map(function(elem){return elem.name;}).join(", ") : null;
-                    conf.rows[i][ii++] = (body[i].stretcherCondition && body[i].stretcherCondition.name) ? body[i].stretcherCondition.name : null;
-                    conf.rows[i][ii++] = (body[i].stretcherJointTechnique) ? body[i].stretcherJointTechnique.map(function(elem){return elem.name;}).join(", ") : null;
-                    conf.rows[i][ii++] = (body[i].stretcherDimensions) ? body[i].stretcherDimensions : null;
-                    conf.rows[i][ii++] = (body[i].stretcherProductionDateEarliest) ? body[i].stretcherProductionDateEarliest : null;
-                    conf.rows[i][ii++] = (body[i].stretcherProductionDateLatest) ? body[i].stretcherProductionDateLatest : null;
-                    conf.rows[i][ii++] = (body[i].stretcherSource) ? body[i].stretcherSource : null;
-
-                    /*analysis field*/
-                    conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
-
-                    /*artwork field*/
-                    conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
-                }
-                var result = nodeExcel.execute(conf);
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-                res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
-                res.end(result, 'binary');
-
-            }, function (err) {
-                /*this is called if any of the promises have failed */
-                console.error(err); 
-            });
-        });
+    	query = {"$text": {"$search": fulltext}};
     }
+    
+    db.samples.find(query)
+    .toArray(function(err, items) {
+
+        if(err || !items){
+        	console.error(err);
+        	res.end();
+        }
+        
+        if(items){
+            /*build excel sheet*/
+            var body = items;
+            var conf ={};
+            conf.cols = [
+            {
+                caption:'Sample Type',
+                type:'string',
+                width:20
+            },{
+                caption:'Ref.num',
+                type:'string',
+                width:20
+            },{
+                caption:'Sample origin',
+                type:'string',
+                width:20
+            },{
+                caption:'Sample date',
+                type:'string',
+                width:20
+            },{
+                caption:'Institution',
+                type:'string',
+                width:30
+            },{
+                caption:'Employee',
+                type:'string',
+                width:20
+            },{
+                caption:'Sample location',
+                type:'string',
+                width:20
+            },{
+                caption:'Remarks',
+                type:'string',
+                width:30
+            },{
+                caption:'Fibre type(s)',
+                type:'string',
+                width:30
+            },{
+                caption:'Fibre glue',
+                type:'string',
+                width:30
+            },{
+                caption:'(Fibre) Ligin',
+                type:'string',
+                width:10
+            },{
+                caption:'(Fibre) Alum',
+                type:'string',
+                width:10
+            },{
+                caption:'(Fibre) Filler',
+                type:'string',
+                width:10
+            },{
+                caption:'Material type(s)',
+                type:'string',
+                width:30
+            },{
+                caption:'(Paint) Priming',
+                type:'string',
+                width:15
+            },{
+                caption:'Paint layers description',
+                type:'string',
+                width:30
+            },{
+                caption:'Paint layers',
+                type:'string',
+                width:30
+            },{
+                caption:'(Pigment) Colour Classification',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Source',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Production no./Batch no.',
+                type:'string',
+                width:30
+            },{
+                caption:'(Pigment) Secondary provenance',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Place of origin',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Chemical composition',
+                type:'string',
+                width:20
+            },{
+                caption:'Pigment name',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Other names',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Form',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Production date',
+                type:'string',
+                width:20
+            },{
+                caption:'(Pigment) Container',
+                type:'string',
+                width:20
+            },{
+                caption:'Stretcher type',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Material type',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Condition',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Joint technique',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Dimensions',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Production earliest',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Production date latest',
+                type:'string',
+                width:20
+            },{
+                caption:'(Stretcher) Source',
+                type:'string',
+                width:20
+            },{
+                caption:'Sample Analysis',
+                type:'string',
+                width:30
+            },{
+                caption:'Artwork Inventory Num.',
+                type:'string',
+                width:20
+            }];
+
+            conf.rows = [];
+            for (i = 0; i<body.length; i++){
+                var ii = 0;
+                /*shared fields */
+                conf.rows[i] = [];
+                conf.rows[i][ii++] = body[i].sampleType.name;
+                conf.rows[i][ii++] = (body[i].referenceNumber) ? body[i].referenceNumber : null;
+                conf.rows[i][ii++] = (body[i].originLocation) ? body[i].originLocation : null;
+                conf.rows[i][ii++] = (body[i].sampleDate) ? body[i].sampleDate : null;
+                conf.rows[i][ii++] = (body[i].owner && body[i].owner.name) ? body[i].owner.name : null;
+                conf.rows[i][ii++] = (body[i].employee) ? body[i].employee : null;
+                conf.rows[i][ii++] = (body[i].sampleLocation) ? body[i].sampleLocation : null;
+                conf.rows[i][ii++] = (body[i].remarks) ? body[i].remarks : null;
+                
+                /*paper fields*/
+                conf.rows[i][ii++] = (body[i].fibreType) ? body[i].fibreType.map(function(elem){return elem.name;}).join(", ") : null;
+                conf.rows[i][ii++] = (body[i].fibreGlue) ? body[i].fibreGlue.map(function(elem){return elem.name;}).join(", ") : null;
+                conf.rows[i][ii++] = (body[i].fibreLigin) ? true : null;
+                conf.rows[i][ii++] = (body[i].fibreAlum) ? true : null;
+                conf.rows[i][ii++] = (body[i].fibreFiller) ? true : null;
+                
+                /*material fields*/
+                conf.rows[i][ii++] = (body[i].materialType) ? body[i].materialType.map(function(elem){return elem.name;}).join(", ") : null;
+                
+                /*paint fields*/
+                conf.rows[i][ii++] = (body[i].paintPriming) ? true : null;
+                conf.rows[i][ii++] = (body[i].paintLayerDescription) ? body[i].paintLayerDescription : null;
+                conf.rows[i][ii++] = (body[i].paintLayer && body[i].paintLayer[0].layerType.name) ? 
+                    body[i].paintLayer.map(function(elem){
+                        /*format all layer data for a single cell*/
+                        var layer = "";
+                        var binders = (elem.paintBinder) ? elem.paintBinder.map(function(elem){return elem.name;}).join(", ") : "";
+                        var colours = (elem.colour) ? elem.colour.map(function(elem){return elem.name;}).join(", ") : "";
+                        var pigments = (elem.pigment) ? elem.pigment.map(function(elem){return elem.name;}).join(", ") : "";
+                        var dyes = (elem.dye) ? elem.dye.map(function(elem){return elem.name;}).join(", ") : "";
+                        
+                        layer = elem.layerType.name + " layer" +
+                                "\n  Binders: " + binders +
+                                "\n  Colours: " + colours +
+                                "\n  Pigments: " + pigments +
+                                "\n  Dyes: " + dyes;
+                        
+                        return layer;
+                    }).join("\n\n") : null;
+
+                /*pigment fields*/
+                conf.rows[i][ii++] = (body[i].pigmentColourClass && body[i].pigmentColourClass.name) ? body[i].pigmentColourClass.name : null;
+                conf.rows[i][ii++] = (body[i].pigmentSource) ? body[i].pigmentSource : null;
+                conf.rows[i][ii++] = (body[i].pigmentProdNumber) ? body[i].pigmentProdNumber : null;
+                conf.rows[i][ii++] = (body[i].pigmentSecondryProvenance) ? body[i].pigmentSecondryProvenance : null;
+                conf.rows[i][ii++] = (body[i].pigmentOrigin) ? body[i].pigmentOrigin : null;
+                conf.rows[i][ii++] = (body[i].pigmentComposition) ? body[i].pigmentComposition : null;
+                conf.rows[i][ii++] = (body[i].pigmentName && body[i].pigmentName.name) ? body[i].pigmentName.name : null;
+                conf.rows[i][ii++] = (body[i].pigmentOtherName) ? body[i].pigmentOtherName : null;
+                conf.rows[i][ii++] = (body[i].pigmentForm && body[i].pigmentForm.name) ? body[i].pigmentForm.name : null;
+                conf.rows[i][ii++] = (body[i].productionDate) ? body[i].productionDate : null;
+                conf.rows[i][ii++] = (body[i].pigmentContainer && body[i].pigmentContainer.name) ? body[i].pigmentContainer.name : null;
+
+                /*stretcher fields*/
+                conf.rows[i][ii++] = (body[i].stretcherType) ? body[i].stretcherType.map(function(elem){return elem.name;}).join(", ") : null;
+                conf.rows[i][ii++] = (body[i].stretcherMaterialType) ? body[i].stretcherMaterialType.map(function(elem){return elem.name;}).join(", ") : null;
+                conf.rows[i][ii++] = (body[i].stretcherCondition && body[i].stretcherCondition.name) ? body[i].stretcherCondition.name : null;
+                conf.rows[i][ii++] = (body[i].stretcherJointTechnique) ? body[i].stretcherJointTechnique.map(function(elem){return elem.name;}).join(", ") : null;
+                conf.rows[i][ii++] = (body[i].stretcherDimensions) ? body[i].stretcherDimensions : null;
+                conf.rows[i][ii++] = (body[i].stretcherProductionDateEarliest) ? body[i].stretcherProductionDateEarliest : null;
+                conf.rows[i][ii++] = (body[i].stretcherProductionDateLatest) ? body[i].stretcherProductionDateLatest : null;
+                conf.rows[i][ii++] = (body[i].stretcherSource) ? body[i].stretcherSource : null;
+
+                /*analysis field*/
+                conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
+
+                /*artwork field*/
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
+            }
+            var result = nodeExcel.execute(conf);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+            res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
+            res.end(result, 'binary');
+        }
+    });
 });
 
 /**********************
@@ -533,7 +528,7 @@ app.get('/search', function(req, res) {
         if (startDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
         if (endDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
         
-        /*apply AND operation if we have any filters*/
+        /*apply AND operation to any filters*/
         if(filters.length){
             query.$and = filters;
         }
@@ -542,7 +537,7 @@ app.get('/search', function(req, res) {
         //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
         .limit(pageSize)
         .toArray(function(err, items) {
-            if(err | !items){
+            if(err || !items){
               /*this is called if any of the promises have failed */
               console.error(err);
               res.end();  /*?check*/
@@ -587,7 +582,7 @@ app.get('/searchSize', function(req, res) {
         .count(function(err, count) {
             /* if you pass an integer, express framework will use it to set the
              * HTTP status code. To avoid this, we need to cast it to a string */
-            if(err | !count){
+            if(err || !count){
                 res.send("0");
             }else{
                 console.log("searchSize: " + count);
