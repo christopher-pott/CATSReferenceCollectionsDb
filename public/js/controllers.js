@@ -914,7 +914,7 @@ function CarouselImageCtrl($scope, state) {
     
     $scope.addArtworkSlide = function(externalurl, title) {
         var imageurl = externalurl.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
-                       + "&mode=hight&hight=600";
+                       + "&mode=width&width=600";
         slides.push({
             image: imageurl,
             text: title

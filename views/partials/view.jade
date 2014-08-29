@@ -322,7 +322,7 @@ div#viewContainer
 							label Owner
 						div.col-sm-4{{record.artwork.owner}}
 	div(ng-controller="CarouselImageCtrl").row
-		div(style="height: 600px").col-sm-5
+		div(style="width: 600px").col-sm-5
 			carousel(interval="myInterval", disable-animation="true")
 				slide(ng-repeat="slide in slides", active="slide.active")
 					img(ng-src="{{slide.image}}", style="margin:auto")

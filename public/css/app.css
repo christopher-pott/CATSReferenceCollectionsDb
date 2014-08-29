@@ -96,6 +96,7 @@ form.submitted .has-error, form.submitted .ng-invalid {
 #viewContainer .carousel-control.left, #viewContainer .carousel-control.right{
 /*  background-image: none; */
 }
+
 /*Fix found on stackoverflow for glyphicon font problem*/
 .glyphicon {
     font-family: inherit;
