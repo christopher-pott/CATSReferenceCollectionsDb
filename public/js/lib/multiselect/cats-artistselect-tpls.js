@@ -117,6 +117,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                        if (solrResp.numFound === 1){ /*there can be only one*/
                            var doc = solrResp.docs[0];
                            artwork.corpusId = doc.csid;
+                           artwork.externalurl = doc.externalurl;
                            artwork.inventoryNum = doc.id;
                            artwork.title = doc.title_first;
                            var earliest = new Date(doc.object_production_date_earliest);

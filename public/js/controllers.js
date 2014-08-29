@@ -696,7 +696,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
 
 
     /* START tabs for paint layers */
-    var setAllInactive = function() {
+    var setAllLayerTabsInactive = function() {
         angular.forEach($scope.record.paintLayer, function(paintLayer) {
             paintLayer.active = false;
         });
@@ -708,7 +708,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     };
 
     $scope.addLayer = function () {
-        setAllInactive();
+        setAllLayerTabsInactive();
         addNewLayer();
     };
 
@@ -718,7 +718,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     /* END tabs for paint layers */
 
     /* START tabs for xray */
-    var setAllInactive = function() {
+    var setAllXrayTabsInactive = function() {
         angular.forEach($scope.record.xrayGroup, function(xrayGroup) {
             xrayGroup.active = false;
         });
@@ -730,7 +730,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     };
 
     $scope.addXray = function () {
-        setAllInactive();
+        setAllXrayTabsInactive();
         addNewXray();
     };
 
@@ -898,20 +898,35 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     };
 };
 
-function CarouselImageCtrl($scope) {
+function CarouselImageCtrl($scope, state) {
 
     $scope.myInterval = -1;
 
     var slides = $scope.slides = [];
+    
     $scope.addSlide = function() {
-        var newWidth = 600 + slides.length;
+        var notVeryRandomKittenNumber = 600 + slides.length;
         slides.push({
-            image: 'http://placekitten.com/' + newWidth + '/600',
-            text: ['More','Extra','Lots of','Surplus'][slides.length % 4] + ' ' +
-            ['Cats', 'Kittys', 'Felines', 'Cutes'][slides.length % 4]
+            image: 'http://placekitten.com/' + notVeryRandomKittenNumber + '/600',
+            text: 'cats'
+        });
+    };
+    
+    $scope.addArtworkSlide = function(externalurl, title) {
+        var imageurl = externalurl.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+                       + "&mode=hight&hight=600";
+        slides.push({
+            image: imageurl,
+            text: title
         });
     };
 
+    if(state.sample && state.sample.artwork && state.sample.artwork.externalurl){
+        $scope.addArtworkSlide(state.sample.artwork.externalurl, 
+                               state.sample.artwork.inventoryNum + ": " + 
+                               state.sample.artwork.title);
+    }
+    
     for (var i=0; i<4; i++) {
         $scope.addSlide();
     }

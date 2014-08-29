@@ -60,5 +60,16 @@ angular.module('myApp.directives', [])
         
         // Below maybe some additional setup
     }
-}]);
+}])
+/*solves bug : http://stackoverflow.com/questions/22641834/angularjs-corousel-stops-working*/
+.directive('disableAnimation', function($animate){
+    return {
+        restrict: 'A',
+        link: function($scope, $element, $attrs){
+            $attrs.$observe('disableAnimation', function(value){
+                $animate.enabled(!value, $element);
+            });
+        }
+    }
+});
 

@@ -16,10 +16,10 @@ block body
 							span.input-group-btn
 								button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
 			div.col-lg-3.col-sm-5.col-md-5.login
-				button(ng-show="!loggedin", ng-click="loginUser()", popover="Login to register new samples", popover-trigger="mouseenter", popover-popup-delay="2000", popover-placement="bottom").btn.btn-default
+				button(ng-show="!loggedin", ng-click="loginUser()").btn.btn-default
 					span.glyphicon.glyphicon-user 
 						|Login
-				button(ng-show="loggedin", ng-click="logout()", popover="Logout", popover-trigger="mouseenter", popover-popup-delay="2000", popover-placement="bottom").btn.btn-default
+				button(ng-show="loggedin", ng-click="logout()").btn.btn-default
 					span.glyphicon.glyphicon-user 
 						|Logout {{email}}
 				script(type="text/ng-template")#myLoginContent

@@ -94,7 +94,7 @@ form.submitted .has-error, form.submitted .ng-invalid {
 }
 /*removes grey background form carousel*/
 #viewContainer .carousel-control.left, #viewContainer .carousel-control.right{
- background-image: none;
+/*  background-image: none; */
 }
 /*Fix found on stackoverflow for glyphicon font problem*/
 .glyphicon {

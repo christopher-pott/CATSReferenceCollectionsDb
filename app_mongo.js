@@ -419,9 +419,10 @@ app.get('/Excel', function(req, res){
 app.get('/searchsmk', function(req, res) {
     var id = req.query.id;
     var options = {
-        host: 'csdev-seb',
-        port: 8180,
-        path: '/solr-example/dev_cats/select?q=id%3A' + id + '&wt=json&indent=true',
+        host: 'solr-02.smk.dk',        //'csdev-seb',
+        port: 8080,                    // 8180,
+        path: '/solr/prod_CATS/' +     //'/solr-example/dev_cats/
+              'select?q=id%3A' + id + '&wt=json&indent=true',
         method: 'GET'
     };
     var proxy = http.request(options, function (resp) {
