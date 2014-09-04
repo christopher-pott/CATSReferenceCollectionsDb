@@ -509,13 +509,17 @@ app.get('/search', function(req, res) {
         
         var fullText = req.query.fulltext;
         var sampleType = req.query.sampletype;
-        var d = new Date(Date.parse(req.query.startdate));
-        var startDate = d.toISOString();
-     //   var startDate = new Date(req.query.startdate);
-     //   var startDate = req.query.startdate;
-        var endDate = req.query.enddate;
+        /*date query requires ISO strings*/
+        var startDate = (req.query.startdate) ? new Date(req.query.startdate).toISOString().replace(/T.*Z/, '') : null;
+        var endDate = (req.query.enddate) ? new Date(req.query.enddate).toISOString().replace(/T.*Z/, '') : null;
+        /*ignore time as artwork date times are not relevant : 
+         * if just a year is selected in datepicker, the time is set to 00:00:00
+         * if a date is selected the time is localized, which means the year could be the
+         * previous year if 01/01/yyyy is used.
+         * Need to test if datepicker is used: does this still work*/
+
+        /*var pageNum = req.query.pageNum;*/
         var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
-       /*var pageNum = req.query.pageNum;*/
         var query = {};
         var filters = [];
         
@@ -529,7 +533,7 @@ app.get('/search', function(req, res) {
          */
         if (fullText){filters.push({"$text" : {"$search": fullText}});}
         if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
+        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});}
         if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
         
         /*apply AND operation to any filters*/
@@ -566,14 +570,16 @@ app.get('/searchSize', function(req, res) {
 
         var fullText = req.query.fulltext;
         var sampleType = req.query.sampletype;
-        var startDate = req.query.startdate;
-        var endDate = req.query.enddate;
+        var startDate = (req.query.startdate) ? new Date(req.query.startdate).toISOString().replace(/T.*Z/, '') : null;
+        var endDate = (req.query.enddate) ? new Date(req.query.enddate).toISOString().replace(/T.*Z/, '') : null;
+        /*ignore time as artwork date times are not relevant*/
+
         var query = {};
         var filters = [];
 
         if (fullText){filters.push({"$text" : {"$search": fullText}});}
         if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
+        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});}
         if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
         
         /*apply AND operation to any filters*/

@@ -108,7 +108,8 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
                 if ( newValue !== oldValue ) {
                     state.filter = $scope.filter
                 }
-            }
+            },
+            true /*object equality*/
         );
     
     //TODO :do this differently : ....or what

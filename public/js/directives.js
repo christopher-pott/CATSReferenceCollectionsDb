@@ -8,59 +8,6 @@ angular.module('myApp.directives', [])
     elm.text(version);
   };
 })
-.directive('cpMultiselectDropdown', [function() {
-    return function(scope, element, attributes) {
-        
-        element = $(element[0]); // Get the element as a jQuery element
-        
-        // Below setup the dropdown:
-        
-        element.multiselect({
-            buttonClass : 'btn btn-large',
-            buttonWidth : '200px',
-            includeSelectAllOption: true,
-            buttonContainer : '<div class="btn-group" />',
-            maxHeight : 200,
-            enableFiltering : true,
-            enableCaseInsensitiveFiltering: true,
-            buttonText : function(options) {
-                if (options.length == 0) {
-                    return element.data()['placeholder'] + ' <b class="caret"></b>';
-                } else if (options.length > 1) {
-                    return _.first(options).text 
-                    + ' + ' + (options.length - 1)
-                    + ' more selected <b class="caret"></b>';
-                } else {
-                    return _.first(options).text
-                    + ' <b class="caret"></b>';
-                }
-            },
-            // Replicate the native functionality on the elements so
-            // that angular can handle the changes for us.
-            onChange: function (optionElement, checked) {
-                optionElement.removeAttr('selected');
-                if (checked) {
-                    optionElement.prop('selected', 'selected');
-                }
-                element.change();
-            }
-            
-        });
-        // Watch for any changes to the length of our select element
-        scope.$watch(function () {
-            return element[0].length;
-        }, function () {
-            element.multiselect('rebuild');
-        });
-        
-        // Watch for any changes from outside the directive and refresh
-        scope.$watch(attributes.ngModel, function () {
-            element.multiselect('refresh');
-        });
-        
-        // Below maybe some additional setup
-    }
-}])
 /*solves bug : http://stackoverflow.com/questions/22641834/angularjs-corousel-stops-working*/
 .directive('disableAnimation', function($animate){
     return {
@@ -71,5 +18,44 @@ angular.module('myApp.directives', [])
             });
         }
     }
-});
+})
+/*Solves date timezone bug: https://github.com/angular-ui/bootstrap/issues/2072
+ * 
+ * Removes the timezone (and hence localisation) from dates 
+ * Usage: datepicker-localdate
+ * */
+.directive('datepickerLocaldate', ['$parse', function ($parse) {
+    var directive = {
+        restrict: 'A',
+        require: ['ngModel'],
+            link: link
+        };
+        return directive;
+ 
+        function link(scope, element, attr, ctrls) {
+            var ngModelController = ctrls[0];
+ 
+            // called with a JavaScript Date object when picked from the datepicker
+        ngModelController.$parsers.push(function (viewValue) {
+        	
+        	if(!viewValue) return null; /*cpo : otherwise dates cannot be deleted*/
+            // undo the timezone adjustment we did during the formatting
+            viewValue.setMinutes(viewValue.getMinutes() - viewValue.getTimezoneOffset());
+            // we just want a local date in ISO format
+                return viewValue.toISOString().substring(0, 10);
+            });
+ 
+            // called with a 'yyyy-mm-dd' string to format
+        ngModelController.$formatters.push(function (modelValue) {
+            if (!modelValue) {
+                return undefined;
+            }
+            // date constructor will apply timezone deviations from UTC (i.e. if locale is behind UTC 'dt' will be one day behind)
+            var dt = new Date(modelValue);
+            // 'undo' the timezone offset again (so we end up on the original date again)
+            dt.setMinutes(dt.getMinutes() + dt.getTimezoneOffset());
+            return dt;
+        });
+    }
+}]);
 
