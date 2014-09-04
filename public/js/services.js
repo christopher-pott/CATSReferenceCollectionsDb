@@ -6,18 +6,20 @@ var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 
 serviceMod.factory('catsAPIservice', function($http) {
 	return {
-		search : function(term, sampletype, startdate, enddate) {
+		search : function(term, filter) {
 			var url = "search?type=sample&pageSize=100" 
 			        + ((!!term) ? "&fulltext=" + term : "") 
-                    + ((!!sampletype) ? "&sampletype=" + sampletype : "") 
-                    + ((!!startdate) ? "&startdate=" + startdate : "") 
-                    + ((!!enddate) ? "&enddate=" + enddate : "");
-                    
+                    + ((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
+                    + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
+                    + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
 			return $http.get(url);
 		},
-        searchSize : function(term) {
-            var url = "searchSize?type=sample&fulltext=" 
-                    + ((!!term) ? term : "");
+        searchSize : function(term, filter) {
+            var url = "searchSize?type=sample" 
+                    + ((!!term) ? "&fulltext=" + term : "") 
+                    + ((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
+                    + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
+                    + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
             return $http.get(url);
         },		
 		createSample : function(postData) {

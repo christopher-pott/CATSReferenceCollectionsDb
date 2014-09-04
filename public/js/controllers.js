@@ -5,6 +5,9 @@
 angular.module('myApp.controllers', ['ui.bootstrap']).
 controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPIservice) {
     
+    /*unsure where to init this*/
+    state.filter = {};
+    
 	/*initialise login state*/
     catsAPIservice.loggedin().success(function (response) {
         state.loggedin = (response == "0") ? false : true;
@@ -27,7 +30,7 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
             }
         }
     );
-    
+
     /* Opens the user login modal window*/
     $scope.loginUser = function () {
         var loginModalInstance =  $modal.open({
@@ -60,15 +63,24 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
 }).
 controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
+    $scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
+                        {id: 'material', name: 'Material Sample', grp:'Physical samples'},
+                        {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
+                        {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
+                        {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
+                        {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
+    
     // These must be read here, otherwise the list will be empty when
     // the browser 'back' button is pressed after viewing a single record
     $scope.searchResultsList = state.resultList;
     $scope.searchResultsListSize = state.resultListSize;
     $scope.searchTerm = state.searchTerm;
+    $scope.filter = state.filter;
 
-    // Call the partial search service
+    // Call the full text search service (currently returns 100 results)
     $scope.search = function() {
-        catsAPIservice.search(state.searchTerm).success(function (response) {
+        catsAPIservice.search(state.searchTerm, $scope.filter)
+        .success(function (response) {
             $scope.searchTerm = state.searchTerm;
             $scope.searchResultsList = response;
             state.resultList = response;
@@ -76,9 +88,10 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         });
     };
     
-    // Call the partial search service
+    // Get the total number of results
     $scope.searchCount = function() {
-        catsAPIservice.searchSize(state.searchTerm).success(function (response) {
+        catsAPIservice.searchSize(state.searchTerm, $scope.filter)
+        .success(function (response) {
             $scope.searchResultsListSize = response;
             state.resultListSize = response;
         }).error(function (err) {
@@ -86,7 +99,19 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         });
     };
     
-    //do this differently : ....or what
+    
+    $scope.$watch(
+            // This is the listener function
+            function() { return $scope.filter; },
+            // This is the change handler
+            function(newValue, oldValue) {
+                if ( newValue !== oldValue ) {
+                    state.filter = $scope.filter
+                }
+            }
+        );
+    
+    //TODO :do this differently : ....or what
     
     $scope.loggedin = state.loggedin;
     

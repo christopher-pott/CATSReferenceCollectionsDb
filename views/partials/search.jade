@@ -608,25 +608,25 @@ div#searchContainer
 				div.row
 					div.form-group.row
 						label.col-sm-2.col-lg-1 Sample type
-						catsmultiselect(ng-model="filterSampleType", options="c.name c.dkname group by grp for c in sampleTypes",
-							ms-header="Sample type").col-lg-2.col-sm-3
+						catsmultiselect(ng-model="filter.sampleType", options="c.name c.dkname group by grp for c in sampleTypes",
+							ms-header="Sample type").col-lg-2.col-sm-4
 					div.form-group.row
 						label.col-sm-2.col-lg-1 Artwork date
 						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
 							div.input-group
-								input(type="text", datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="filterEarliestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								input(type="text", datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="filter.earliestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
 							div.input-group
-								input(type="text", datepicker-popup="{{format}}", placeholder="Latest date", ng-model="filterLatestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								input(type="text", datepicker-popup="{{format}}", placeholder="Latest date", ng-model="filter.latestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 					div.form-group.row
 						label.col-sm-2.col-lg-1.control_label 
 						div.col-lg-2.col-sm-3
 							label.checkbox-inline.control_label Apply filter
-								input(type="checkbox", ng-model="$filterApply")
+								input(type="checkbox", ng-model="filter.apply")
 		// button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-filter 
 					|Filter

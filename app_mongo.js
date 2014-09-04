@@ -509,7 +509,10 @@ app.get('/search', function(req, res) {
         
         var fullText = req.query.fulltext;
         var sampleType = req.query.sampletype;
-        var startDate = req.query.startdate;
+        var d = new Date(Date.parse(req.query.startdate));
+        var startDate = d.toISOString();
+     //   var startDate = new Date(req.query.startdate);
+     //   var startDate = req.query.startdate;
         var endDate = req.query.enddate;
         var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
        /*var pageNum = req.query.pageNum;*/
@@ -526,8 +529,8 @@ app.get('/search', function(req, res) {
          */
         if (fullText){filters.push({"$text" : {"$search": fullText}});}
         if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (startDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
-        if (endDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
+        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
+        if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
         
         /*apply AND operation to any filters*/
         if(filters.length){
@@ -561,22 +564,21 @@ app.get('/searchSize', function(req, res) {
 
     if(searchType === 'sample'){
 
-        var fulltext = req.query.fulltext;
+        var fullText = req.query.fulltext;
+        var sampleType = req.query.sampletype;
+        var startDate = req.query.startdate;
+        var endDate = req.query.enddate;
         var query = {};
+        var filters = [];
 
-        if (fulltext){
-            /* db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
-             *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
-             *                        {"sampleType.name": sampletype},
-             *                        {"$text": {"$search": fulltext}}
-             *                       ]})
-             */
-
-            query = {
-                "$text": {
-                  "$search": fulltext
-                }
-            };
+        if (fullText){filters.push({"$text" : {"$search": fullText}});}
+        if (sampleType){filters.push({"sampleType.name": sampleType});}
+        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lt: endDate}});}
+        if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
+        
+        /*apply AND operation to any filters*/
+        if(filters.length){
+            query.$and = filters;
         }
 
         db.samples.find(query)
