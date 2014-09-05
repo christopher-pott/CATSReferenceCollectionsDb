@@ -123,9 +123,9 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                            var earliest = new Date(doc.object_production_date_earliest);
                            
                            artwork.productionDateEarliest = (doc.object_production_date_earliest) ?
-                                                          doc.object_production_date_earliest : "";
+                                                          doc.object_production_date_earliest.substring(0,10) : ""; /*date only*/
                            artwork.productionDateLatest = (doc.object_production_date_latest) ?
-                                                           doc.object_production_date_latest : "";
+                                                           doc.object_production_date_latest.substring(0,10) : "";
                            artwork.artist = doc.artists_data;   
                            artwork.dimensions = doc.dimension_netto;
                            artwork.technique = doc.prod_technique;

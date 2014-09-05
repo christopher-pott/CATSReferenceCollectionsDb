@@ -608,18 +608,19 @@ div#searchContainer
 				div.row
 					div.form-group.row
 						label.col-sm-2.col-lg-1 Sample type
-						catsmultiselect(ng-model="filter.sampleType", options="c.name c.dkname group by grp for c in sampleTypes",
+						catsmultiselect(ng-click="filterChanged()", ng-model="filter.sampleType", options="c.name c.dkname group by grp for c in sampleTypes",
 							ms-header="Sample type").col-lg-2.col-sm-4
 					div.form-group.row
-						label.col-sm-2.col-lg-1 Artwork date
+						label(ng-show="filter.sampleType.id !== 'pigment'").col-sm-2.col-lg-1 Artwork date
+						label(ng-show="filter.sampleType.id == 'pigment'").col-sm-2.col-lg-1 Pigment date
 						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
 							div.input-group
-								input(type="text", datepicker-localdate, datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="filter.earliestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								input(ng-blur="filterChanged()", type="text", datepicker-localdate, datepicker-popup="{{format}}", placeholder="Earliest date", ng-model="filter.earliestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 						div(ng-controller="DatepickerCntrl").col-lg-2.col-sm-4
 							div.input-group
-								input(type="text", datepicker-localdate, datepicker-popup="{{format}}", placeholder="Latest date", ng-model="filter.latestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+								input(ng-blur="filterChanged()", type="text", datepicker-localdate, datepicker-popup="{{format}}", placeholder="Latest date", ng-model="filter.latestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
 					// div.form-group.row
@@ -651,27 +652,27 @@ div#searchContainer
 					tr
 					tr
 						th Sample Ref num
+						th Type
 						th Artwork ref num
 						th Artwork period
-						th Type
+						th Pigment date
 						th Analysis
 						th Institution
 						th Location
-						th Date
 						th(ng-show="loggedin") Edit
 						th(ng-show="loggedin") Delete
 				tbody
 					tr(ng-repeat="res in searchResultsList")
 						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
+						td{{res.sampleType.name}}
 						td{{res.artwork.inventoryNum}}
 						td{{res.artwork.productionDateEarliest | date:'yyyy'}} - {{res.artwork.productionDateLatest | date:'yyyy'}}
-						td{{res.sampleType.name}}
+						td{{res.productionDate | date:'yyyy'}}
 						td
 							div(ng-repeat="analysis in res.sampleAnalysis") 
 									{{analysis.type.name}}
 						td{{res.owner.name}}
 						td{{res.sampleLocation}}
-						td{{res.sampleDate  | date:'dd/MM/yyyy'}}
 						td(ng-show="loggedin"): button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 								span.glyphicon.glyphicon-edit 
 						td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default

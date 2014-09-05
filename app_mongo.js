@@ -533,8 +533,23 @@ app.get('/search', function(req, res) {
          */
         if (fullText){filters.push({"$text" : {"$search": fullText}});}
         if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});}
-        if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
+        /* searches by date should use the related artwork date, except for pigments
+         * which have their own production dates
+         * */
+        if (endDate){
+            if (sampleType == 'Pigment'){
+                filters.push({"productionDate" : {$lte: endDate}});
+            }else{
+                filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});
+            }
+        }
+        if (startDate){
+            if (sampleType == 'Pigment'){
+                filters.push({"productionDate" : {$gte: startDate}});
+            }else{
+                filters.push({"artwork.productionDateLatest" : {$gte: startDate}});
+            }
+        }
         
         /*apply AND operation to any filters*/
         if(filters.length){
@@ -579,8 +594,20 @@ app.get('/searchSize', function(req, res) {
 
         if (fullText){filters.push({"$text" : {"$search": fullText}});}
         if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (endDate){filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});}
-        if (startDate){filters.push({"artwork.productionDateLatest" : {$gte: startDate}});}
+        if (endDate){
+            if (sampleType == 'Pigment'){
+                filters.push({"productionDate" : {$lte: endDate}});
+            }else{
+                filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});
+            }
+        }
+        if (startDate){
+            if (sampleType == 'Pigment'){
+                filters.push({"productionDate" : {$gte: startDate}});
+            }else{
+                filters.push({"artwork.productionDateLatest" : {$gte: startDate}});
+            }
+        }
         
         /*apply AND operation to any filters*/
         if(filters.length){

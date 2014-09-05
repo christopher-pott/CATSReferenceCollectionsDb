@@ -106,12 +106,16 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
             // This is the change handler
             function(newValue, oldValue) {
                 if ( newValue !== oldValue ) {
-                    state.filter = $scope.filter
+                    state.filter = $scope.filter;
+                   // state.searchRequested = true; updates too often
                 }
             },
             true /*object equality*/
         );
     
+    $scope.filterChanged = function(searchTerm) {
+        state.searchRequested = true;
+    };
     //TODO :do this differently : ....or what
     
     $scope.loggedin = state.loggedin;
