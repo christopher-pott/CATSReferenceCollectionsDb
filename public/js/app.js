@@ -11,7 +11,8 @@ angular.module('myApp', [
   'ngAnimate',
   'ui.multiselect',
   'ui.catsmultiselect',
-  'ui.catsartistselect'
+  'ui.catsartistselect',
+  'toggle-switch'
 ]).
 config(function ($routeProvider, $locationProvider) {
     

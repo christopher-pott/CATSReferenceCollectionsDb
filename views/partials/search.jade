@@ -599,10 +599,11 @@ div#searchContainer
 					span.glyphicon.glyphicon-ban-circle 
 						|Cancel
 	div.group.row
-		accordion(close-others="false").col-sm-8.col-xs-12.col-lg-10
-			accordion-group(is-open="statusMeta.isFirstOpen")
+		accordion(close-others="false",ng-click="filterChanged()").col-sm-8.col-xs-12.col-lg-10
+			accordion-group(is-open="filter.isOpen")
 				accordion-heading
-					button(popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right").btn.btn-default
+					toggle-switch(model="switchStatus", knob-label="Filter", popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right")
+					//button(popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right").btn.btn-default
 						span.glyphicon.glyphicon-filter 
 							| Filter
 				div.row
@@ -623,17 +624,6 @@ div#searchContainer
 								input(ng-blur="filterChanged()", type="text", datepicker-localdate, datepicker-popup="{{format}}", placeholder="Latest date", ng-model="filter.latestDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 								span.input-group-btn
 									button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-					// div.form-group.row
-						label.col-sm-2.col-lg-1.control_label 
-						div.col-lg-2.col-sm-3
-							label.checkbox-inline.control_label Apply filter
-								input(type="checkbox", ng-model="filter.apply")
-		// button(popover="The filter is used to enhance your search results by exactly specifying ranges for individual fields", popover-placement="right", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
-				span.glyphicon.glyphicon-filter 
-					|Filter
-		// button(popover="Remove the search request, results and all filters", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
-				span.glyphicon.glyphicon-ban-circle 
-					|Reset
 		div.col-lg-1.col-sm-2
 			button(ng-show="loggedin", ng-click="registerClicked()", popover="Add a new reference sample to the database", popover-trigger="mouseenter", popover-popup-delay="1500").btn.btn-default 
 				span.glyphicon.glyphicon-plus 

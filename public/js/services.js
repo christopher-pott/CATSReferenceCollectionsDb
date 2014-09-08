@@ -8,18 +8,22 @@ serviceMod.factory('catsAPIservice', function($http) {
 	return {
 		search : function(term, filter) {
 			var url = "search?type=sample&pageSize=100" 
-			        + ((!!term) ? "&fulltext=" + term : "") 
-                    + ((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
+			        + ((!!term) ? "&fulltext=" + term : "");
+			if (filter){
+			    url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
                     + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
+			}
 			return $http.get(url);
 		},
         searchSize : function(term, filter) {
             var url = "searchSize?type=sample" 
-                    + ((!!term) ? "&fulltext=" + term : "") 
-                    + ((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
+                    + ((!!term) ? "&fulltext=" + term : "");
+            if (filter){                    
+                url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
                     + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
+            }
             return $http.get(url);
         },		
 		createSample : function(postData) {

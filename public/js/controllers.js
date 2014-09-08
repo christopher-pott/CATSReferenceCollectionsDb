@@ -76,10 +76,12 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     $scope.searchResultsListSize = state.resultListSize;
     $scope.searchTerm = state.searchTerm;
     $scope.filter = state.filter;
+    $scope.switchStatus = state.filter.isOpen;
 
     // Call the full text search service (currently returns 100 results)
     $scope.search = function() {
-        catsAPIservice.search(state.searchTerm, $scope.filter)
+        var filter = ($scope.filter.isOpen) ? $scope.filter : null;
+        catsAPIservice.search(state.searchTerm, filter)
         .success(function (response) {
             $scope.searchTerm = state.searchTerm;
             $scope.searchResultsList = response;
@@ -90,7 +92,8 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     
     // Get the total number of results
     $scope.searchCount = function() {
-        catsAPIservice.searchSize(state.searchTerm, $scope.filter)
+        var filter = ($scope.filter.isOpen) ? $scope.filter : null;
+        catsAPIservice.searchSize(state.searchTerm, filter)
         .success(function (response) {
             $scope.searchResultsListSize = response;
             state.resultListSize = response;
