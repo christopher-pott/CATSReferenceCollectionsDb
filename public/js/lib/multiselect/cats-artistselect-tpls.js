@@ -118,7 +118,7 @@ angular.module('ui.catsartistselect', ['catsartistselect.tpl.html'])
                            var doc = solrResp.docs[0];
                            artwork.corpusId = doc.csid;
                            artwork.externalurl = doc.externalurl;
-                           artwork.inventoryNum = doc.id;
+                           artwork.inventoryNum = doc.id_s;
                            artwork.title = doc.title_first;
                            var earliest = new Date(doc.object_production_date_earliest);
                            

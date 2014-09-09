@@ -145,16 +145,57 @@ app.get('/partials/:name', routes.partials);
 /* JSON API */
 app.get('/api/name', api.name);
 
+
+
+
+function buildSampleQuery(req) {
+    
+    var fullText = req.query.fulltext;
+    var sampleType = req.query.sampletype;
+    /*date query requires ISO strings*/
+    var startDate = (req.query.startdate) ? new Date(req.query.startdate).toISOString().replace(/T.*Z/, '') : null;
+    var endDate = (req.query.enddate) ? new Date(req.query.enddate).toISOString().replace(/T.*Z/, '') : null;
+    /*ignore time as artwork date times are not relevant : 
+     * if just a year is selected in datepicker, the time is set to 00:00:00
+     * if a date is selected the time is localized, which means the year could be the
+     * previous year if 01/01/yyyy is used.
+     * Need to test if datepicker is used: does this still work*/
+
+    var query = {};
+    var filters = [];
+    
+    /* Build the following query:
+     * 
+     * db.samples.find({$and:[{$or: [{"productionDate" : {$lte: endDate}}, {"artwork.productionDateEarliest" : {$lte: endDate}}]},
+     *                        {$or: [{"productionDate" : {$gte: startDate}}, {"artwork.productionDateLatest" : {$gte: startDate}}]},
+     *                        {"sampleType.name": sampletype},
+     *                        {"$text": {"$search": fulltext}
+     *                       }]
+     *                 })
+     */
+    if (fullText){filters.push({"$text" : {"$search": fullText}});}
+    if (sampleType){filters.push({"sampleType.name": sampleType});}
+    /* searches by date should use the related artwork date, except for pigments
+     * which have their own production dates (named productionDate)
+     * */
+    if (endDate){
+        filters.push({$or: [{"productionDate" : {$lte: endDate}}, {"artwork.productionDateEarliest" : {$lte: endDate}}]});
+    }
+    if (startDate){
+        filters.push({$or: [{"productionDate" : {$gte: startDate}}, {"artwork.productionDateLatest" : {$gte: startDate}}]});
+    }
+    /*apply AND operation to any filters*/
+    if(filters.length){
+        query.$and = filters;
+    }
+    return query;
+}
+
 /* Excel export (requires 'excel-export' module)*/
 app.get('/Excel', function(req, res){
 
     /*Search without limits*/
-    var fulltext = req.query.fulltext;
-    var query = {};
-
-    if (fulltext){
-    	query = {"$text": {"$search": fulltext}};
-    }
+    var query = buildSampleQuery(req);
     
     db.samples.find(query)
     .toArray(function(err, items) {
@@ -419,10 +460,10 @@ app.get('/Excel', function(req, res){
 app.get('/searchsmk', function(req, res) {
     var id = req.query.id;
     var options = {
-        host: 'solr-02.smk.dk',        //'csdev-seb',
+        host: 'solr.smk.dk',           //'csdev-seb',
         port: 8080,                    // 8180,
         path: '/solr/prod_CATS/' +     //'/solr-example/dev_cats/
-              'select?q=id%3A' + id + '&wt=json&indent=true',
+              'select?q=id_s%3A' + id + '&wt=json&indent=true',  /*id_s also works on verso & multiworks*/
         method: 'GET'
     };
     var proxy = http.request(options, function (resp) {
@@ -504,58 +545,13 @@ function getArtworks(samples) {
 app.get('/search', function(req, res) {
 
     var searchType = req.query.type;
+  /*var pageNum = req.query.pageNum;*/
+    var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
 
     if(searchType === 'sample'){
         
-        var fullText = req.query.fulltext;
-        var sampleType = req.query.sampletype;
-        /*date query requires ISO strings*/
-        var startDate = (req.query.startdate) ? new Date(req.query.startdate).toISOString().replace(/T.*Z/, '') : null;
-        var endDate = (req.query.enddate) ? new Date(req.query.enddate).toISOString().replace(/T.*Z/, '') : null;
-        /*ignore time as artwork date times are not relevant : 
-         * if just a year is selected in datepicker, the time is set to 00:00:00
-         * if a date is selected the time is localized, which means the year could be the
-         * previous year if 01/01/yyyy is used.
-         * Need to test if datepicker is used: does this still work*/
-
-        /*var pageNum = req.query.pageNum;*/
-        var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
-        var query = {};
-        var filters = [];
+        var query = buildSampleQuery(req);
         
-        /* Build the following query:
-         * 
-         * db.samples.find({$and:[{"artwork.productionDateEarliest" : {$lt: endSearchDate}},
-         *                        {"artwork.productionDateLatest" : {$gte: startSearchDate}},
-         *                        {"sampleType.name": sampletype},
-         *                        {"$text": {"$search": fulltext}}
-         *                       ]})
-         */
-        if (fullText){filters.push({"$text" : {"$search": fullText}});}
-        if (sampleType){filters.push({"sampleType.name": sampleType});}
-        /* searches by date should use the related artwork date, except for pigments
-         * which have their own production dates
-         * */
-        if (endDate){
-            if (sampleType == 'Pigment'){
-                filters.push({"productionDate" : {$lte: endDate}});
-            }else{
-                filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});
-            }
-        }
-        if (startDate){
-            if (sampleType == 'Pigment'){
-                filters.push({"productionDate" : {$gte: startDate}});
-            }else{
-                filters.push({"artwork.productionDateLatest" : {$gte: startDate}});
-            }
-        }
-        
-        /*apply AND operation to any filters*/
-        if(filters.length){
-            query.$and = filters;
-        }
-
         db.samples.find(query)
         //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
         .limit(pageSize)
@@ -580,39 +576,12 @@ app.get('/search', function(req, res) {
 app.get('/searchSize', function(req, res) {
 
     var searchType = req.query.type;
+  /*var pageNum = req.query.pageNum;*/
+    var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
 
     if(searchType === 'sample'){
 
-        var fullText = req.query.fulltext;
-        var sampleType = req.query.sampletype;
-        var startDate = (req.query.startdate) ? new Date(req.query.startdate).toISOString().replace(/T.*Z/, '') : null;
-        var endDate = (req.query.enddate) ? new Date(req.query.enddate).toISOString().replace(/T.*Z/, '') : null;
-        /*ignore time as artwork date times are not relevant*/
-
-        var query = {};
-        var filters = [];
-
-        if (fullText){filters.push({"$text" : {"$search": fullText}});}
-        if (sampleType){filters.push({"sampleType.name": sampleType});}
-        if (endDate){
-            if (sampleType == 'Pigment'){
-                filters.push({"productionDate" : {$lte: endDate}});
-            }else{
-                filters.push({"artwork.productionDateEarliest" : {$lte: endDate}});
-            }
-        }
-        if (startDate){
-            if (sampleType == 'Pigment'){
-                filters.push({"productionDate" : {$gte: startDate}});
-            }else{
-                filters.push({"artwork.productionDateLatest" : {$gte: startDate}});
-            }
-        }
-        
-        /*apply AND operation to any filters*/
-        if(filters.length){
-            query.$and = filters;
-        }
+        var query = buildSampleQuery(req);
 
         db.samples.find(query)
         .count(function(err, count) {
@@ -849,8 +818,15 @@ app.get('/artwork', function(req, res) {
     
     if (invNum){
         console.log("get artwork by invNum: " + invNum);
+        var rg = new RegExp('^\"'+ invNum + '\"$', "i");
+        console.log("regex :" + rg.toString());
+        var query = {"inventoryNum" :  { "$regex" : rg }}
+        console.log(JSON.stringify(query));
 
-        db.artworks.find({"inventoryNum" : invNum})
+        /* Regex will be inefficient, but we must have a case insensitive search for
+         * inventory numbers as we don't want to duplicate records.
+         * */
+        db.artworks.find(query)
         .toArray(function(err, items) {
             res.send(items);
         })

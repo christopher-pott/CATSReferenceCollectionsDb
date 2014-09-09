@@ -629,7 +629,7 @@ div#searchContainer
 				span.glyphicon.glyphicon-plus 
 					|Register
 		div.col-lg-1.col-sm-2
-			button(ng-click="exportClicked(searchTerm)", popover="Generate and download a .xlsx spreadsheet of the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="left").btn.btn-default
+			button(ng-click="exportClicked(searchTerm, filter)", popover="Generate and download a .xlsx spreadsheet of the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="left").btn.btn-default
 				span.glyphicon.glyphicon-download 
 					|Export
 	div.group.row
@@ -644,8 +644,7 @@ div#searchContainer
 						th Sample Ref num
 						th Type
 						th Artwork ref num
-						th Artwork period
-						th Pigment date
+						th Date/period
 						th Analysis
 						th Institution
 						th Location
@@ -656,8 +655,8 @@ div#searchContainer
 						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
 						td{{res.sampleType.name}}
 						td{{res.artwork.inventoryNum}}
-						td{{res.artwork.productionDateEarliest | date:'yyyy'}} - {{res.artwork.productionDateLatest | date:'yyyy'}}
-						td{{res.productionDate | date:'yyyy'}}
+						td(ng-show="res.sampleType.id !== 'pigment'"){{res.artwork.productionDateEarliest | date:'yyyy'}} - {{res.artwork.productionDateLatest | date:'yyyy'}}
+						td(ng-show="res.sampleType.id == 'pigment'"){{res.productionDate | date:'yyyy'}}
 						td
 							div(ng-repeat="analysis in res.sampleAnalysis") 
 									{{analysis.type.name}}

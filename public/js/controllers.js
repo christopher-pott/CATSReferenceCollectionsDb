@@ -80,8 +80,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
 
     // Call the full text search service (currently returns 100 results)
     $scope.search = function() {
-        var filter = ($scope.filter.isOpen) ? $scope.filter : null;
-        catsAPIservice.search(state.searchTerm, filter)
+        catsAPIservice.search(state.searchTerm, $scope.filter)
         .success(function (response) {
             $scope.searchTerm = state.searchTerm;
             $scope.searchResultsList = response;
@@ -92,8 +91,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     
     // Get the total number of results
     $scope.searchCount = function() {
-        var filter = ($scope.filter.isOpen) ? $scope.filter : null;
-        catsAPIservice.searchSize(state.searchTerm, filter)
+        catsAPIservice.searchSize(state.searchTerm, $scope.filter)
         .success(function (response) {
             $scope.searchResultsListSize = response;
             state.resultListSize = response;
@@ -191,12 +189,12 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     /* Generates an excel formatted file (xlsx) containing the search results
      * and triggers a file download
      * */
-    var createExportDoc = function(searchTerm) {
+    var createExportDoc = function(searchTerm, filter) {
     	
     	var blob = null;
     	var docType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-        catsAPIservice.Excel(searchTerm).success(function (response) {
+        catsAPIservice.Excel(searchTerm, filter).success(function (response) {
 
             /*package the newly generated spreadsheet data as blob we can use for file download*/
         	try{
@@ -247,9 +245,9 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
      * adds them to the sample data. When all the responses
      * have been received, creates an excel doc.
      */
-    $scope.exportClicked = function(searchTerm) {
+    $scope.exportClicked = function(searchTerm, filter) {
         
-        createExportDoc(searchTerm);
+        createExportDoc(searchTerm, filter);
 
         
 //        /*create a new unit of work by creating a Deferred object*/

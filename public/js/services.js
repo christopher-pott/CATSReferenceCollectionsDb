@@ -9,7 +9,7 @@ serviceMod.factory('catsAPIservice', function($http) {
 		search : function(term, filter) {
 			var url = "search?type=sample&pageSize=100" 
 			        + ((!!term) ? "&fulltext=" + term : "");
-			if (filter){
+			if (filter && filter.isOpen){
 			    url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
                     + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
@@ -19,7 +19,7 @@ serviceMod.factory('catsAPIservice', function($http) {
         searchSize : function(term, filter) {
             var url = "searchSize?type=sample" 
                     + ((!!term) ? "&fulltext=" + term : "");
-            if (filter){                    
+            if (filter && filter.isOpen){
                 url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
                     + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
@@ -56,9 +56,16 @@ serviceMod.factory('catsAPIservice', function($http) {
 			var url = "artwork?id=" + id;
 			return $http.get(url);
 		},
-        Excel : function(term) {
+        Excel : function(term, filter) {
+            var url = "Excel?fulltext=" 
+                    + ((!!term) ? "&fulltext=" + term : "");
+            if (filter && filter.isOpen){
+                url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
+                    + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
+                    + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
+            }
             return $http({
-                url : "Excel?fulltext=" + ((!!term) ? term : ""),
+                url : url,
                 method : "GET",
                 responseType: 'arraybuffer' /*important!*/
             });
