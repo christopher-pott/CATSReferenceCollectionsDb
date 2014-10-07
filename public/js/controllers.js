@@ -521,17 +521,25 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
          {id: '2', name: 'paper', dkname: 'papir'},
          {id: '2', name: 'plastic container', dkname: 'plastikbeholder'}];
 
-    $scope.lists.colours =
-        [{id: '1', name: 'black', dkname:'sort', grp:''},
-         {id: '2', name: 'blue', dkname:'blå', grp:''},
-         {id: '3', name: 'brown', dkname:'brun', grp:''},
-         {id: '4', name: 'green', dkname:'grøn', grp:''},
-         {id: '5', name: 'grey', dkname:'grå', grp:''},
-         {id: '6', name: 'orange', dkname:'orange', grp:''},
-         {id: '7', name: 'purple', dkname:'lilla', grp:''},
-         {id: '8', name: 'red', dkname:'rød', grp:''},
-         {id: '9', name: 'white', dkname:'hvid', grp:''},
-         {id: '10', name: 'yellow', dkname:'gul', grp:''}];
+//    $scope.lists.colours =
+//        [{id: '1', name: 'black', dkname:'sort', grp:''},
+//         {id: '2', name: 'blue', dkname:'blå', grp:''},
+//         {id: '3', name: 'brown', dkname:'brun', grp:''},
+//         {id: '4', name: 'green', dkname:'grøn', grp:''},
+//         {id: '5', name: 'grey', dkname:'grå', grp:''},
+//         {id: '6', name: 'orange', dkname:'orange', grp:''},
+//         {id: '7', name: 'purple', dkname:'lilla', grp:''},
+//         {id: '8', name: 'red', dkname:'rød', grp:''},
+//         {id: '9', name: 'white', dkname:'hvid', grp:''},
+//         {id: '10', name: 'yellow', dkname:'gul', grp:''}];
+    
+    catsAPIservice.getVocab("colours")
+    .success(function (response) {
+        $scope.lists.colours = response[0].items;
+    })
+    .error(function (err) {
+        loginAlert('Reading vocabs failed!');
+    });
 
     $scope.lists.pigments =
         [{id: '1', name: 'bone black', dkname:'bensort', grp:''},

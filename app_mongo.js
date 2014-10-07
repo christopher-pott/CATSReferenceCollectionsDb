@@ -817,11 +817,9 @@ app.get('/artwork', function(req, res) {
     var id = db.ObjectId(req.query.id);
     
     if (invNum){
-        console.log("get artwork by invNum: " + invNum);
-        var rg = new RegExp('^\"'+ invNum + '\"$', "i");
-        console.log("regex :" + rg.toString());
-        var query = {"inventoryNum" :  { "$regex" : rg }}
-        console.log(JSON.stringify(query));
+        var rg = new RegExp('^'+ invNum + '$', "i");
+        var query = {"inventoryNum" :  { "$regex" : rg }};
+        console.log("get artwork query : " + JSON.stringify(query));
 
         /* Regex will be inefficient, but we must have a case insensitive search for
          * inventory numbers as we don't want to duplicate records.
@@ -836,6 +834,98 @@ app.get('/artwork', function(req, res) {
         db.artworks.find({"_id" : id})
         .toArray(function(err, items) {
             res.send(items);
+        })
+    }
+});
+
+/********************
+ * VOCAB operations
+ ********************/
+
+/* Updates or inserts (upserts) a new vocab in mongodb using mongojs.
+ * 
+ * Expected input:
+ * {type : 'sampleType', item : {name: 'Material Sample', secondaryname: '', grp:'Physical samples'}}
+ * 
+ * Behaviour: "item" will be added to the "items" array of the same "sampleType":
+ * {type : 'sampleType', items : [{name: 'Material Sample', secondaryname: '', grp:'Physical samples'},
+ *                                {name: 'Paint Cross Section', secondaryname: '', grp:'Physical samples'} ]}
+ *                                
+ * Returns: the whole vocab list
+ * */
+app.post('/vocab', function(req, res){
+
+    if (!req.isAuthenticated()){
+        res.send(401);
+    };
+
+    var body = req.body;
+
+    var query = {'type' : body.type, 'items.name' : body.item.name};
+    db.vocabs.find(query).toArray(function(err, items) {
+        /*if vocab doesn't exist*/
+        if (err || !items || items.length == 0){
+            /*create it*/
+            /*inserts new entry if "sampletype" already exists*/
+            /*db.vocabs.update({type:'colours'}, {$addToSet: {items: {name:'pulk', secondaryname:'', grp:'xxxx'}}})*/
+
+            var query = {'type': body.type};
+            var options = {};  //don't need this
+            var b = {$addToSet: 
+                        {items:{name : body.item.name,
+                                secondaryname : body.item.secondaryname,
+                                grp : body.item.grp
+                               }
+                        }
+            };
+            db.vocabs.update(query, b, options, function (err, created) {
+                if (err || !created){
+                    console.log(body.sampleType + " not created");
+                    throw err;
+                } else {
+                    console.log('created successful ');
+                    res.send(created);
+                }
+            });
+
+        } else {
+            /*overwrites an existing entry*/
+            var query = {'type': body.type,'items.name': body.item.name};
+            var options = {};  //don't need this
+            var b = {$set: {"items.$.name": body.item.name, 
+                            "items.$.secondaryname": body.item.secondaryname , 
+                            "items.$.grp": body.item.grp 
+                           }
+            };
+            db.vocabs.update(query, b, options, function (err, updated) {
+                if (err || !updated){
+                    console.log(body.sampleType + " not updated");
+                    throw err;
+                } else {
+                    console.log('update successful ');
+                    res.send(updated);
+                }
+            });
+        }
+    });
+});
+
+app.get('/vocab', function(req, res) {
+
+    var type = req.query.type;
+    
+    if (type){
+        var query = {"type" :  type};
+        console.log("get vocab query : " + JSON.stringify(query));
+
+        db.vocabs.find(query)
+        .toArray(function(err, items) {
+            if (err || !items){
+                console.log("vocab " + type + " not found");
+                throw err;
+            } else {
+                res.send(items);
+            }
         })
     }
 });

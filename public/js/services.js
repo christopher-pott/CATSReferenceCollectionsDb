@@ -56,6 +56,10 @@ serviceMod.factory('catsAPIservice', function($http) {
 			var url = "artwork?id=" + id;
 			return $http.get(url);
 		},
+        getVocab : function(type) {
+            var url = "vocab?type=" + type;
+            return $http.get(url);
+        },
         Excel : function(term, filter) {
             var url = "Excel?fulltext=" 
                     + ((!!term) ? "&fulltext=" + term : "");

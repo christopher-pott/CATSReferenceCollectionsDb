@@ -75,7 +75,7 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Colours
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="paintLayer.colour", options="c.name c.dkname group by grp for c in colours",
+															catsmultiselect(multiple="true", ng-model="paintLayer.colour", options="c.name c.secondaryname group by grp for c in colours",
 															ms-header="Select colours").multi
 													div.form-group
 														label.col-sm-4.control_label Pigments
@@ -200,7 +200,7 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Colour Classification
 											div.col-sm-8
-												catsmultiselect(ng-model="record.pigmentColourClass", options="c.name c.dkname group by grp for c in colours",
+												catsmultiselect(ng-model="record.pigmentColourClass", options="c.name c.secondaryname group by grp for c in colours",
 													ms-header="Select colours").multi
 									div.group.col-sm-6
 										div.form-group

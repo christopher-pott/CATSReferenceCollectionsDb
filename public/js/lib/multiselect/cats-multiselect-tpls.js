@@ -1,6 +1,4 @@
-angular.module('ui.catsmultiselect', [
-  'catsmultiselect.tpl.html'
-])
+angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap'])
 
   //from bootstrap-ui typeahead parser
   .factory('catsoptionParser', ['$parse', function ($parse) {
@@ -9,7 +7,7 @@ angular.module('ui.catsmultiselect', [
 	//	(.*?)   group of any characters together (the whole string) array 1
 	//	(?: starts a non-capturing group - so this won't be captured in the array
 	//  (?:\s+as\s+(.*?))?   this ignores " as _label_"	
-	//  (?:\s+grouped\s+as\s+\((.*?\s+in\s+.*?)\))  this ignores the grouped by clause
+	//  (?:\s+group\s+by\s+\  this ignores the group by clause
 	//  \s+for\s+   matches " for "
 	//  (?:([\$\w][\$\w\d]*)) matches the item name
 	 
@@ -22,7 +20,7 @@ angular.module('ui.catsmultiselect', [
     		// https://gist.github.com/guillaume86/5638205   
     		// angular-bootstrap-typeahead.js    		
 
-    		var match = input.match(TYPEAHEAD_REGEXP), modelMapper, viewMapper, source;
+    		var match = input.match(TYPEAHEAD_REGEXP), modelMapper, viewMapper, source, vocabName;
     		if (!match) {
     			throw new Error(
     					"Expected typeahead specification in form of '_modelValue_ (_translation_)? (group by _group_)? for _item_ in _collection_'" +
@@ -32,6 +30,7 @@ angular.module('ui.catsmultiselect', [
     		return {
     			itemName: match[4],             //the alias for the item
     			grpName: match[3],              //the alias of the group
+    			vocabName: match[5],
     			source: $parse(match[5]),       //the source list of objects for the select
     			viewMapper: $parse(match[1]),   //main label
     			modelMapper: $parse(match[2]),  //danish translation
@@ -40,10 +39,36 @@ angular.module('ui.catsmultiselect', [
     	}
     };
   }])
+  .factory('vocabService', ['$http', function ($http) {
+       return {
+           updateVocab : function(data) {
+               return $http({
+                   url : 'vocab',
+                   method : "POST",
+                   data : data,
+                   headers : {
+                       'Content-Type' : 'application/json'
+                   }
+               });
+           },
+           getVocab : function(type) {
+               var url = "vocab?type=" + type;
+               return $http.get(url);
+           }
+      };
+   }])
+  .factory("multistate", function() {
+    'use strict';
+    var multistate = {};
 
-  .directive('catsmultiselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser',
+    return {
+        multistate : multistate,
+    };
+  })
 
-    function ($parse, $document, $compile, $interpolate, catsoptionParser) {
+  .directive('catsmultiselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser', 'multistate',
+
+    function ($parse, $document, $compile, $interpolate, catsoptionParser, multistate) {
       return {
         restrict: 'E',
         require: 'ngModel',
@@ -113,11 +138,14 @@ angular.module('ui.catsmultiselect', [
             getHeaderText();
             modelCtrl.$setValidity('required', scope.valid());
           }, true);
-
+            
           function parseModel() {
             scope.items.length = 0;
             scope.groups.length = 0;
             var model = parsedResult.source(originalScope);
+            scope.groups.name = parsedResult.vocabName;
+            //            var t = parsedResult.viewMapper(source);
+////            var t2 = parsedResult.group(originalScope);
             if(!angular.isDefined(model)) return;
             
             for (var i = 0; i < model.length; i++) {
@@ -146,18 +174,27 @@ angular.module('ui.catsmultiselect', [
             		grpIndex = scope.groups.push(grp) - 1;
             		//scope.groups[grpIndex].items = [];
             	}
-            	var tag = parsedResult.viewMapper(local);
-            	var translation = parsedResult.modelMapper(local);
-            	if(translation) {
-            		tag += " (" + parsedResult.modelMapper(local) + ")";
+            	var name = parsedResult.viewMapper(local);
+            	var tag = name; //= parsedResult.viewMapper(local);
+            	var secondary = parsedResult.modelMapper(local);
+            	if(secondary) {
+            		tag += " (" + secondary + ")";
             	}
             	//add item
                 scope.groups[grpIndex].items.push({
+                  groupName: grpName,
+                  name: name,
+                  secondary: secondary,
                   label: tag,
                   model: model[i],
                   checked: false,
                   group: parsedResult.groupMapper(local)
                 });
+            }
+            /*sort the vocabularies alphabetically after name*/
+            scope.groups.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+            for(var ii = 0; ii < scope.groups.length; ii++) {
+                scope.groups[ii].items.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
             }
           }
 
@@ -263,6 +300,12 @@ angular.module('ui.catsmultiselect', [
             }
           }
 
+          scope.updateLists = function (list) {
+              var getter = parsedResult.source;
+              var setter = getter.assign;
+              setter(originalScope, list);
+          };
+
           scope.checkAll = function () {
             if (!isMultiple) return;
             angular.forEach(scope.groups, function (group) {
@@ -294,49 +337,167 @@ angular.module('ui.catsmultiselect', [
       };
     }])
 
-  .directive('catsmultiselectPopup', ['$document', function ($document) {
-    return {
-      restrict: 'E',
-      scope: false,
-      replace: true,
-      templateUrl: 'catsmultiselect.tpl.html',
-      link: function (scope, element, attrs) {
+  .directive('catsmultiselectPopup', ['$document', '$compile', 'multistate',
 
-        scope.isVisible = false;
+    function ($document, $compile, multistate) {
+        return {
+          restrict: 'E',
+          scope: false,
+          replace: true,
+          templateUrl: 'catsmultiselect.tpl.html',
+          link: function (scope, element, attrs) {
 
-        scope.toggleSelect = function () {
-          if (element.hasClass('open')) {
-            element.removeClass('open');
-            $document.unbind('click', clickHandler);
-          } else {
-            element.addClass('open');
-            $document.bind('click', clickHandler);
-            scope.focus();
+            scope.isVisible = false;
+
+            scope.toggleSelect = function () {
+              if (element.hasClass('open')) {
+                element.removeClass('open');
+                $document.unbind('click', clickHandler);
+              } else {
+                element.addClass('open');
+                $document.bind('click', clickHandler);
+                scope.focus();
+              }
+            };
+    
+            function clickHandler(event) {
+              if (elementMatchesAnyInArray(event.target, element.find(event.target.tagName)))
+                return;
+              element.removeClass('open');
+              $document.unbind('click', clickHandler);
+              scope.$apply();
+            }
+    
+            scope.focus = function focus(){
+              var searchBox = element.find('input')[0];
+              searchBox.focus();
+            }
+    
+            var elementMatchesAnyInArray = function (element, elementArray) {
+              for (var i = 0; i < elementArray.length; i++)
+                if (element == elementArray[i])
+                  return true;
+              return false;
+            }
           }
-        };
-
-        function clickHandler(event) {
-          if (elementMatchesAnyInArray(event.target, element.find(event.target.tagName)))
-            return;
-          element.removeClass('open');
-          $document.unbind('click', clickHandler);
-          scope.$apply();
         }
+  }])
 
-        scope.focus = function focus(){
-          var searchBox = element.find('input')[0];
-          searchBox.focus();
-        }
+  .controller('ModalVocabCtrl', function ($scope, $modal, multistate) {
 
-        var elementMatchesAnyInArray = function (element, elementArray) {
-          for (var i = 0; i < elementArray.length; i++)
-            if (element == elementArray[i])
-              return true;
-          return false;
-        }
+      $scope.items = ['item1', 'item2', 'item3'];
+ 
+      $scope.addItem = function () {
+          var modalVocabInstanceCtrl =  $modal.open({
+              size: 'lg',
+              templateUrl:'catsvocab.tpl.html',
+              controller: ModalVocabInstanceCtrl,
+              resolve: {
+                  groups: function () {
+                      return $scope.$parent.groups;
+                  },
+                  pnt: function () {
+                      return $scope.$parent;
+                      //return $scope.$parent.groups;
+                  }//,
+                  //vocabService : vocabService
+              } 
+              
+//          modalVocabInstanceCtrl.result.then(function (selectedItem) {
+//            $scope.selected = selectedItem;
+//          }, function () {
+//           // $log.info('Modal dismissed at: ' + new Date());
+//          });
+        });
+     }
+  })
+// Please note that $modalInstance represents a modal window (instance) dependency.
+// It is not the same as the $modal service used above.
+
+var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups, vocabService, pnt) {
+
+  $scope.vocab = {};
+  $scope.groups = groups;
+  $scope.loading = false;
+  $scope.alerts = [];
+  $scope.selected = false;
+
+  
+  //$scope.items = items;
+//  $scope.selected = {
+//  //  item: $scope.items[0]
+//  };
+
+  $scope.ok = function () {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+  
+  $scope.updateSuccess = function(message) {
+
+      $scope.alerts.push({type: 'success', msg: message, icon: 'glyphicon glyphicon-ok'});
+
+      $timeout(function(){
+          $scope.alerts.splice(0, 1);
+        //  $modalInstance.close();
+          $scope.vocab = {}; //restore list
+          $scope.selected = false;
+      }, 3000);
+  };
+  
+  $scope.closeAlert = function(index) {
+      $scope.alerts.splice(index, 1);
+  };
+  
+  $scope.update = function (type) {
+      var v = {'type' : type, 
+               'item' : {'name': $scope.vocab.name,
+                         'secondaryname': $scope.vocab.secName,
+                         'grp': $scope.vocab.grpName,
+                        }
+      };
+      $scope.loading = true;
+      vocabService.updateVocab(v)
+      .success(function (resp) {
+          /*refresh list*/
+          vocabService.getVocab(type)
+          .success(function (response) {
+              var list = response[0].items.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+              pnt.updateLists(list);
+              $scope.updateSuccess("Vocabulary updated successfully");
+              $scope.loading = false;
+          })
+          .error(function (err) {
+              loginAlert('Reading vocabs failed!');
+              $scope.loading = false;
+          });
+      })
+      .error(function (response) {
+
+      })
+  };
+
+  $scope.updateInputs = function (vocab) {
+      $scope.selected = false;
+      for(var i=0;i<$scope.groups.length;i++){
+          for(var ii=0;ii<$scope.groups[i].items.length;ii++){
+              if($scope.groups[i].items[ii].name == vocab){
+                  /*match found*/
+                  $scope.vocab.secName = $scope.groups[i].items[ii].secondary;
+                  $scope.vocab.grpName = $scope.groups[i].name;
+                  $scope.selected = true;
+                  return;
+              }
+          }
       }
-    }
-  }]);
+      $scope.vocab.secName = "";
+      $scope.vocab.grpName = "";
+      return;
+  };
+};
 
 angular.module('catsmultiselect.tpl.html', [])
 
@@ -363,8 +524,13 @@ angular.module('catsmultiselect.tpl.html', [])
       "    <div class=\"col col-sm-8\">\n" +
       "      <input class=\"form-control\" type=\"text\" ng-model=\"searchText.$\" autofocus=\"autofocus\" placeholder=\"Filter\" />\n" +
       "    </div>" +      
-      "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
-      "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-plus\"></i> New </button>\n" +
+//      "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
+//      "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-plus\"></i> New </button>\n" +
+          "<div ng-controller=\"ModalVocabCtrl\">\n" +
+//          "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
+          "    <div class=\"col col-sm-4\">\n" +
+          "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-edit\"></i> Edit list </button>\n" +
+          "    </div>\n" + 
       "    </div>" +
       "  </div>" +
       "  <div class=\"row uigroup\">" + 
@@ -388,4 +554,51 @@ angular.module('catsmultiselect.tpl.html', [])
       "  </div>" +      
       "  </ul>\n" +
       "</div>");
+  }])
+    
+    .run(['$templateCache', function($templateCache) {
+
+        $templateCache.put('catsvocab.tpl.html',
+
+        "<div ng-include=\"\'catsvocab.tpl.html\'\">\n" + //otherwise it doesn't appear first click
+        "    <script type=\"text/ng-template\" id=\"catsvocab.tpl.html\">\n" + 
+        "        <div class=\"modal-header\">\n" + 
+        "            <h3 class=\"modal-title\">Vocabulary Editor</h3>\n" + 
+        "        </div>\n" + 
+        "        <div class=\"modal-body\">\n" + 
+        "          <table class=\"table\">\n" + 
+        "            <h4> {{ groups.name }} </h4>\n" + 
+        "            <thead>\n" + 
+        "               <th> Preferred name </th>\n" +
+        "               <th> Secondary name(s) </th>\n" +
+        "               <th> Group </th>\n" +
+        "               <th></th>\n" +
+        "            </thead>\n" +
+        "            <tbody>\n" +
+        "              <tr>\n" +
+        "                <td><input type=\"text\" ng-model=\"vocab.name\" ng-change=\"updateInputs(vocab.name)\" class=\"form-control\"></input></td>" +
+        "                <td><input type=\"text\" ng-model=\"vocab.secName\" class=\"form-control\"></input></td>" +
+        "                <td><input type=\"text\" ng-model=\"vocab.grpName\" class=\"form-control\"></input></td>" +
+        "                <td><button class=\"btn btn-primary\" ng-disabled=\"!vocab.name\" ng-click=\"update(groups.name)\" ><i class=\"glyphicon glyphicon-save\"></i> Save</button></td>" + 
+        "              </tr>\n" + 
+        "            </tbody>\n" +
+        "            <tbody ng-repeat=\"group in groups\">\n" +
+        "              <tr ng-repeat=\"item in group.items | filter:vocab.name | orderBy:name \">\n" +
+        "                <td> {{ item.name }} </td>" +
+        "                <td> {{ item.secondary }} </td>" +
+        "                <td> {{ group.name }} </td>" +
+        "                <td><i class=\"glyphicon glyphicon-ok\" ng-show=\"vocab.name == item.name\"></i> </td>" +
+        "              </tr>\n" + 
+        "            </tbody>\n" + 
+        "          </table>\n" + 
+        "          <alert ng-repeat=\"alert in alerts\" type=\"{{alert.type}}\" close=\"closeAlert($index)\" class=\"animation\"><i class=\"{{alert.icon}}\"></i> {{alert.msg}}</alert>" +
+        "        </div>\n" + 
+        "        <div class=\"modal-footer\">\n" + 
+        "         <img class=\"spinner\" ng-show=\"loading\" src=\"images/ajax-loader.gif \"></img>" +
+        "            <button class=\"btn btn-primary\" ng-click=\"ok()\">Close</button>\n" + 
+      //"            <button class=\"btn btn-warning\" ng-click=\"cancel()\">Cancel</button>\n" + 
+        "        </div>\n" + 
+        "    </script>\n" +
+        "</div>\n" 
+        );
   }]);
