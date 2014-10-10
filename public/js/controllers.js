@@ -356,72 +356,6 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
                                  {id: '2', name: 'School of Conservation'},
                                  {id: '3', name: 'Statens Museum for Kunst (SMK)'}];
 
-    $scope.lists.materialTypes = 
-        [{id: '1', name: 'glass', dkname:'glas', grp:''},
-         {id: '2', name: 'bisque', dkname:'biskuit', grp:'Ceramical'},
-         {id: '2', name: 'chamotte', dkname:'chamotte', grp:'Ceramical'},
-         {id: '2', name: 'earthenware', dkname:'brændt ler', grp:'Ceramical'},
-         {id: '2', name: 'faience', dkname:'fajance', grp:'Ceramical'},
-         {id: '2', name: 'pipeclay', dkname:'pipeler', grp:'Ceramical'},
-         {id: '2', name: 'plastiline', dkname:'plastilin', grp:'Ceramical'},
-         {id: '2', name: 'porcelain', dkname:'porcelæn', grp:'Ceramical'},
-         {id: '2', name: 'raku', dkname:'raku', grp:'Ceramical'},
-         {id: '2', name: 'roche céramique', dkname:'roche céramique', grp:'Ceramical'},
-         {id: '2', name: 'stoneware', dkname:'stentøj', grp:'Ceramical'},
-         {id: '2', name: 'terra-cotta', dkname:'terrracotta', grp:'Ceramical'},
-         {id: '2', name: 'unfired clay', dkname:'ubrændt ler', grp:'Ceramical'},
-         {id: '2', name: 'canvas', dkname:'lærred', grp:''},
-         {id: '2', name: 'aluminum', dkname:'aluminium)', grp:'Metals'},
-         {id: '2', name: 'bronze', dkname:'bronze', grp:'Metals'},
-         {id: '2', name: 'copper', dkname:'kobber', grp:'Metals'},
-         {id: '2', name: 'gold', dkname:'guld', grp:'Metals'},
-         {id: '2', name: 'iron', dkname:'jern', grp:'Metals'},
-         {id: '2', name: 'lead', dkname:'bly', grp:'Metals'},
-         {id: '2', name: 'leaf gold', dkname:'bladguld', grp:'Metals'},
-         {id: '2', name: 'ore', dkname:'malm', grp:'Metals'},
-         {id: '2', name: 'pewter', dkname:'tin', grp:'Metals'},
-         {id: '2', name: 'silver', dkname:'sølv', grp:'Metals'},
-         {id: '2', name: 'tin', dkname:'blik', grp:'Metals'},
-         {id: '2', name: 'zinc', dkname:'zink', grp:'Metals'},
-         {id: '2', name: 'organic material', dkname:'organisk materiale', grp:''},
-         {id: '2', name: 'pigment scraping', dkname:'pigmentskrab', grp:''},
-         {id: '2', name: 'acrylate', dkname:'akryl', grp:'Synthetic'},
-         {id: '2', name: 'glass fibre', dkname:'glasfiber', grp:'Synthetic'},
-         {id: '2', name: 'plastic', dkname:'plast', grp:'Synthetic'},
-         {id: '2', name: 'polyester', dkname:'polyester', grp:'Synthetic'},
-         {id: '2', name: 'polyurethane foam', dkname:'polyurethanskum', grp:'Synthetic'},
-         {id: '2', name: 'polyvinyl chloride', dkname:'pvc', grp:'Synthetic'},
-         {id: '2', name: 'ash', dkname:'ask', grp:'Wood'},
-         {id: '2', name: 'beech', dkname:'bøgetræ', grp:'Wood'},
-         {id: '2', name: 'birch', dkname:'birketræ', grp:'Wood'},
-         {id: '2', name: 'boxwood', dkname:'buksbom', grp:'Wood'},
-         {id: '2', name: 'Brazilian rosewood', dkname:'palisander', grp:'Wood'},
-         {id: '2', name: 'ebony', dkname:'ibenholt', grp:'Wood'},
-         {id: '2', name: 'elm', dkname:'elmetræ', grp:'Wood'},
-         {id: '2', name: 'lime', dkname:'lindetræ', grp:'Wood'},
-         {id: '2', name: 'mable', dkname:'ahorn', grp:'Wood'},
-         {id: '2', name: 'mahogany', dkname:'mahogni', grp:'Wood'},
-         {id: '2', name: 'nut', dkname:'nøddetræ', grp:'Wood'},
-         {id: '2', name: 'oak', dkname:'egetræ', grp:'Wood'},
-         {id: '2', name: 'pine', dkname:'fyr/pinjetræ', grp:'Wood'},
-         {id: '2', name: 'poplar', dkname:'poppeltræ', grp:'Wood'},
-         {id: '2', name: 'sandalwood', dkname:'sandeltræ', grp:'Wood'},
-         {id: '2', name: 'teak', dkname:'teaktræ', grp:'Wood'},
-         {id: '2', name: 'walnut', dkname:'valnøddetræ', grp:'Wood'},
-         {id: '2', name: 'willow', dkname:'piletræ', grp:'Wood'}]; 	
-
-    $scope.lists.paintBinders = [{id: '1', name: 'casin', dkname: 'kasein', grp:''},
-                                 {id: '2', name: 'emulsion', dkname: 'emulsion', grp:''},
-                                 {id: '3', name: 'glue', dkname: 'lim', grp:'Glue'},
-                                 {id: '4', name: 'animal glue', dkname: 'lim animalisk', grp:'Glue'},
-                                 {id: '5', name: 'vegetable glue', dkname: 'lim vegetabilsk', grp:'Glue'},
-                                 {id: '6', name: 'oil', dkname: 'olie', grp:'Oil'},
-                                 {id: '7', name: 'linseed oil', dkname: 'linolie', grp:'Oil'},
-                                 {id: '8', name: 'poppy oil', dkname: 'valmulie', grp:'Oil'},
-                                 {id: '9', name: 'walnut oil', dkname: 'valnøddolie', grp:'Oil'},
-                                 {id: '10', name: 'resin', dkname: 'harpiks', grp:''},
-                                 {id: '11', name: 'synthetic', dkname: 'syntetisk', grp:''}];
-
     $scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
                                 {id: 'material', name: 'Material Sample', grp:'Physical samples'},
                                 {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
@@ -520,48 +454,46 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
          {id: '2', name: 'original container', dkname: 'originalemballage'},
          {id: '2', name: 'paper', dkname: 'papir'},
          {id: '2', name: 'plastic container', dkname: 'plastikbeholder'}];
-
-//    $scope.lists.colours =
-//        [{id: '1', name: 'black', dkname:'sort', grp:''},
-//         {id: '2', name: 'blue', dkname:'blå', grp:''},
-//         {id: '3', name: 'brown', dkname:'brun', grp:''},
-//         {id: '4', name: 'green', dkname:'grøn', grp:''},
-//         {id: '5', name: 'grey', dkname:'grå', grp:''},
-//         {id: '6', name: 'orange', dkname:'orange', grp:''},
-//         {id: '7', name: 'purple', dkname:'lilla', grp:''},
-//         {id: '8', name: 'red', dkname:'rød', grp:''},
-//         {id: '9', name: 'white', dkname:'hvid', grp:''},
-//         {id: '10', name: 'yellow', dkname:'gul', grp:''}];
     
-    catsAPIservice.getVocab("colours")
-    .success(function (response) {
-        $scope.lists.colours = response[0].items;
-    })
-    .error(function (err) {
-        loginAlert('Reading vocabs failed!');
-    });
-
-    $scope.lists.pigments =
-        [{id: '1', name: 'bone black', dkname:'bensort', grp:''},
-         {id: '2', name: 'chalk', dkname:'kridt', grp:''},
-         {id: '3', name: 'lamp black', dkname:'trækulsort', grp:''},
-         {id: '4', name: 'lead white', dkname:'blyhvidt', grp:''},
-         {id: '5', name: 'plaster', dkname:'gips', grp:''},
-         {id: '6', name: 'red ocher', dkname:'rød okker', grp:'Earth colours'},
-         {id: '7', name: 'yellow ocher', dkname:'gul okker', grp:'Earth colours'},
-         {id: '8', name: 'titanium white', dkname:'titanhvidt', grp:''},
-         {id: '9', name: 'vine black', dkname:'sodsort', grp:''},
-         {id: '10', name: 'zinc white', dkname:'zinkhvidt', grp:''}];
-
-    $scope.lists.dyes =
-        [{id: '1', name: 'asphalt', dkname:'asfalt', grp:''},
-         {id: '2', name: 'indigo', dkname:'indigo', grp:''},
-         {id: '3', name: 'unknown organic brown', dkname:'brun organisk - ubestemt', grp:'Organic brown'},
-         {id: '4', name: 'brazilwood', dkname:'brasiltræ', grp:'Organic red'},
-         {id: '5', name: 'cocheneal', dkname:'cochenille', grp:'Organic red'},
-         {id: '6', name: 'krap', dkname:'krap', grp:'Organic red'},
-         {id: '7', name: 'unknown organic red', dkname:'rød organisk - ubestemt', grp:'Organic red'},
-         {id: '8', name: 'unknown organic yellow', dkname:'gul organisk - ubestemt', grp:'Organic yellow'}];
+//    catsAPIservice.getVocab("colours")
+//    .success(function (response) {
+//        $scope.lists.colours = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading colours failed!');
+//    });
+//
+//    catsAPIservice.getVocab("pigments")
+//    .success(function (response) {
+//        $scope.lists.pigments = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading pigments failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("binders")
+//    .success(function (response) {
+//        $scope.lists.binders = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading binders failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("dyes")
+//    .success(function (response) {
+//        $scope.lists.dyes = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading dyes failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("materials")
+//    .success(function (response) {
+//        $scope.lists.materials = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading materials failed!');
+//    });
 
     $scope.lists.mainTabs = { tabOneState : true};
     $scope.lists.submitted = false;
@@ -575,9 +507,19 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
             controller: ModalInstanceCtrl,
             size: size,
             backdrop: 'static',
-            resolve:{
+            resolve:{ /*these are resolved before controller is initialised*/
                 lists: function () {
                     return $scope.lists;
+                },
+                coloursx : function () {
+                    /* each time we start the 'register' modal, we reread the current editable vocabs
+                     * from mongo - why not save all in mongo and read the whole block?*/
+                    return catsAPIservice.getVocab("colours")
+                            .then (function (data) {
+                                if(data && data.data && data.data[0].items){
+                                    return data.data[0].items;
+                                }
+                            });
                 }
             }
         });
@@ -679,8 +621,8 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
 
 // Please note that $modalInstance represents a modal window (instance)
 // dependency.
-// It is not the same as the $modal service used above.
-var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state) {
+// It is not the same as the $modal service used above. 
+var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state, coloursx) {
 
     var resetRecord = function() {
         $scope.record = {};
@@ -703,14 +645,14 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     
     $scope.artwork = lists.artwork;
     $scope.sampleTypes = lists.sampleTypes;
-    $scope.colours = lists.colours;
-    $scope.pigments = lists.pigments;
-    $scope.dyes = lists.dyes;		
+    $scope.colours = coloursx; //.data[0].items;//lists.colours;
+//    $scope.pigments = lists.pigments;
+//    $scope.dyes = lists.dyes;		
     $scope.layerTypes = lists.layerTypes;
     $scope.fibreTypes = lists.fibreTypes;	
-    $scope.paintBinders = lists.paintBinders;
+//    $scope.binders = lists.binders;
     $scope.fibreGlueTypes = lists.fibreGlueTypes;
-    $scope.materialTypes = lists.materialTypes;
+//    $scope.materials = lists.materials;
     $scope.sampleOwners = lists.sampleOwners;	
     $scope.analysisTypes = lists.analysisTypes;
     $scope.stretcherTypes = lists.stretcherTypes;
@@ -732,7 +674,46 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     $scope.submitted = lists.submitted;
     $scope.alerts = lists.alerts;
     $scope.createAnother = lists.createAnother;
+    
+//    catsAPIservice.getVocab("colours")
+//    .success(function (response) {
+//        $scope.colours = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading colours failed!');
+//    });
 
+    catsAPIservice.getVocab("pigments")
+    .success(function (response) {
+        $scope.pigments = response[0].items;
+    })
+    .error(function (err) {
+        loginAlert('Reading pigments failed!');
+    });
+    
+    catsAPIservice.getVocab("binders")
+    .success(function (response) {
+        $scope.binders = response[0].items;
+    })
+    .error(function (err) {
+        loginAlert('Reading binders failed!');
+    });
+    
+    catsAPIservice.getVocab("dyes")
+    .success(function (response) {
+        $scope.dyes = response[0].items;
+    })
+    .error(function (err) {
+        loginAlert('Reading dyes failed!');
+    });
+    
+    catsAPIservice.getVocab("materials")
+    .success(function (response) {
+        $scope.materials = response[0].items;
+    })
+    .error(function (err) {
+        loginAlert('Reading materials failed!');
+    });
 
     /* START tabs for paint layers */
     var setAllLayerTabsInactive = function() {

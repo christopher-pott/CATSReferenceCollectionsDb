@@ -72,6 +72,12 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
       return {
         restrict: 'E',
         require: 'ngModel',
+        /* code put in 'link' will run after compilation
+         * 'scope' is the same as '$scope'. OriginalScope is that passsed from the parent controller.
+         * When a directive requires a controller, it receives that controller as the fourth argument
+         * of its link function (modelCtrl). This code is called for each catsmultiselect directive, 
+         * modelCtrl.$modelValue is the values from the stored vocabulary identified by ng-model    .
+         *  */
         link: function (originalScope, element, attrs, modelCtrl) {
 
           var exp = attrs.options,
@@ -124,7 +130,8 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
               parseModel();
           }, true);
 
-          //watch model change
+          /*watch model change : the modelValue is the saved (selected vocabs) ngModel for that 
+            particular multiselect instance*/
           scope.$watch(function () {
             return modelCtrl.$modelValue;
           }, function (newVal, oldVal) {
@@ -144,8 +151,7 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
             scope.groups.length = 0;
             var model = parsedResult.source(originalScope);
             scope.groups.name = parsedResult.vocabName;
-            //            var t = parsedResult.viewMapper(source);
-////            var t2 = parsedResult.group(originalScope);
+
             if(!angular.isDefined(model)) return;
             
             for (var i = 0; i < model.length; i++) {
@@ -180,6 +186,15 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
             	if(secondary) {
             		tag += " (" + secondary + ")";
             	}
+            	
+            	/*if a new vocab is added ensure checked status is not lost*/
+            	var checked = false;
+                angular.forEach(modelCtrl.$modelValue, function (val) {
+                    if (angular.equals(model[i], val)) {
+                      checked = true;
+                    }
+                });
+                    
             	//add item
                 scope.groups[grpIndex].items.push({
                   groupName: grpName,
@@ -187,7 +202,7 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
                   secondary: secondary,
                   label: tag,
                   model: model[i],
-                  checked: false,
+                  checked: checked,
                   group: parsedResult.groupMapper(local)
                 });
             }
@@ -300,10 +315,12 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
             }
           }
 
-          scope.updateLists = function (list) {
+          scope.updateVocabGroup = function (vocabGroup) {
+              /* update the groups.items vocab group which was read into the multiselect
+               * the list in the vocab editor is updated immediately by this*/
               var getter = parsedResult.source;
               var setter = getter.assign;
-              setter(originalScope, list);
+              setter(originalScope, vocabGroup);
           };
 
           scope.checkAll = function () {
@@ -420,7 +437,7 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
   $scope.groups = groups;
   $scope.loading = false;
   $scope.alerts = [];
-  $scope.selected = false;
+//  $scope.selected = false;
 
   
   //$scope.items = items;
@@ -444,7 +461,7 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
           $scope.alerts.splice(0, 1);
         //  $modalInstance.close();
           $scope.vocab = {}; //restore list
-          $scope.selected = false;
+//          $scope.selected = false;
       }, 3000);
   };
   
@@ -453,6 +470,9 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
   };
   
   $scope.update = function (type) {
+      /* Saves the value stored in scope 'vocab' to the vocabulary collection on mongo
+       * and adds it to the list in the vocab editor popup 
+       * */
       var v = {'type' : type, 
                'item' : {'name': $scope.vocab.name,
                          'secondaryname': $scope.vocab.secName,
@@ -460,13 +480,15 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
                         }
       };
       $scope.loading = true;
+      /*save the new vocab to mongodb*/
       vocabService.updateVocab(v)
       .success(function (resp) {
-          /*refresh list*/
+          /*read the updated vocab group back from mongodb*/
           vocabService.getVocab(type)
           .success(function (response) {
-              var list = response[0].items.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
-              pnt.updateLists(list);
+              var vocabGroup = response[0].items.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+              /*update the vocab editing popup list with the new value*/
+              pnt.updateVocabGroup(vocabGroup);
               $scope.updateSuccess("Vocabulary updated successfully");
               $scope.loading = false;
           })
@@ -479,16 +501,20 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
 
       })
   };
-
+  
   $scope.updateInputs = function (vocab) {
-      $scope.selected = false;
+//      $scope.selected = false;
+
+      /* When vocab name is edited, check list to see if there's an exact match:
+       * if there is, copy over the other fields*/
+      
       for(var i=0;i<$scope.groups.length;i++){
           for(var ii=0;ii<$scope.groups[i].items.length;ii++){
               if($scope.groups[i].items[ii].name == vocab){
                   /*match found*/
                   $scope.vocab.secName = $scope.groups[i].items[ii].secondary;
                   $scope.vocab.grpName = $scope.groups[i].name;
-                  $scope.selected = true;
+//                  $scope.selected = true;
                   return;
               }
           }
@@ -581,9 +607,9 @@ angular.module('catsmultiselect.tpl.html', [])
         "                <td><input type=\"text\" ng-model=\"vocab.grpName\" class=\"form-control\"></input></td>" +
         "                <td><button class=\"btn btn-primary\" ng-disabled=\"!vocab.name\" ng-click=\"update(groups.name)\" ><i class=\"glyphicon glyphicon-save\"></i> Save</button></td>" + 
         "              </tr>\n" + 
-        "            </tbody>\n" +
-        "            <tbody ng-repeat=\"group in groups\">\n" +
-        "              <tr ng-repeat=\"item in group.items | filter:vocab.name | orderBy:name \">\n" +
+        "            </tbody>\n" + 
+        "            <tbody ng-repeat=\"group in groups | orderBy:items.name \">\n" +
+        "              <tr ng-repeat=\"item in group.items | filter:vocab.name  \">\n" +
         "                <td> {{ item.name }} </td>" +
         "                <td> {{ item.secondary }} </td>" +
         "                <td> {{ group.name }} </td>" +
