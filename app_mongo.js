@@ -913,21 +913,24 @@ app.post('/vocab', function(req, res){
 app.get('/vocab', function(req, res) {
 
     var type = req.query.type;
+    var query = {};
     
-    if (type){
-        var query = {"type" :  type};
-        console.log("get vocab query : " + JSON.stringify(query));
-
-        db.vocabs.find(query)
-        .toArray(function(err, items) {
-            if (err || !items){
-                console.log("vocab " + type + " not found");
-                throw err;
-            } else {
-                res.send(items);
-            }
-        })
+    if (type != undefined){
+        /*if a type is provided, just fetch that type, otherwise return all vocabs*/
+        query = {"type" :  type}
     }
+    console.log("get vocab query : " + JSON.stringify(query));
+
+    db.vocabs.find(query)
+    .toArray(function(err, items) {
+        /*if error creating array, or if array is empty*/
+        if (err || !items || !items.length){
+            console.log("vocab " + type + " not found");
+            res.send(404); /*"not found", will triggger .error() handler*/
+        } else {
+            res.send(items);
+        }
+    })
 });
 
 /********************

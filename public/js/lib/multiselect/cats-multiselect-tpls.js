@@ -54,6 +54,10 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
            getVocab : function(type) {
                var url = "vocab?type=" + type;
                return $http.get(url);
+           },
+           loggedin : function() {
+               var url = "/loggedin";
+               return $http.get(url);
            }
       };
    }])
@@ -66,9 +70,9 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
     };
   })
 
-  .directive('catsmultiselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser', 'multistate',
+  .directive('catsmultiselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser', 'multistate', 'vocabService',
 
-    function ($parse, $document, $compile, $interpolate, catsoptionParser, multistate) {
+    function ($parse, $document, $compile, $interpolate, catsoptionParser, multistate, vocabService) {
       return {
         restrict: 'E',
         require: 'ngModel',
@@ -92,6 +96,13 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
           scope.header = 'Select';
           scope.multiple = isMultiple;
           scope.disabled = false;
+          
+          /*initialise login state*/
+          vocabService.loggedin().success(function (response) {
+              scope.userRole = (response == "0") ? false : response.role;
+          }).error(function (err) {
+              scope.userRole = false;
+          });
 
           originalScope.$on('$destroy', function () {
             scope.$destroy();
@@ -427,6 +438,28 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
 //          });
         });
      }
+
+      $scope.showEditButton = function () {
+          /*This is not secure : a default user reading this could 
+           *edit other vocabs - but this is acceptable as our logged
+           *in users are unlikely to try this*/
+          if ($scope.$parent.userRole == "admin"){
+              return true;
+          }
+          else{
+              /*TODO: re-factor when time allows*/
+              if (($scope.groups.name == 'colours') ||
+                  ($scope.groups.name == 'pigments') ||
+                  ($scope.groups.name == 'binders') ||
+                  ($scope.groups.name == 'dyes') ||
+                  ($scope.groups.name == 'materials')) {
+                  return true;
+              }
+              else{
+                  return false;
+              }
+          }
+     }
   })
 // Please note that $modalInstance represents a modal window (instance) dependency.
 // It is not the same as the $modal service used above.
@@ -453,15 +486,23 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
     $modalInstance.dismiss('cancel');
   };
   
-  $scope.updateSuccess = function(message) {
+  var updateSuccess = function(message) {
 
       $scope.alerts.push({type: 'success', msg: message, icon: 'glyphicon glyphicon-ok'});
 
       $timeout(function(){
           $scope.alerts.splice(0, 1);
-        //  $modalInstance.close();
           $scope.vocab = {}; //restore list
-//          $scope.selected = false;
+      }, 3000);
+  };
+  
+  var vocabAlert = function(message) {
+
+      $scope.loading = false;
+      $scope.alerts.push({type: 'danger', msg: message, icon: 'glyphicon glyphicon-warning-sign'});
+
+      $timeout(function(){
+          $scope.alerts.splice(0, 1);
       }, 3000);
   };
   
@@ -489,16 +530,15 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
               var vocabGroup = response[0].items.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
               /*update the vocab editing popup list with the new value*/
               pnt.updateVocabGroup(vocabGroup);
-              $scope.updateSuccess("Vocabulary updated successfully");
+              updateSuccess("Vocabulary updated successfully");
               $scope.loading = false;
           })
           .error(function (err) {
-              loginAlert('Reading vocabs failed!');
-              $scope.loading = false;
+              vocabAlert('Reading vocabs failed!');
           });
       })
       .error(function (response) {
-
+          vocabAlert('Updating vocabs failed!');
       })
   };
   
@@ -555,7 +595,7 @@ angular.module('catsmultiselect.tpl.html', [])
           "<div ng-controller=\"ModalVocabCtrl\">\n" +
 //          "    <div class=\"col col-sm-4\" ng-show= \"(groups | filter:searchText).length == 0\">\n" +
           "    <div class=\"col col-sm-4\">\n" +
-          "       <button class=\"btn btn-default\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-edit\"></i> Edit list </button>\n" +
+          "       <button class=\"btn btn-default\" ng-show=\"showEditButton()\" ng-click=\"addItem()\" type=\"button\"><i class=\"glyphicon glyphicon-edit\"></i> Edit list </button>\n" +
           "    </div>\n" + 
       "    </div>" +
       "  </div>" +

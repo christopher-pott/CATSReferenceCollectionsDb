@@ -314,186 +314,159 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
 
     $scope.lists.artwork = {};
 
-    $scope.lists.layerTypes = 
-        [{id: '1', name: 'Ground', dkname:'', grp:''},
-         {id: '2', name: 'Imprimatura', dkname:'', grp:''},
-         {id: '3', name: 'Paint', dkname:'', grp:''},
-         {id: '4', name: 'Varnish', dkname:'', grp:''}];
-
-    $scope.lists.analysisTypes = 
-        [{id: '1', name: 'Automated thread count'},
-         {id: '2', name: 'C14'},
-         {id: '3', name: 'Dendrochronology'},
-         {id: '4', name: 'FTIR'},
-         {id: '5', name: 'GC-MS'},
-         {id: '6', name: 'HPLC'},
-         {id: '7', name: 'IRR'},
-         {id: '8', name: 'Microscopy'},
-         {id: '9', name: 'Other'},
-         {id: '10', name: 'Photographic'},
-         {id: '11', name: 'Polar. Micro.'},
-         {id: '12', name: 'Raman'},
-         {id: '13', name: 'SEM/EDX'},
-         {id: '14', name: 'Visual'},
-         {id: '15', name: 'Weave mapping'},
-         {id: '16', name: 'Wood identification'},
-         {id: '17', name: 'X-radiography'},
-         {id: '18', name: 'XRF'}];
-
-    $scope.lists.fibreTypes = [{id: '1', name: 'blend'},
-                               {id: '2', name: 'cellulose (wooden)'},
-                               {id: '3', name: 'cotton'},
-                               {id: '4', name: 'hemp'},
-                               {id: '5', name: 'linen'},
-                               {id: '6', name: 'other'},
-                               {id: '7', name: 'synthetic'}];	
-
-    $scope.lists.fibreGlueTypes = [{id: '1', name: 'animal'},
-                                   {id: '2', name: 'synthetic'},
-                                   {id: '3', name: 'vegetable'}];	
-
-    $scope.lists.sampleOwners = [{id: '1', name: 'National Museum of Denmark'},
-                                 {id: '2', name: 'School of Conservation'},
-                                 {id: '3', name: 'Statens Museum for Kunst (SMK)'}];
-
-    $scope.lists.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
-                                {id: 'material', name: 'Material Sample', grp:'Physical samples'},
-                                {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
-                                {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
-                                {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
-                                {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
-
-    $scope.lists.mediaTypes = [{id: '1', name: 'black-and-white negative film', grp:''},
-                               {id: '2', name: 'dias', grp:''},
-                               {id: '3', name: 'analogue IR film', grp:'IR'},
-                               {id: '4', name: 'Digital Artist', grp:'IR'},
-                               {id: '5', name: 'Digital Osiris', grp:'IR'},
-                               {id: '6', name: 'IR vidicon ', grp:'IR'}];
-
-    $scope.lists.mediaFilms = [{id: '1', name: 'Dowie'},
-                               {id: '2', name: 'EPD120'},
-                               {id: '3', name: 'FP4'},
-                               {id: '4', name: 'FP special'},
-                               {id: '5', name: 'HP3'},
-                               {id: '6', name: 'IR-HS'},
-                               {id: '7', name: 'Kodak IR-ER'},
-                               {id: '8', name: 'Kodak IR.HS4143'}];
-
-    $scope.lists.mediaFormats = [{id: '1', name: '4 x 4'},
-                                 {id: '2', name: '4 x 5'},
-                                 {id: '3', name: '6 x 6'},
-                                 {id: '4', name: '24 x 36'}];
-
-    $scope.lists.mediaFilters = [{id: '1', name: 'Kodak Wratten 2B'},
-                                 {id: '2', name: 'Kodak Wratten 2E'},
-                                 {id: '3', name: 'Kodak Wratten 87'},
-                                 {id: '4', name: 'Kodak Wratten 87C'},
-                                 {id: '5', name: 'Kodak Wratten 88A'},
-                                 {id: '6', name: 'polarization filter'},
-                                 {id: '7', name: 'Schott UG-12'}];
-
-    $scope.lists.mediaLightings = [{id: '1', name: 'natural'},
-                                   {id: '2', name: 'regular'},
-                                   {id: '3', name: 'side light'},
-                                   {id: '4', name: 'sodium light'},
-                                   {id: '5', name: 'symmetrical light'},
-                                   {id: '6', name: 'tangential light'},
-                                   {id: '7', name: 'UV flourescence'},
-                                   {id: '8', name: 'UV reflected'}];
-
-    $scope.lists.mediaScopes = [{id: '1', name: 'back'},
-                                {id: '2', name: 'detail'},
-                                {id: '3', name: 'front'},
-                                {id: '4', name: 'total'}];  	
-
-    $scope.lists.xrayTypes = [{id: '1', name: 'analogue'},
-                              {id: '2', name: 'digital'},
-                              {id: '3', name: 'scan'}];
-
-    $scope.lists.xrayFilmTypes = [{id: '1', name: '30 x 40 cm'},
-                                  {id: '2', name: 'Repro film'}];
-
-    $scope.lists.xrayFilters = [{id: '1', name: 'aluminium'},
-                                {id: '2', name: 'iron'},
-                                {id: '3', name: 'copper'}];
-
-    $scope.lists.stretcherConditions = 
-        [{id: '1', name: 'complete', dkname: 'komplet'},
-         {id: '2', name: 'fragment', dkname: 'fragment'}];
-
-    $scope.lists.stretcherTypes = 
-        [{id: '1', name: 'strainer', dkname: 'spændramme'},
-         {id: '2', name: 'stretcher', dkname: 'kileramme'},
-         {id: '3', name: 'with horizontal cross bar', dkname: 'med tværsprosse'},
-         {id: '4', name: 'with intersecting cross bars', dkname: 'med kryds'},
-         {id: '5', name: 'with double intersecting cross bars', dkname: 'med dobbelt kryds'}];
-
-    $scope.lists.stretcherJointTechniques = 
-        [{id: '1', name: 'bridle joint', dkname: 'slids'},
-         {id: '2', name: 'mitered bridle joint', dkname: 'slids med gering'},
-         {id: '3', name: 'lap joint', dkname: 'bladsamling'},
-         {id: '4', name: 'pinned', dkname: 'med dyveler'},
-         {id: '5', name: 'with reinforcement', dkname: 'med forstærkningsplade'},
-         {id: '6', name: 'other', dkname: 'anden'}];
-
-    $scope.lists.stretcherMaterialTypes = 
-        [{id: '1', name: 'hardwood', dkname: 'løvtræ'},
-         {id: '2', name: 'softwood ', dkname: 'nåletræ'}];
-
-    $scope.lists.pigmentForms = 
-        [{id: '1', name: 'chunk', dkname: 'stykke'},
-         {id: '2', name: 'crystal', dkname: 'krystal'},
-         {id: '3', name: 'flakes', dkname: 'flager'},
-         {id: '4', name: 'powder', dkname: 'pulver'},
-         {id: '5', name: 'stone', dkname: 'sten'},
-         {id: '6', name: 'bound to textile', dkname: 'tekstil'}];
-
-    $scope.lists.pigmentContainers = 
-        [{id: '1', name: 'glass container', dkname: 'glasbeholder'},
-         {id: '2', name: 'microscope slide', dkname: 'objektglas'},
-         {id: '2', name: 'original container', dkname: 'originalemballage'},
-         {id: '2', name: 'paper', dkname: 'papir'},
-         {id: '2', name: 'plastic container', dkname: 'plastikbeholder'}];
-    
-//    catsAPIservice.getVocab("colours")
-//    .success(function (response) {
-//        $scope.lists.colours = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading colours failed!');
-//    });
+//    $scope.lists.layerTypes = 
+//        [{id: '1', name: 'Ground', dkname:'', grp:''},
+//         {id: '2', name: 'Imprimatura', dkname:'', grp:''},
+//         {id: '3', name: 'Paint', dkname:'', grp:''},
+//         {id: '4', name: 'Varnish', dkname:'', grp:''}];
 //
-//    catsAPIservice.getVocab("pigments")
-//    .success(function (response) {
-//        $scope.lists.pigments = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading pigments failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("binders")
-//    .success(function (response) {
-//        $scope.lists.binders = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading binders failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("dyes")
-//    .success(function (response) {
-//        $scope.lists.dyes = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading dyes failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("materials")
-//    .success(function (response) {
-//        $scope.lists.materials = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading materials failed!');
-//    });
+//    $scope.lists.analysisTypes = 
+//        [{id: '1', name: 'Automated thread count'},
+//         {id: '2', name: 'C14'},
+//         {id: '3', name: 'Dendrochronology'},
+//         {id: '4', name: 'FTIR'},
+//         {id: '5', name: 'GC-MS'},
+//         {id: '6', name: 'HPLC'},
+//         {id: '7', name: 'IRR'},
+//         {id: '8', name: 'Microscopy'},
+//         {id: '9', name: 'Other'},
+//         {id: '10', name: 'Photographic'},
+//         {id: '11', name: 'Polar. Micro.'},
+//         {id: '12', name: 'Raman'},
+//         {id: '13', name: 'SEM/EDX'},
+//         {id: '14', name: 'Visual'},
+//         {id: '15', name: 'Weave mapping'},
+//         {id: '16', name: 'Wood identification'},
+//         {id: '17', name: 'X-radiography'},
+//         {id: '18', name: 'XRF'}];
+//
+//    $scope.lists.fibreTypes = 
+//        [{id: '1', name: 'blend'},
+//         {id: '2', name: 'cellulose (wooden)'},
+//         {id: '3', name: 'cotton'},
+//         {id: '4', name: 'hemp'},
+//         {id: '5', name: 'linen'},
+//         {id: '6', name: 'other'},
+//         {id: '7', name: 'synthetic'}];
+//
+//    $scope.lists.fibreGlueTypes = 
+//        [{id: '1', name: 'animal'},
+//         {id: '2', name: 'synthetic'},
+//         {id: '3', name: 'vegetable'}];
+//
+//    $scope.lists.sampleOwners =
+//        [{id: '1', name: 'National Museum of Denmark'},
+//         {id: '2', name: 'School of Conservation'},
+//         {id: '3', name: 'Statens Museum for Kunst (SMK)'}];
+//
+//    $scope.lists.sampleTypes = 
+//        [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
+//         {id: 'material', name: 'Material Sample', grp:'Physical samples'},
+//         {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
+//         {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
+//         {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
+//         {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
+//
+//    $scope.lists.mediaTypes = 
+//        [{id: '1', name: 'black-and-white negative film', grp:''},
+//         {id: '2', name: 'dias', grp:''},
+//         {id: '3', name: 'analogue IR film', grp:'IR'},
+//         {id: '4', name: 'Digital Artist', grp:'IR'},
+//         {id: '5', name: 'Digital Osiris', grp:'IR'},
+//         {id: '6', name: 'IR vidicon ', grp:'IR'}];
+//
+//    $scope.lists.mediaFilms = 
+//        [{id: '1', name: 'Dowie'},
+//         {id: '2', name: 'EPD120'},
+//         {id: '3', name: 'FP4'},
+//         {id: '4', name: 'FP special'},
+//         {id: '5', name: 'HP3'},
+//         {id: '6', name: 'IR-HS'},
+//         {id: '7', name: 'Kodak IR-ER'},
+//         {id: '8', name: 'Kodak IR.HS4143'}];
+//
+//    $scope.lists.mediaFormats = 
+//        [{id: '1', name: '4 x 4'},
+//         {id: '2', name: '4 x 5'},
+//         {id: '3', name: '6 x 6'},
+//         {id: '4', name: '24 x 36'}];
+//
+//    $scope.lists.mediaFilters = 
+//        [{id: '1', name: 'Kodak Wratten 2B'},
+//         {id: '2', name: 'Kodak Wratten 2E'},
+//         {id: '3', name: 'Kodak Wratten 87'},
+//         {id: '4', name: 'Kodak Wratten 87C'},
+//         {id: '5', name: 'Kodak Wratten 88A'},
+//         {id: '6', name: 'polarization filter'},
+//         {id: '7', name: 'Schott UG-12'}];
+//
+//    $scope.lists.mediaLightings = 
+//        [{id: '1', name: 'natural'},
+//         {id: '2', name: 'regular'},
+//         {id: '3', name: 'side light'},
+//         {id: '4', name: 'sodium light'},
+//         {id: '5', name: 'symmetrical light'},
+//         {id: '6', name: 'tangential light'},
+//         {id: '7', name: 'UV flourescence'},
+//         {id: '8', name: 'UV reflected'}];
+//
+//    $scope.lists.mediaScopes = 
+//        [{id: '1', name: 'back'},
+//         {id: '2', name: 'detail'},
+//         {id: '3', name: 'front'},
+//         {id: '4', name: 'total'}];  	
+//
+//    $scope.lists.xrayTypes = 
+//        [{id: '1', name: 'analogue'},
+//         {id: '2', name: 'digital'},
+//         {id: '3', name: 'scan'}];
+//
+//    $scope.lists.xrayFilmTypes = 
+//        [{id: '1', name: '30 x 40 cm'},
+//         {id: '2', name: 'Repro film'}];
+//
+//    $scope.lists.xrayFilters = 
+//        [{id: '1', name: 'aluminium'},
+//         {id: '2', name: 'iron'},
+//         {id: '3', name: 'copper'}];
+//
+//    $scope.lists.stretcherConditions = 
+//        [{id: '1', name: 'complete', dkname: 'komplet'},
+//         {id: '2', name: 'fragment', dkname: 'fragment'}];
+//
+//    $scope.lists.stretcherTypes = 
+//        [{id: '1', name: 'strainer', dkname: 'spændramme'},
+//         {id: '2', name: 'stretcher', dkname: 'kileramme'},
+//         {id: '3', name: 'with horizontal cross bar', dkname: 'med tværsprosse'},
+//         {id: '4', name: 'with intersecting cross bars', dkname: 'med kryds'},
+//         {id: '5', name: 'with double intersecting cross bars', dkname: 'med dobbelt kryds'}];
+//
+//    $scope.lists.stretcherJointTechniques = 
+//        [{id: '1', name: 'bridle joint', dkname: 'slids'},
+//         {id: '2', name: 'mitered bridle joint', dkname: 'slids med gering'},
+//         {id: '3', name: 'lap joint', dkname: 'bladsamling'},
+//         {id: '4', name: 'pinned', dkname: 'med dyveler'},
+//         {id: '5', name: 'with reinforcement', dkname: 'med forstærkningsplade'},
+//         {id: '6', name: 'other', dkname: 'anden'}];
+//
+//    $scope.lists.stretcherMaterialTypes = 
+//        [{id: '1', name: 'hardwood', dkname: 'løvtræ'},
+//         {id: '2', name: 'softwood ', dkname: 'nåletræ'}];
+//
+//    $scope.lists.pigmentForms = 
+//        [{id: '1', name: 'chunk', dkname: 'stykke'},
+//         {id: '2', name: 'crystal', dkname: 'krystal'},
+//         {id: '3', name: 'flakes', dkname: 'flager'},
+//         {id: '4', name: 'powder', dkname: 'pulver'},
+//         {id: '5', name: 'stone', dkname: 'sten'},
+//         {id: '6', name: 'bound to textile', dkname: 'tekstil'}];
+//
+//    $scope.lists.pigmentContainers = 
+//        [{id: '1', name: 'glass container', dkname: 'glasbeholder'},
+//         {id: '2', name: 'microscope slide', dkname: 'objektglas'},
+//         {id: '2', name: 'original container', dkname: 'originalemballage'},
+//         {id: '2', name: 'paper', dkname: 'papir'},
+//         {id: '2', name: 'plastic container', dkname: 'plastikbeholder'}];
 
     $scope.lists.mainTabs = { tabOneState : true};
     $scope.lists.submitted = false;
@@ -511,13 +484,13 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
                 lists: function () {
                     return $scope.lists;
                 },
-                coloursx : function () {
-                    /* each time we start the 'register' modal, we reread the current editable vocabs
-                     * from mongo - why not save all in mongo and read the whole block?*/
-                    return catsAPIservice.getVocab("colours")
-                            .then (function (data) {
-                                if(data && data.data && data.data[0].items){
-                                    return data.data[0].items;
+                vocabsArray : function () {
+                    /* each time we start the 'register' modal, read the whole vocab block*/
+                    return catsAPIservice.getVocab()
+                            .then (function (resp) {
+                                if(resp && resp.data && resp.data[0]){
+                                    /*return array of vocabs*/
+                                    return resp.data;
                                 }
                             });
                 }
@@ -622,7 +595,7 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
 // Please note that $modalInstance represents a modal window (instance)
 // dependency.
 // It is not the same as the $modal service used above. 
-var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state, coloursx) {
+var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state, vocabsArray) {
 
     var resetRecord = function() {
         $scope.record = {};
@@ -645,36 +618,54 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     
     $scope.artwork = lists.artwork;
     $scope.sampleTypes = lists.sampleTypes;
-    $scope.colours = coloursx; //.data[0].items;//lists.colours;
-//    $scope.pigments = lists.pigments;
-//    $scope.dyes = lists.dyes;		
-    $scope.layerTypes = lists.layerTypes;
-    $scope.fibreTypes = lists.fibreTypes;	
-//    $scope.binders = lists.binders;
-    $scope.fibreGlueTypes = lists.fibreGlueTypes;
-//    $scope.materials = lists.materials;
-    $scope.sampleOwners = lists.sampleOwners;	
-    $scope.analysisTypes = lists.analysisTypes;
-    $scope.stretcherTypes = lists.stretcherTypes;
-    $scope.stretcherConditions = lists.stretcherConditions;
-    $scope.stretcherJointTechniques = lists.stretcherJointTechniques;
-    $scope.stretcherMaterialTypes = lists.stretcherMaterialTypes;
-    $scope.pigmentForms = lists.pigmentForms;
-    $scope.pigmentContainers = lists.pigmentContainers;	
-    $scope.xrayTypes = lists.xrayTypes;	
-    $scope.xrayFilmTypes = lists.xrayFilmTypes;
-    $scope.xrayFilters = lists.xrayFilters;
-    $scope.mediaTypes = lists.mediaTypes;
-    $scope.mediaFilms = lists.mediaFilms;
-    $scope.mediaFormats = lists.mediaFormats;
-    $scope.mediaFilters = lists.mediaFilters;
-    $scope.mediaLightings = lists.mediaLightings;
-    $scope.mediaScopes = lists.mediaScopes;
+//    $scope.colours = coloursx; //.data[0].items;//lists.colours;
+////    $scope.pigments = lists.pigments;
+////    $scope.dyes = lists.dyes;		
+//    $scope.layerTypes = lists.layerTypes;
+//    $scope.fibreTypes = lists.fibreTypes;	
+////    $scope.binders = lists.binders;
+//    $scope.fibreGlueTypes = lists.fibreGlueTypes;
+////    $scope.materials = lists.materials;
+//    $scope.sampleOwners = lists.sampleOwners;	
+//    $scope.analysisTypes = lists.analysisTypes;
+//    $scope.stretcherTypes = lists.stretcherTypes;
+//    $scope.stretcherConditions = lists.stretcherConditions;
+//    $scope.stretcherJointTechniques = lists.stretcherJointTechniques;
+//    $scope.stretcherMaterialTypes = lists.stretcherMaterialTypes;
+//    $scope.pigmentForms = lists.pigmentForms;
+//    $scope.pigmentContainers = lists.pigmentContainers;	
+//    $scope.xrayTypes = lists.xrayTypes;	
+//    $scope.xrayFilmTypes = lists.xrayFilmTypes;
+//    $scope.xrayFilters = lists.xrayFilters;
+//    $scope.mediaTypes = lists.mediaTypes;
+//    $scope.mediaFilms = lists.mediaFilms;
+//    $scope.mediaFormats = lists.mediaFormats;
+//    $scope.mediaFilters = lists.mediaFilters;
+//    $scope.mediaLightings = lists.mediaLightings;
+//    $scope.mediaScopes = lists.mediaScopes;
     $scope.mainTabs = lists.mainTabs;
     $scope.submitted = lists.submitted;
     $scope.alerts = lists.alerts;
     $scope.createAnother = lists.createAnother;
     
+    /*copy the vocabs to the scope*/
+    for (var i=0; i < vocabsArray.length; i++){
+        $scope[vocabsArray[i].type] = vocabsArray[i].items;
+    }
+    
+//    catsAPIservice.getVocab()
+//      .success(function (response) {
+//          for (var i=0; i < response.length; i++){
+//            $scope[response[i].type] = response[i].items;
+//            if(response[i].type == "sampleTypes"){
+//                $scope.selected = {sampleType: $scope.sampleTypes[0]};
+//            }
+//        }
+//      })
+//      .error(function (err) {
+//          saveFailed('Reading vocabs failed!');
+//      });
+
 //    catsAPIservice.getVocab("colours")
 //    .success(function (response) {
 //        $scope.colours = response[0].items;
@@ -683,37 +674,37 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
 //        loginAlert('Reading colours failed!');
 //    });
 
-    catsAPIservice.getVocab("pigments")
-    .success(function (response) {
-        $scope.pigments = response[0].items;
-    })
-    .error(function (err) {
-        loginAlert('Reading pigments failed!');
-    });
-    
-    catsAPIservice.getVocab("binders")
-    .success(function (response) {
-        $scope.binders = response[0].items;
-    })
-    .error(function (err) {
-        loginAlert('Reading binders failed!');
-    });
-    
-    catsAPIservice.getVocab("dyes")
-    .success(function (response) {
-        $scope.dyes = response[0].items;
-    })
-    .error(function (err) {
-        loginAlert('Reading dyes failed!');
-    });
-    
-    catsAPIservice.getVocab("materials")
-    .success(function (response) {
-        $scope.materials = response[0].items;
-    })
-    .error(function (err) {
-        loginAlert('Reading materials failed!');
-    });
+//    catsAPIservice.getVocab("pigments")
+//    .success(function (response) {
+//        $scope.pigments = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading pigments failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("binders")
+//    .success(function (response) {
+//        $scope.binders = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading binders failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("dyes")
+//    .success(function (response) {
+//        $scope.dyes = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading dyes failed!');
+//    });
+//    
+//    catsAPIservice.getVocab("materials")
+//    .success(function (response) {
+//        $scope.materials = response[0].items;
+//    })
+//    .error(function (err) {
+//        loginAlert('Reading materials failed!');
+//    });
 
     /* START tabs for paint layers */
     var setAllLayerTabsInactive = function() {
@@ -781,7 +772,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
     };
     /* END tabs for paint layers */
 
-    $scope.selected = {sampleType: $scope.sampleTypes[0]};
+
 
     /* This function is used for testing, if the button is enabled in search.jade (ng-show="true")
      * then we can clear artworks
@@ -832,7 +823,7 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
         $timeout(function(){
             $scope.alerts.splice(0, 1);
             if ($scope.createAnother === false){
-                $modalInstance.close($scope.selected.sampleType);
+                $modalInstance.close();
             }
             else{
                 /* clear the form */
