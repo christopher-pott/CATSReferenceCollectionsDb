@@ -3,6 +3,7 @@
  **********************/
 
 var express = require('express'),
+    fs = require('fs'),
     nodeExcel = require('excel-export'),
     routes = require('./routes'),
     api = require('./routes/api'),
@@ -932,6 +933,44 @@ app.get('/vocab', function(req, res) {
         }
     })
 });
+
+/********************
+ * IMAGE operations
+ ********************/
+/*
+ * The new body-parser module only handles urlencoded and json bodies. 
+ * That means for multipart bodies (file uploads) you need an additional
+ * module like busboy or formadible : this is the OLD version
+ */
+app.post('/image', function(req, res){
+
+    if (!req.isAuthenticated()){
+        res.send(401);
+    };
+    
+    var readPath = req.files.file.path;
+    var writePath = "/mnt/fotoarkiv/globus/catsdb/";
+    var name = req.files.file.name;
+
+    fs.readFile(readPath, function (err, data) {
+        if(err) {
+            console.log(err);
+            res.send(500); /*"Internal server Error"*/
+        }
+        else {
+            fs.writeFile(writePath + name, data, function(err) {
+                if(err) {
+                    console.log(err);
+                    res.send(500); /*"Internal server Error"*/
+                } else {
+                    var url = "http://cspic.smk.dk/globus/catsdb/" + name;
+                    console.log("The file was saved to " + url);
+                    res.status(201).send(url); 
+                }
+            })
+        }
+    })
+}); 
 
 /********************
  * RECORD operations

@@ -321,14 +321,14 @@ div#viewContainer
 						div.col-sm-4
 							label Owner
 						div.col-sm-4{{record.artwork.owner}}
-	div(ng-controller="CarouselImageCtrl").row
+	div(ng-controller="CarouselImageCtrl", ng-show="showImages").row
 		div(style="width: 600px").col-sm-5
 			carousel(interval="myInterval", disable-animation="true")
 				slide(ng-repeat="slide in slides", active="slide.active")
 					img(ng-src="{{slide.image}}", style="margin:auto")
 					div.carousel-caption
-						h4 Image {{$index + 1}}
-						p{{slide.text}}
+						h4 {{slide.title}}
+						p {{slide.text}}
 	
 
 

@@ -1,14 +1,28 @@
 'use strict';
 
-/* Controllers */
+/* 
+ * Angular Controllers
+ * 
+ * */
 
-angular.module('myApp.controllers', ['ui.bootstrap']).
+angular.module('myApp.controllers', ['ui.bootstrap', 'angularFileUpload']).
 controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPIservice) {
     
-    /*unsure where to init this*/
+    /* Initialize the search filter and the lists it requires */
     state.filter = {};
+    state.uploadedImage = {};
+    state.deleteImage = {index:''};
     
-	/*initialise login state*/
+    catsAPIservice.getVocab("sampleTypes")
+    .success(function (resp) {
+        if(resp && resp[0] && resp[0]._id){
+            state.sampleTypes = resp[0].items;
+        }
+    }).error(function (err) {
+        alert('Sample Types could not be read from database. Filter is not initialized');
+    });
+    
+	/* Initialize login state*/
     catsAPIservice.loggedin().success(function (response) {
         state.loggedin = (response == "0") ? false : true;
         $scope.email = (response == "0") ? false : response.username;
@@ -18,7 +32,7 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
         state.loggedin = false;
     });
     
-    /*update login button even when we're in another scope*/
+    /* Update login state whenever user logs in/out*/
     $scope.$watch(
         // This is the listener function
         function() { return state.loggedin; },
@@ -63,22 +77,19 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
 }).
 controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
-    $scope.sampleTypes = [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
-                        {id: 'material', name: 'Material Sample', grp:'Physical samples'},
-                        {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
-                        {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
-                        {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
-                        {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
-    
-    // These must be read here, otherwise the list will be empty when
-    // the browser 'back' button is pressed after viewing a single record
+    $scope.loggedin = state.loggedin;
+    $scope.sampleTypes = state.sampleTypes;
+
+    /* These must be read here, otherwise the list will be empty when
+     * the browser 'back' button is pressed after viewing a single record
+     */
     $scope.searchResultsList = state.resultList;
     $scope.searchResultsListSize = state.resultListSize;
     $scope.searchTerm = state.searchTerm;
     $scope.filter = state.filter;
     $scope.switchStatus = state.filter.isOpen;
 
-    // Call the full text search service (currently returns 100 results)
+    /* Call the full text search service (currently returns 100 results) */
     $scope.search = function() {
         catsAPIservice.search(state.searchTerm, $scope.filter)
         .success(function (response) {
@@ -88,8 +99,8 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
             $scope.searchCount();
         });
     };
-    
-    // Get the total number of results
+
+    /* Get the total number of results */
     $scope.searchCount = function() {
         catsAPIservice.searchSize(state.searchTerm, $scope.filter)
         .success(function (response) {
@@ -99,32 +110,28 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
             $scope.searchResultsListSize = 0;
         });
     };
-    
-    
+
     $scope.$watch(
-            // This is the listener function
-            function() { return $scope.filter; },
-            // This is the change handler
-            function(newValue, oldValue) {
-                if ( newValue !== oldValue ) {
-                    state.filter = $scope.filter;
-                   // state.searchRequested = true; updates too often
-                }
-            },
-            true /*object equality*/
-        );
+        /* This is the listener function */
+        function() { return $scope.filter; },
+        /* This is the change handler */
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+                state.filter = $scope.filter;
+               /* state.searchRequested = true; updates too often */
+            }
+        },
+        true /* Object equality */
+    );
     
     $scope.filterChanged = function(searchTerm) {
         state.searchRequested = true;
     };
-    //TODO :do this differently : ....or what
-    
-    $scope.loggedin = state.loggedin;
-    
+
     $scope.$watch(
-        // This is the listener function
+        /* This is the listener function */
         function() { return state.loggedin; },
-        // This is the change handler
+        /* This is the change handler */
         function(newValue, oldValue) {
             if ( newValue !== oldValue ) {
                 $scope.loggedin = state.loggedin;
@@ -132,26 +139,26 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         }
     );
     
-    // Clicking on a reference number will direct over to view mode
-    // and save the sample details so the view controller can retrieve them
+    /* Clicking on a reference number will direct over to view mode
+     * and save the sample details so the view controller can retrieve them
+     */
     $scope.viewSample = function(sample) {
         $location.path('/view');
         state.sample = sample;
         state.create = false;
     };
 
-    // The actual search is triggered here by the 'searchRequested' flag
-    // changing
+    /* The actual search is triggered here by the 'searchRequested' flag changing */
     $scope.$watch(
-            // This is the listener function
-            function() { return state.searchRequested; },
-            // This is the change handler
-            function(newValue, oldValue) {
-                if ( newValue === true ) {
-                    $scope.search();
-                    state.searchRequested = false;
-                }
+        /* This is the listener function */
+        function() { return state.searchRequested; },
+        /* This is the change handler */
+        function(newValue, oldValue) {
+            if ( newValue === true ) {
+                $scope.search();
+                state.searchRequested = false;
             }
+        }
     );
 
     $scope.registerClicked = function(sample) {
@@ -163,8 +170,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         } 
     };
 
-    /* Delete a single sample record
-     * */
+    /* Delete a single sample record */
     $scope.deleteClicked = function(sampleId) {
         
         catsAPIservice.delete(sampleId).success(function (response) {
@@ -173,7 +179,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         });
     };
 
-    /* Needed for older browsers which don't support click() on href's */
+    /* Needed for older browsers which don't support click() on href's  */
     var fakeClick = function(anchorObj) {
     	/*try to click()*/
     	if (anchorObj.click){
@@ -188,7 +194,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     
     /* Generates an excel formatted file (xlsx) containing the search results
      * and triggers a file download
-     * */
+     */
     var createExportDoc = function(searchTerm, filter) {
     	
     	var blob = null;
@@ -201,7 +207,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
                 blob = new Blob([response], {type: docType});
     		}
     		catch(e){
-    		    /* TypeError old chrome and FF*/
+    		    /* TypeError old Chrome and FF*/
     		    window.BlobBuilder = window.BlobBuilder || 
     		                         window.WebKitBlobBuilder || 
     		                         window.MozBlobBuilder || 
@@ -217,7 +223,6 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     		        blob = new Blob( [response], {type : docType});
     		    }
     		    else{
-    		        /* TODO: handle error case  */
     		    	alert("Your browser doesn't support this. " +
     		    		  "Please try again with a more recent browser.");
     		    }
@@ -226,7 +231,7 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     			var objectUrl = URL.createObjectURL(blob);
 		    }
 		    catch (e) {
-		    	/*try again, some browsers support this syntax instead*/
+		    	/* Try again, some browsers support this syntax instead */
 		    	if(e.type == 'not_defined' && e.arguments[0] === 'URL'){
 		    		var objectUrl = webkitURL.createObjectURL(blob);
 		    	}
@@ -248,33 +253,6 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     $scope.exportClicked = function(searchTerm, filter) {
         
         createExportDoc(searchTerm, filter);
-
-        
-//        /*create a new unit of work by creating a Deferred object*/
-//        var defer = $q.defer();
-//        var promises = [];
-//        
-//        angular.forEach(samples, function(value){
-//            if(value.artwork_id){
-//                promises.push(catsAPIservice.readArtwork(value.artwork_id)
-//                    .success(function (response) {
-//                        /*extra sanity check*/
-//                        if(value.artwork_id === response[0]._id){
-//                            value.artwork = response[0];
-//                        }
-//                    })
-//                    .error(function (err) {
-//                        //TODO: add failure case
-//                    })
-//                );
-//            }
-//        });
-//
-//        /*When all the responses are home, then build the report*/
-//        $q.all(promises).then(function(results){
-//            defer.resolve();
-//            createExportDoc(samples);
-//        });
     }
 }).
 controller('BrowseController', function ($scope) {
@@ -292,6 +270,7 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
 
 }).
 controller('DatepickerCntrl', function ($scope) {
+    
     $scope.open = function($event) {
         $event.preventDefault();
         $event.stopPropagation();
@@ -310,186 +289,20 @@ controller('DatepickerCntrl', function ($scope) {
 }).
 controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice) {
 
-    $scope.lists = {};
-
-    $scope.lists.artwork = {};
-
-//    $scope.lists.layerTypes = 
-//        [{id: '1', name: 'Ground', dkname:'', grp:''},
-//         {id: '2', name: 'Imprimatura', dkname:'', grp:''},
-//         {id: '3', name: 'Paint', dkname:'', grp:''},
-//         {id: '4', name: 'Varnish', dkname:'', grp:''}];
-//
-//    $scope.lists.analysisTypes = 
-//        [{id: '1', name: 'Automated thread count'},
-//         {id: '2', name: 'C14'},
-//         {id: '3', name: 'Dendrochronology'},
-//         {id: '4', name: 'FTIR'},
-//         {id: '5', name: 'GC-MS'},
-//         {id: '6', name: 'HPLC'},
-//         {id: '7', name: 'IRR'},
-//         {id: '8', name: 'Microscopy'},
-//         {id: '9', name: 'Other'},
-//         {id: '10', name: 'Photographic'},
-//         {id: '11', name: 'Polar. Micro.'},
-//         {id: '12', name: 'Raman'},
-//         {id: '13', name: 'SEM/EDX'},
-//         {id: '14', name: 'Visual'},
-//         {id: '15', name: 'Weave mapping'},
-//         {id: '16', name: 'Wood identification'},
-//         {id: '17', name: 'X-radiography'},
-//         {id: '18', name: 'XRF'}];
-//
-//    $scope.lists.fibreTypes = 
-//        [{id: '1', name: 'blend'},
-//         {id: '2', name: 'cellulose (wooden)'},
-//         {id: '3', name: 'cotton'},
-//         {id: '4', name: 'hemp'},
-//         {id: '5', name: 'linen'},
-//         {id: '6', name: 'other'},
-//         {id: '7', name: 'synthetic'}];
-//
-//    $scope.lists.fibreGlueTypes = 
-//        [{id: '1', name: 'animal'},
-//         {id: '2', name: 'synthetic'},
-//         {id: '3', name: 'vegetable'}];
-//
-//    $scope.lists.sampleOwners =
-//        [{id: '1', name: 'National Museum of Denmark'},
-//         {id: '2', name: 'School of Conservation'},
-//         {id: '3', name: 'Statens Museum for Kunst (SMK)'}];
-//
-//    $scope.lists.sampleTypes = 
-//        [{id: 'fibre', name: 'Fibre(paper)', grp:'Physical samples'},
-//         {id: 'material', name: 'Material Sample', grp:'Physical samples'},
-//         {id: 'paint', name: 'Paint Cross Section', grp:'Physical samples'},
-//         {id: 'pigment', name: 'Pigment', grp:'Physical samples'},
-//         {id: 'stretcher', name: 'Stretcher/Strainer', grp:'Physical samples'},
-//         {id: 'noninvasive', name: 'Non-invasive analysis (no sample)', grp:'Non invasive methods'}];
-//
-//    $scope.lists.mediaTypes = 
-//        [{id: '1', name: 'black-and-white negative film', grp:''},
-//         {id: '2', name: 'dias', grp:''},
-//         {id: '3', name: 'analogue IR film', grp:'IR'},
-//         {id: '4', name: 'Digital Artist', grp:'IR'},
-//         {id: '5', name: 'Digital Osiris', grp:'IR'},
-//         {id: '6', name: 'IR vidicon ', grp:'IR'}];
-//
-//    $scope.lists.mediaFilms = 
-//        [{id: '1', name: 'Dowie'},
-//         {id: '2', name: 'EPD120'},
-//         {id: '3', name: 'FP4'},
-//         {id: '4', name: 'FP special'},
-//         {id: '5', name: 'HP3'},
-//         {id: '6', name: 'IR-HS'},
-//         {id: '7', name: 'Kodak IR-ER'},
-//         {id: '8', name: 'Kodak IR.HS4143'}];
-//
-//    $scope.lists.mediaFormats = 
-//        [{id: '1', name: '4 x 4'},
-//         {id: '2', name: '4 x 5'},
-//         {id: '3', name: '6 x 6'},
-//         {id: '4', name: '24 x 36'}];
-//
-//    $scope.lists.mediaFilters = 
-//        [{id: '1', name: 'Kodak Wratten 2B'},
-//         {id: '2', name: 'Kodak Wratten 2E'},
-//         {id: '3', name: 'Kodak Wratten 87'},
-//         {id: '4', name: 'Kodak Wratten 87C'},
-//         {id: '5', name: 'Kodak Wratten 88A'},
-//         {id: '6', name: 'polarization filter'},
-//         {id: '7', name: 'Schott UG-12'}];
-//
-//    $scope.lists.mediaLightings = 
-//        [{id: '1', name: 'natural'},
-//         {id: '2', name: 'regular'},
-//         {id: '3', name: 'side light'},
-//         {id: '4', name: 'sodium light'},
-//         {id: '5', name: 'symmetrical light'},
-//         {id: '6', name: 'tangential light'},
-//         {id: '7', name: 'UV flourescence'},
-//         {id: '8', name: 'UV reflected'}];
-//
-//    $scope.lists.mediaScopes = 
-//        [{id: '1', name: 'back'},
-//         {id: '2', name: 'detail'},
-//         {id: '3', name: 'front'},
-//         {id: '4', name: 'total'}];  	
-//
-//    $scope.lists.xrayTypes = 
-//        [{id: '1', name: 'analogue'},
-//         {id: '2', name: 'digital'},
-//         {id: '3', name: 'scan'}];
-//
-//    $scope.lists.xrayFilmTypes = 
-//        [{id: '1', name: '30 x 40 cm'},
-//         {id: '2', name: 'Repro film'}];
-//
-//    $scope.lists.xrayFilters = 
-//        [{id: '1', name: 'aluminium'},
-//         {id: '2', name: 'iron'},
-//         {id: '3', name: 'copper'}];
-//
-//    $scope.lists.stretcherConditions = 
-//        [{id: '1', name: 'complete', dkname: 'komplet'},
-//         {id: '2', name: 'fragment', dkname: 'fragment'}];
-//
-//    $scope.lists.stretcherTypes = 
-//        [{id: '1', name: 'strainer', dkname: 'spændramme'},
-//         {id: '2', name: 'stretcher', dkname: 'kileramme'},
-//         {id: '3', name: 'with horizontal cross bar', dkname: 'med tværsprosse'},
-//         {id: '4', name: 'with intersecting cross bars', dkname: 'med kryds'},
-//         {id: '5', name: 'with double intersecting cross bars', dkname: 'med dobbelt kryds'}];
-//
-//    $scope.lists.stretcherJointTechniques = 
-//        [{id: '1', name: 'bridle joint', dkname: 'slids'},
-//         {id: '2', name: 'mitered bridle joint', dkname: 'slids med gering'},
-//         {id: '3', name: 'lap joint', dkname: 'bladsamling'},
-//         {id: '4', name: 'pinned', dkname: 'med dyveler'},
-//         {id: '5', name: 'with reinforcement', dkname: 'med forstærkningsplade'},
-//         {id: '6', name: 'other', dkname: 'anden'}];
-//
-//    $scope.lists.stretcherMaterialTypes = 
-//        [{id: '1', name: 'hardwood', dkname: 'løvtræ'},
-//         {id: '2', name: 'softwood ', dkname: 'nåletræ'}];
-//
-//    $scope.lists.pigmentForms = 
-//        [{id: '1', name: 'chunk', dkname: 'stykke'},
-//         {id: '2', name: 'crystal', dkname: 'krystal'},
-//         {id: '3', name: 'flakes', dkname: 'flager'},
-//         {id: '4', name: 'powder', dkname: 'pulver'},
-//         {id: '5', name: 'stone', dkname: 'sten'},
-//         {id: '6', name: 'bound to textile', dkname: 'tekstil'}];
-//
-//    $scope.lists.pigmentContainers = 
-//        [{id: '1', name: 'glass container', dkname: 'glasbeholder'},
-//         {id: '2', name: 'microscope slide', dkname: 'objektglas'},
-//         {id: '2', name: 'original container', dkname: 'originalemballage'},
-//         {id: '2', name: 'paper', dkname: 'papir'},
-//         {id: '2', name: 'plastic container', dkname: 'plastikbeholder'}];
-
-    $scope.lists.mainTabs = { tabOneState : true};
-    $scope.lists.submitted = false;
-    $scope.lists.alerts = [];
-    $scope.lists.createAnother = false;
-
-    // open the modal dialog
+    /* Open the modal dialog */
     $scope.open = function (size) {
         var modalInstance = $modal.open({
             templateUrl: 'myModalContent',
             controller: ModalInstanceCtrl,
             size: size,
             backdrop: 'static',
-            resolve:{ /*these are resolved before controller is initialised*/
-                lists: function () {
-                    return $scope.lists;
-                },
+            resolve:{ /* These are resolved before controller is initialized */
                 vocabsArray : function () {
-                    /* each time we start the 'register' modal, read the whole vocab block*/
+                    /* Each time we start the 'register' modal, read the whole vocabulary block */
                     return catsAPIservice.getVocab()
                             .then (function (resp) {
                                 if(resp && resp.data && resp.data[0]){
-                                    /*return array of vocabs*/
+                                    /* Return the array of vocabularies */
                                     return resp.data;
                                 }
                             });
@@ -503,33 +316,136 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
         });
     };
 
-    /* catch the registerRequested event and
+    /* Catch the registerRequested event and
      * open the modal window
      */
     $scope.$watch(
-        // This is the listener function
+        /* This is the listener function */
         function() { return state.registerRequested; },
-        // This is the change handler
+        /* This is the change handler */
         function(newValue, oldValue) {
             if ( newValue === true ) {
-                if(state.sample){
-                    /*existing sample record*/
-                    $scope.lists.record = state.sample;
-                }
-                $scope.open('lg'); /*pass size*/
+                $scope.open('lg');
                 state.registerRequested = false;
             }
         }
     );
-})
+}).
+controller('ImageUploadController', function ($scope, $upload, $timeout, state) {
+
+    /*See upload.js in angular-file-upload for an example controller*/
+
+//    $scope.usingFlash = FileAPI && FileAPI.upload != null;
+    $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
+    $scope.uploadRightAway = false;
+    
+    $scope.getThumbnail = function(url) {
+       return url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+              + "&mode=width&width=200";
+    };
+
+    $scope.deleteImage = function(i) {
+        state.deleteImage = {index : i};
+     };
+//    $scope.changeAngularVersion = function() {
+//        window.location.hash = $scope.angularVersion;
+//        window.location.reload(true);
+//    };
+    
+    $scope.hasUploader = function(index) {
+        return $scope.upload[index] != null;
+    };
+    
+    $scope.cancel = function(index) {
+        if($scope.hasUploader(index)){
+            $scope.upload[index].abort(); 
+            $scope.upload[index] = null;
+        }
+    };
+    
+//    $scope.angularVersion = window.location.hash.length > 1 ? (window.location.hash.indexOf('/') === 1 ? 
+//            window.location.hash.substring(2): window.location.hash.substring(1)) : '1.2.20';
+
+    $scope.onFileSelect = function($files) {
+
+        $scope.selectedFiles = [];
+        $scope.progress = [];
+        if ($scope.upload && $scope.upload.length > 0) {
+            for (var i = 0; i < $scope.upload.length; i++) {
+                if ($scope.upload[i] != null) {
+                    $scope.upload[i].abort();
+                }
+            }
+        }
+        $scope.upload = [];
+        $scope.uploadResult = [];
+        $scope.selectedFiles = $files;
+        $scope.dataUrls = [];
+        
+        for ( var i = 0; i < $files.length; i++) {
+            var $file = $files[i];
+            if ($scope.fileReaderSupported && $file.type.indexOf('image') > -1) {
+                var fileReader = new FileReader();
+                fileReader.readAsDataURL($files[i]);
+                var loadFile = function(fileReader, index) {
+                    fileReader.onload = function(e) {
+                        $timeout(function() {
+                            $scope.dataUrls[index] = e.target.result;
+                        });
+                    }
+                }(fileReader, i);
+            }
+            $scope.progress[i] = -1;
+            if ($scope.uploadRightAway) {
+                $scope.start(i);
+            }
+        }
+  
+        $scope.start = function(index) {
+            $scope.progress[index] = 0;
+            $scope.errorMsg = null;
+            $scope.upload[index] = $upload.upload({
+                url: 'image',
+                method: 'POST',
+                data: {myObj: $scope.myModelObj},
+                file: $scope.selectedFiles[index]
+            });
+            $scope.upload[index].then(function(response) { /*then.(success, error, progress)*/
+                /*success*/
+                $scope.uploadResult.push(response.statusText);
+                var image = {};
+                image.name = $scope.selectedFiles[0].name;
+                image.url = response.data;
+             //   image.url = "http://cspic.smk.dk/globus/40412628/img0572.jpg";
+                $timeout(function() {
+                    state.uploadedImage = image;
+                    $scope.upload = [];
+                    $scope.uploadResult = [];
+                    $scope.selectedFiles = [];
+                    $scope.dataUrls = [];
+                },1500);
+            }, function(response) {
+                /*error*/
+                if (response.status > 0){
+                    $scope.errorMsg = response.status + ': ' + response.data;
+                }
+            }, function(evt) {
+                /*progress*/
+                $scope.progress[index] = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+            });
+        }
+    };
+});
 
 var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, catsAPIservice) {
 
     $scope.alerts = [];
 
+    /* Handles user login attempts and password changes
+     */
     $scope.login = function (form, email, password, newPassword, newPasswordRepeat, changePassword) {
 
-        /* show required fields only after a save attempt */
+        /* Flag to show the "required" fields only after a first save attempt */
         $scope.submitted = true;
 
         if (form.$invalid){
@@ -544,14 +460,15 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
             }
         }
         
-        /*Perform authentication*/
+        /* Perform authentication */
         catsAPIservice.login(email, password)
         .success(function (response) {
         	state.email = response.username;
             state.loggedin = true;
             
+            /* Attempt change password */
             if(changePassword){
-                var data = {"username": email, "password": newPassword, "role":"default"};
+                var data = {"username": email, "password": newPassword, "role": response.role};
                 catsAPIservice.updateUser(data)
                 .success(function (response) {
                     loginSucccess("Password Changed");
@@ -567,6 +484,9 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         });
     };
 
+    /* 
+     * User status notifications
+     */
     var loginSucccess = function(message) {
 
         $scope.alerts.push({type: 'success', msg: message, icon: 'glyphicon glyphicon-ok'});
@@ -591,193 +511,165 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
         $scope.alerts.splice(index, 1);
     };
 }
+ 
+var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, catsAPIservice, state, vocabsArray) {
 
-// Please note that $modalInstance represents a modal window (instance)
-// dependency.
-// It is not the same as the $modal service used above. 
-var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsAPIservice, state, vocabsArray) {
+    $scope.artwork = {};
+    $scope.mainTabs = { tabOneState : true};
+    $scope.submitted = false;
+    $scope.alerts = [];
+    $scope.createAnother = false;
 
+    /*Prepare an empty record*/
     var resetRecord = function() {
+
         $scope.record = {};
-        
-        /*create initial tabs*/
+        /*Tabs require some initialization*/
         $scope.record.paintLayer = [{id: "1", layerType: "", paintBinder: [], colour: "", 
                                     pigment: "", dye: "", active: true}];
         $scope.record.sampleAnalysis = [{id: "1", type: "", description:"", referenceNumber:"", 
                                         date:"", employee:"", owner:"", originLocation:"", 
                                         location:"", results:"", active: true}];
-        /*TODO: reset all list values too*/
+        $scope.record.images = [{name: "kms4250", description: " a landscape", url: "http://cspic.smk.dk/globus/GLOBUS%202005/Globus%20Februar%202005/KMS4250.jpg"},
+                                {name: "kms4245", description: "another landscape", url: "http://cspic.smk.dk/globus/40412628/img0572.jpg"}];
     };
+
+    /* Update images whenever a new one is uploaded */
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.uploadedImage; },
+        // This is the change handler
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+                $scope.record.images.push(state.uploadedImage);
+            }
+        }
+    );
     
-    if(lists.record._id) {
-        $scope.record = lists.record;
+    /* Remove image reference if requested */
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.deleteImage; },
+        // This is the change handler
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+                $scope.record.images.splice(state.deleteImage.index, 1);
+            }
+        }
+    );
+    
+    if(state.sample && state.sample._id) {
+        /* Editing an existing record*/
+        $scope.record = state.sample;
     }
     else {	
+        /* Registering a new record */
         resetRecord();
     }
-    
-    $scope.artwork = lists.artwork;
-    $scope.sampleTypes = lists.sampleTypes;
-//    $scope.colours = coloursx; //.data[0].items;//lists.colours;
-////    $scope.pigments = lists.pigments;
-////    $scope.dyes = lists.dyes;		
-//    $scope.layerTypes = lists.layerTypes;
-//    $scope.fibreTypes = lists.fibreTypes;	
-////    $scope.binders = lists.binders;
-//    $scope.fibreGlueTypes = lists.fibreGlueTypes;
-////    $scope.materials = lists.materials;
-//    $scope.sampleOwners = lists.sampleOwners;	
-//    $scope.analysisTypes = lists.analysisTypes;
-//    $scope.stretcherTypes = lists.stretcherTypes;
-//    $scope.stretcherConditions = lists.stretcherConditions;
-//    $scope.stretcherJointTechniques = lists.stretcherJointTechniques;
-//    $scope.stretcherMaterialTypes = lists.stretcherMaterialTypes;
-//    $scope.pigmentForms = lists.pigmentForms;
-//    $scope.pigmentContainers = lists.pigmentContainers;	
-//    $scope.xrayTypes = lists.xrayTypes;	
-//    $scope.xrayFilmTypes = lists.xrayFilmTypes;
-//    $scope.xrayFilters = lists.xrayFilters;
-//    $scope.mediaTypes = lists.mediaTypes;
-//    $scope.mediaFilms = lists.mediaFilms;
-//    $scope.mediaFormats = lists.mediaFormats;
-//    $scope.mediaFilters = lists.mediaFilters;
-//    $scope.mediaLightings = lists.mediaLightings;
-//    $scope.mediaScopes = lists.mediaScopes;
-    $scope.mainTabs = lists.mainTabs;
-    $scope.submitted = lists.submitted;
-    $scope.alerts = lists.alerts;
-    $scope.createAnother = lists.createAnother;
-    
-    /*copy the vocabs to the scope*/
+
+    /* Read the vocabularies to the scope*/
     for (var i=0; i < vocabsArray.length; i++){
         $scope[vocabsArray[i].type] = vocabsArray[i].items;
     }
-    
-//    catsAPIservice.getVocab()
-//      .success(function (response) {
-//          for (var i=0; i < response.length; i++){
-//            $scope[response[i].type] = response[i].items;
-//            if(response[i].type == "sampleTypes"){
-//                $scope.selected = {sampleType: $scope.sampleTypes[0]};
-//            }
-//        }
-//      })
-//      .error(function (err) {
-//          saveFailed('Reading vocabs failed!');
-//      });
 
-//    catsAPIservice.getVocab("colours")
-//    .success(function (response) {
-//        $scope.colours = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading colours failed!');
-//    });
-
-//    catsAPIservice.getVocab("pigments")
-//    .success(function (response) {
-//        $scope.pigments = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading pigments failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("binders")
-//    .success(function (response) {
-//        $scope.binders = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading binders failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("dyes")
-//    .success(function (response) {
-//        $scope.dyes = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading dyes failed!');
-//    });
-//    
-//    catsAPIservice.getVocab("materials")
-//    .success(function (response) {
-//        $scope.materials = response[0].items;
-//    })
-//    .error(function (err) {
-//        loginAlert('Reading materials failed!');
-//    });
-
-    /* START tabs for paint layers */
+    /* 
+     * START tabs for paint layers 
+     */
     var setAllLayerTabsInactive = function() {
+
         angular.forEach($scope.record.paintLayer, function(paintLayer) {
             paintLayer.active = false;
         });
     };
 
     var addNewLayer = function() {
+
         var id = $scope.record.paintLayer.length + 1;
-        $scope.record.paintLayer.push({id: id, layerType: "", paintBinderbinder: [], colour: "", pigment: "", dye: "",  active: true});
+        var emptyLayer = {id: id, layerType: "", paintBinderbinder: [], colour: "",
+                          pigment: "", dye: "", active: true};
+
+        $scope.record.paintLayer.push(emptyLayer);
     };
 
     $scope.addLayer = function () {
+
         setAllLayerTabsInactive();
         addNewLayer();
     };
 
     $scope.removeLayerTab = function (index) {
+
         $scope.record.paintLayer.splice(index, 1);
     };
     /* END tabs for paint layers */
 
-    /* START tabs for xray */
+    /* 
+     * START tabs for xray 
+     */
     var setAllXrayTabsInactive = function() {
+
         angular.forEach($scope.record.xrayGroup, function(xrayGroup) {
             xrayGroup.active = false;
         });
     };
 
     var addNewXray = function() {
+
         var id = $scope.record.xrayGroup.length + 1;
-        $scope.record.xrayGroup.push({id: id, kv: "", ma:"", time: "", focus: "", distance: "", filter: "", test: false, active: true});
+        var emptyXray = {id: id, kv: "", ma:"", time: "", focus: "", distance: "", 
+                         filter: "", test: false, active: true};
+
+        $scope.record.xrayGroup.push(emptyXray);
     };
 
     $scope.addXray = function () {
+
         setAllXrayTabsInactive();
         addNewXray();
     };
 
     $scope.removeXrayTab = function (index) {
+
         $scope.record.xrayGroup.splice(index, 1);
     };
     /* END tabs for Xray */
 
-    /* START tabs for analysis */
+    /* 
+     * START tabs for analysis 
+     */
     var setAllAnalysisInactive = function() {
+        
         angular.forEach($scope.record.sampleAnalysis, function(sampleAnalysis) {
             sampleAnalysis.active = false;
         });
     };
 
     var addNewAnalysis = function() {
+        
         var id = $scope.record.sampleAnalysis.length + 1;
-        $scope.record.sampleAnalysis.push({id: id, sampleAnalysisType: "", sampleAnalysisDescription:"", active: true});
+        var emptyAnalysis = {id: id, sampleAnalysisType: "", sampleAnalysisDescription:"",
+                             active: true};
+        
+        $scope.record.sampleAnalysis.push(emptyAnalysis);
     };
 
     $scope.addAnalysis = function () {
+        
         setAllAnalysisInactive();
         addNewAnalysis();
     };
 
     $scope.removeAnalysisTab = function (index) {
+        
         $scope.record.sampleAnalysis.splice(index, 1);
     };
-    /* END tabs for paint layers */
-
-
+    /* END tabs for analysis */
 
     /* This function is used for testing, if the button is enabled in search.jade (ng-show="true")
      * then we can clear artworks
      * */
     $scope.clearArtwork = function () {
+        
         $scope.record.artwork = {};
     };
 
@@ -795,9 +687,8 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
         });
     };
 
-    /* Notifications
-     * 
-     * Should really disable the whole modal during some notification timeouts
+    /* 
+     * User status notifications
      */
     var invalidAlert = function() {
 
@@ -838,16 +729,15 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
 
         $scope.alerts.splice(index, 1);
     };
-    
+
+    /* Save a sample record to db*/
     var saveSample = function (record) {
         
         /* we copy to 'rec' because if we just use the original
          * ($scope.record) then the fields disappear immediately in the UI whilst the status
-         * indicator times out. (We delete the artwork fields because we don't
-         * want to send them to the sample record as well)
+         * indicator times out.
          * */
         var rec = JSON.parse(JSON.stringify(record)); /*quick cheat to copy a simple json object*/
-     //   delete rec.artwork; now we'll keep it!!
         
         catsAPIservice.createSample(rec)
         .success(function (response) {
@@ -860,13 +750,17 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
         });
         state.searchRequested = true; /*refresh search results*/
     };
-    
+
+    /* Save an artwork record and a sample record to db
+     * If the artwork save fails, the sample save is not attempted
+     */
     var saveArtworkAndSample = function () {
 
         catsAPIservice.createArtwork($scope.record.artwork)
             .success(function (response) {
-                $scope.record.artwork_id = response._id; /*id of artwork we've just created, or updated*/
-                saveSample($scope.record);  //TODO move to server
+                /*add the id of artwork we've just created, or updated*/
+                $scope.record.artwork._id = response._id;
+                saveSample($scope.record);
             })
             .error(function (err) {
                 var message = "Save Artwork & Sample failed ";
@@ -875,8 +769,9 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
             });
     }
 
-    /* This saves a sample record and optionally an artwork
-     * */
+    /* 
+     * This saves a sample record and optionally an artwork
+     */
     $scope.register = function (formInvalid) {
 
         /* show required fields only after a save attempt */
@@ -888,17 +783,18 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
             $scope.mainTabs.tabOneState = true; 
             return;
         }
-        if ($scope.record.artwork && $scope.record.artwork.inventoryNum){
+        /* If there is an artwork with no _id, then it's not yet been saved in CATS db*/
+        if ($scope.record.artwork && !$scope.record.artwork._id){
             saveArtworkAndSample();
         }else{
-            $scope.record.artwork_id = "";
             saveSample($scope.record);
         }
     };
 
+    /* Handle exit buttons */
     $scope.ok = function () {
 
-        $modalInstance.close($scope.selected.sampleType);
+        $modalInstance.close();
         state.searchRequested = true;
     };
 
@@ -911,10 +807,12 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, lists, catsA
 
 function CarouselImageCtrl($scope, state) {
 
+    $scope.showImages = false;
     $scope.myInterval = -1;
 
     var slides = $scope.slides = [];
     
+    /*just for testing*/
     $scope.addSlide = function() {
         var notVeryRandomKittenNumber = 600 + slides.length;
         slides.push({
@@ -922,25 +820,45 @@ function CarouselImageCtrl($scope, state) {
             text: 'cats'
         });
     };
-    
-    $scope.addArtworkSlide = function(externalurl, title) {
+
+    $scope.addArtworkSlide = function(invNum, externalurl, title) {
         var imageurl = externalurl.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
                        + "&mode=width&width=600";
         slides.push({
+            title: invNum,
             image: imageurl,
             text: title
         });
     };
 
+    /*add artwork image*/
     if(state.sample && state.sample.artwork && state.sample.artwork.externalurl){
-        $scope.addArtworkSlide(state.sample.artwork.externalurl, 
-                               state.sample.artwork.inventoryNum + ": " + 
+        $scope.addArtworkSlide(state.sample.artwork.inventoryNum,
+                               state.sample.artwork.externalurl, 
                                state.sample.artwork.title);
     }
     
-    for (var i=0; i<4; i++) {
-        $scope.addSlide();
+    /*add other images*/
+    if(state.sample && state.sample.images){
+        angular.forEach(state.sample.images, function(image) {
+            var imageurl = image.url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+            + "&mode=width&width=600";
+            slides.push({
+                title: image.name,
+                image: imageurl,
+                text: image.description
+            });
+        });
     }
+    
+    if(slides.length > 0){
+        $scope.showImages = true;
+    }
+    
+    /*just for test*/
+//    for (var i=0; i<4; i++) {
+//        $scope.addSlide();
+//    }
 };
 
 function ImageUploadCtrl($scope) {

@@ -11,7 +11,7 @@ div#searchContainer
 								div.form-group
 									label.col-sm-4.control_label Collection type
 									div.col-sm-8
-										catsmultiselect(ng-model="record.sampleType", required, options="c.name c.dkname group by grp for c in sampleTypes",
+										catsmultiselect(ng-model="record.sampleType", required, options="c.name c.secondaryname group by grp for c in sampleTypes",
 											ms-header="Select collection type")
 								div.form-group 
 									label.col-sm-4.control_label Sample Ref. number
@@ -36,7 +36,7 @@ div#searchContainer
 								div.form-group 
 									label.col-sm-4.control_label Institution
 									div.col-sm-8
-										catsmultiselect(ng-model="record.owner", options="c.name c.dkname group by grp for c in sampleOwners",
+										catsmultiselect(ng-model="record.owner", options="c.name c.secondaryname group by grp for c in sampleOwners",
 											ms-header="Select item owner", disabled="record.sampleType.id == 'noninvasive'")
 								div.form-group 
 									label.col-sm-4.control_label Sample storage location
@@ -64,12 +64,12 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Type
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="paintLayer.layerType", options="c.name c.dkname group by grp for c in layerTypes",
+															catsmultiselect(ng-model="paintLayer.layerType", options="c.name c.secondaryname group by grp for c in layerTypes",
 															ms-header="Select layer type")
 													div.form-group
 														label.col-sm-4.control_label Binders
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="paintLayer.paintBinder", options="c.name c.dkname group by grp for c in binders",
+															catsmultiselect(multiple="true", ng-model="paintLayer.paintBinder", options="c.name c.secondaryname group by grp for c in binders",
 															ms-header="Select binders").multi
 												div.group.col-sm-6
 													div.form-group
@@ -80,12 +80,12 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Pigments
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="paintLayer.pigment", options="c.name c.dkname group by grp for c in pigments",
+															catsmultiselect(multiple="true", ng-model="paintLayer.pigment", options="c.name c.secondaryname group by grp for c in pigments",
 															ms-header="Select pigments").multi
 													div.form-group
 														label.col-sm-4.control_label Dyes
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="paintLayer.dye", options="c.name c.dkname group by grp for c in dyes",
+															catsmultiselect(multiple="true", ng-model="paintLayer.dye", options="c.name c.secondaryname group by grp for c in dyes",
 															ms-header="Select dyes").multi
 										tab(select="addLayer()")
 											tab-heading
@@ -110,14 +110,14 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Fibre Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.fibreType", options="c.name c.dkname group by grp for c in fibreTypes",
+												catsmultiselect(multiple="true", ng-model="record.fibreType", options="c.name c.secondaryname group by grp for c in fibreTypes",
 												ms-header="Select fibre").multi
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Glue
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.fibreGlue", options="c.name c.dkname group by grp for c in fibreGlueTypes",
+												catsmultiselect(multiple="true", ng-model="record.fibreGlue", options="c.name c.secondaryname group by grp for c in fibreGlueTypes",
 												ms-header="Select glue").multi
 								div.row
 									div.group.col-sm-6
@@ -136,7 +136,7 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Material Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.materialType", options="c.name c.dkname group by grp for c in materials",
+												catsmultiselect(multiple="true", ng-model="record.materialType", options="c.name c.secondaryname group by grp for c in materials",
 												ms-header="Select material").multi
 							div(ng-switch-when="stretcher")
 								div.row
@@ -144,26 +144,26 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.stretcherType", options="c.name c.dkname group by grp for c in stretcherTypes",
+												catsmultiselect(multiple="true", ng-model="record.stretcherType", options="c.name c.secondaryname group by grp for c in stretcherTypes",
 												ms-header="Select type").multi
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Material Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.stretcherMaterialType", options="c.name c.dkname group by grp for c in stretcherMaterialTypes",
+												catsmultiselect(multiple="true", ng-model="record.stretcherMaterialType", options="c.name c.secondaryname group by grp for c in stretcherMaterialTypes",
 												ms-header="Select material").multi
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Condition
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.stretcherCondition", options="c.name c.dkname group by grp for c in stretcherConditions",
+												catsmultiselect(ng-model="record.stretcherCondition", options="c.name c.secondaryname group by grp for c in stretcherConditions",
 												ms-header="Select condition").multi
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Joint Technique
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.stretcherJointTechnique", options="c.name c.dkname group by grp for c in stretcherJointTechniques",
+												catsmultiselect(multiple="true", ng-model="record.stretcherJointTechnique", options="c.name c.secondaryname group by grp for c in stretcherJointTechniques",
 												ms-header="Select joint technique").multi
 								div.row
 									div.group.col-sm-6
@@ -234,19 +234,20 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Name
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.pigmentName", options="c.name c.dkname group by grp for c in pigments",
+												catsmultiselect(ng-model="record.pigmentName", options="c.name c.secondaryname group by grp for c in pigments",
 												ms-header="Select name").multi	
 									div.group.col-sm-6
 										div.form-group
-											label.col-sm-4.control_label Other Names
+											label.col-sm-4.control_label Container
 											div.col-sm-8.control_label.multi
-												input(type="text", ng-model="record.pigmentOtherName").form-control
+												catsmultiselect(ng-model="record.pigmentContainer", options="c.name c.secondaryname group by grp for c in pigmentContainers",
+												ms-header="Select container").multi	
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Form
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.pigmentForm", options="c.name c.dkname group by grp for c in pigmentForms",
+												catsmultiselect(ng-model="record.pigmentForm", options="c.name c.secondaryname group by grp for c in pigmentForms",
 												ms-header="Select form").multi	
 									div.group.col-sm-6
 										div.form-group
@@ -256,26 +257,19 @@ div#searchContainer
 													input(type="text", datepicker-localdate, datepicker-popup="{{format}}", ng-model="record.productionDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
 													span.input-group-btn
 														button(type="button", ng-click="open($event)").btn.btn-default: i.glyphicon.glyphicon-calendar
-								div.row
-									div.group.col-sm-6
-										div.form-group
-											label.col-sm-4.control_label Container
-											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.pigmentContainer", options="c.name c.dkname group by grp for c in pigmentContainers",
-												ms-header="Select container").multi	
 							div(ng-switch-when="xray")
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.xrayType", options="c.name c.dkname group by grp for c in xrayTypes",
+												catsmultiselect(ng-model="record.xrayType", options="c.name c.secondaryname group by grp for c in xrayTypes",
 												ms-header="Select type").multi	
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Film Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.xrayFilmType", options="c.name c.dkname group by grp for c in xrayFilmTypes",
+												catsmultiselect(ng-model="record.xrayFilmType", options="c.name c.secondaryname group by grp for c in xrayFilmTypes",
 												ms-header="Select film type").multi	
 								div.row.uigroup
 									tabset
@@ -316,7 +310,7 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Filter
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="xrayGroup.filter", options="c.name c.dkname group by grp for c in xrayFilters",
+															catsmultiselect(ng-model="xrayGroup.filter", options="c.name c.secondaryname group by grp for c in xrayFilters",
 															ms-header="Select filter").multi
 										tab(select="addXray()")
 											tab-heading
@@ -327,41 +321,40 @@ div#searchContainer
 										div.form-group
 											label.col-sm-4.control_label Type
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.mediaType", options="c.name c.dkname group by grp for c in mediaTypes",
+												catsmultiselect(ng-model="record.mediaType", options="c.name c.secondaryname group by grp for c in mediaTypes",
 												ms-header="Select type").multi	
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Film
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.mediaFilm", options="c.name c.dkname group by grp for c in mediaFilms",
+												catsmultiselect(ng-model="record.mediaFilm", options="c.name c.secondaryname group by grp for c in mediaFilms",
 												ms-header="Select film type").multi	
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Format
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.mediaFormat", options="c.name c.dkname group by grp for c in mediaFormats",
+												catsmultiselect(ng-model="record.mediaFormat", options="c.name c.secondaryname group by grp for c in mediaFormats",
 												ms-header="Select format").multi	
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Filter
 											div.col-sm-8.control_label.multi
-												catsmultiselect(ng-model="record.mediaFilter", options="c.name c.dkname group by grp for c in mediaFilters",
+												catsmultiselect(ng-model="record.mediaFilter", options="c.name c.secondaryname group by grp for c in mediaFilters",
 												ms-header="Select filter").multi													
 								div.row
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Lighting
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.mediaLighting", options="c.name c.dkname group by grp for c in mediaLightings",
+												catsmultiselect(multiple="true", ng-model="record.mediaLighting", options="c.name c.secondaryname group by grp for c in mediaLightings",
 												ms-header="Select lighting").multi	
 									div.group.col-sm-6
 										div.form-group
 											label.col-sm-4.control_label Scope
 											div.col-sm-8.control_label.multi
-												catsmultiselect(multiple="true", ng-model="record.mediaScope", options="c.name c.dkname group by grp for c in mediaScopes",
+												catsmultiselect(multiple="true", ng-model="record.mediaScope", options="c.name c.secondaryname group by grp for c in mediaScopes",
 												ms-header="Select scope").multi
-							div
 				tab(heading="Analysis")
 					div.row.embeddedTab
 						tabset
@@ -400,7 +393,7 @@ div#searchContainer
 											div.form-group 
 												label.col-sm-4.control_label Institution
 												div.col-sm-8
-													catsmultiselect(ng-model="sampleAnalysis.owner", options="c.name c.dkname group by grp for c in sampleOwners",
+													catsmultiselect(ng-model="sampleAnalysis.owner", options="c.name c.secondaryname group by grp for c in sampleOwners",
 														ms-header="Select item owner")
 										div.group.col-sm-6
 											div.form-group 
@@ -436,13 +429,13 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Type
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.xrayType", options="c.name c.dkname group by grp for c in xrayTypes",
+															catsmultiselect(ng-model="sampleAnalysis.xrayType", options="c.name c.secondaryname group by grp for c in xrayTypes",
 															ms-header="Select type").multi	
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Film Type
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.xrayFilmType", options="c.name c.dkname group by grp for c in xrayFilmTypes",
+															catsmultiselect(ng-model="sampleAnalysis.xrayFilmType", options="c.name c.secondaryname group by grp for c in xrayFilmTypes",
 															ms-header="Select film type").multi	
 												div.group.col-sm-6
 													div.form-group
@@ -473,7 +466,7 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Filter
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.xrayFilter", options="c.name c.dkname group by grp for c in xrayFilters",
+															catsmultiselect(ng-model="sampleAnalysis.xrayFilter", options="c.name c.secondaryname group by grp for c in xrayFilters",
 															ms-header="Select filter").multi
 												div.group.col-sm-6
 													div.form-group 
@@ -492,45 +485,43 @@ div#searchContainer
 													div.form-group
 														label.col-sm-4.control_label Type
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.mediaType", options="c.name c.dkname group by grp for c in mediaTypes",
+															catsmultiselect(ng-model="sampleAnalysis.mediaType", options="c.name c.secondaryname group by grp for c in mediaTypes",
 															ms-header="Select type").multi	
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Film
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.mediaFilm", options="c.name c.dkname group by grp for c in mediaFilms",
+															catsmultiselect(ng-model="sampleAnalysis.mediaFilm", options="c.name c.secondaryname group by grp for c in mediaFilms",
 															ms-header="Select film type").multi	
 											div.row
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Format
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.mediaFormat", options="c.name c.dkname group by grp for c in mediaFormats",
+															catsmultiselect(ng-model="sampleAnalysis.mediaFormat", options="c.name c.secondaryname group by grp for c in mediaFormats",
 															ms-header="Select format").multi	
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Filter
 														div.col-sm-8.control_label.multi
-															catsmultiselect(ng-model="sampleAnalysis.mediaFilter", options="c.name c.dkname group by grp for c in mediaFilters",
+															catsmultiselect(ng-model="sampleAnalysis.mediaFilter", options="c.name c.secondaryname group by grp for c in mediaFilters",
 															ms-header="Select filter").multi													
 											div.row
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Lighting
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaLighting", options="c.name c.dkname group by grp for c in mediaLightings",
+															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaLighting", options="c.name c.secondaryname group by grp for c in mediaLightings",
 															ms-header="Select lighting").multi	
 												div.group.col-sm-6
 													div.form-group
 														label.col-sm-4.control_label Scope
 														div.col-sm-8.control_label.multi
-															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaScope", options="c.name c.dkname group by grp for c in mediaScopes",
+															catsmultiselect(multiple="true", ng-model="sampleAnalysis.mediaScope", options="c.name c.secondaryname group by grp for c in mediaScopes",
 															ms-header="Select scope").multi
 							tab(select="addAnalysis()")
 								tab-heading
 									i.glyphicon.glyphicon-plus
-				tab(heading="Images")
-					| Images can be attached here
 				tab(heading="Artwork")
 					div.modal-body
 						div.row.uigroup
@@ -587,6 +578,70 @@ div#searchContainer
 									label.col-sm-4.control_label Owner
 									div.col-sm-8
 										input(type="text", ng-model="record.artwork.owner").form-control
+				tab(heading="Images")
+					div.modal-body(ng-controller="ImageUploadController")
+						div.row
+							div.group.col-sm-2
+								h4 Select Image
+								input(type="file", ng-file-select="onFileSelect($files)")
+							div.group.col-sm-1
+							div.group.col-sm-9(ng-show="selectedFiles != null 	&& selectedFiles.length > 0")
+								h4 Upload Image
+								table.table
+									thead
+										tr
+											th Name
+											th Size
+											th Progress
+											th Status
+											th Actions
+									tbody
+										tr(ng-repeat='f in selectedFiles')
+											td
+												strong {{ f.name }}
+												div.sel-file
+													img(ng-show="dataUrls[$index]", ng-src="{{dataUrls[$index]}}")
+											td {{f.size}}B
+											td
+												span
+													.progress(style='margin-bottom: 0;')
+														.progress-bar(role='progressbar', ng-style="{ 'width': progress[$index] + '%' }") {{progress[$index]}}%
+											td 
+												span(ng-show="uploadResult.length > 0")
+													span(ng-show="uploadResult[uploadResult.length-1] == 'Created'")
+														span.glyphicon.glyphicon-ok
+													span(ng-show="uploadResult[uploadResult.length-1] != 'Created'")
+														span.glyphicon.glyphicon-warning-sign
+												span(ng-show="uploadResult.length == 0")
+													span.glyphicon.glyphicon-remove
+											td
+												button.btn-xs.btn-primary(ng-click="start($index)", ng-enable="progress[$index] < 0")
+													span.glyphicon.glyphicon-upload
+													|  Upload
+												button.btn-xs.btn-warning(ng-click="cancel($index)")
+													span.glyphicon.glyphicon-ban-circle
+													|  Cancel
+						br
+						div.row
+							div.group.col-sm-12
+								h4 Related Images 
+								table.table
+									thead
+										tr
+											th Name
+											th Description
+											th(style="width: 220px") Image
+											th Delete
+									tbody
+										tr(ng-repeat='image in record.images')
+											td 
+												strong {{image.name}}
+											td 
+												textarea(rows="4", ng-model="image.description").form-control
+											td(style="width: 220px") 
+												img(ng-src="{{getThumbnail(image.url)}}")
+											td: button(ng-click="deleteImage($index)", popover="Remove this image", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
+												span.glyphicon.glyphicon-remove 
 			alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
 			div.modal-footer
 				p
@@ -594,10 +649,10 @@ div#searchContainer
 					input(type="checkbox", ng-model="$parent.createAnother")
 				button(type="button", ng-click="register(form.$invalid)").btn.btn-primary
 					span.glyphicon.glyphicon-save
-						|Save
+						|  Save
 				button(type="button", ng-click="cancel()").btn.btn-warning 
 					span.glyphicon.glyphicon-ban-circle 
-						|Cancel
+						|  Cancel
 	div.group.row
 		accordion(close-others="false",ng-click="filterChanged()").col-sm-8.col-xs-12.col-lg-10
 			accordion-group(is-open="filter.isOpen")
@@ -609,7 +664,7 @@ div#searchContainer
 				div.row
 					div.form-group.row
 						label.col-sm-2.col-lg-1 Sample type
-						catsmultiselect(ng-click="filterChanged()", ng-model="filter.sampleType", options="c.name c.dkname group by grp for c in sampleTypes",
+						catsmultiselect(ng-click="filterChanged()", ng-model="filter.sampleType", options="c.name c.secondaryname group by grp for c in sampleTypes",
 							ms-header="Sample type").col-lg-2.col-sm-4
 					div.form-group.row
 						label(ng-show="filter.sampleType.id !== 'pigment'").col-sm-2.col-lg-1 Artwork date

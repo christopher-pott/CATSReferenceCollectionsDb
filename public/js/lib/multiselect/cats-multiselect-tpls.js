@@ -441,13 +441,14 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
 
       $scope.showEditButton = function () {
           /*This is not secure : a default user reading this could 
-           *edit other vocabs - but this is acceptable as our logged
+           *hack other vocabs - but this is acceptable as our logged
            *in users are unlikely to try this*/
           if ($scope.$parent.userRole == "admin"){
               return true;
           }
           else{
-              /*TODO: re-factor when time allows*/
+              /* TODO: re-factor when time allows. Really we should read the 'permissions'
+               * from the vocabs and show the button accordingly*/
               if (($scope.groups.name == 'colours') ||
                   ($scope.groups.name == 'pigments') ||
                   ($scope.groups.name == 'binders') ||

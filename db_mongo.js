@@ -31,10 +31,9 @@ for (var i=0; i < defaults.length; i++){
     db.vocabs.insert(defaults[i], function(err, doc) {
         if (err || !doc){
             /*if the error is 'duplicate' - it just means the vocab is already initialised*/
-            if(err && err.code == 11000) {/*mongo duplicate key error*/
-                console.log("Vocab already exists (ignore error below)");
+            if(err && err.code != 11000) {/*11000 == mongo duplicate key error : don't log this*/
+                console.log("Default vocab not added : " + err);
             }
-            console.log("Default vocab not added : " + err);
         } else {
             console.log(doc.type + " default vocabs inserted successfully");
         }
