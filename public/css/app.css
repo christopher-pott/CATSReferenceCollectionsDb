@@ -65,7 +65,7 @@ form.submitted .has-error, form.submitted .ng-invalid {
 	margin-left: 20px;
 }
 .titlearea form {
-	padding-top: 20px;
+/* 	padding-top: 20px; */
 }
 /*remove link styling in title TODO: use image instead*/
 .titlearea a {
@@ -73,7 +73,7 @@ form.submitted .has-error, form.submitted .ng-invalid {
   text-decoration: inherit; /* no underline */
 }
 .titlearea .login {
-	padding-top: 20px;
+/* 	padding-top: 20px; */
 }
 .titlearea .login button{
 	background-color: #212121;
@@ -82,8 +82,13 @@ form.submitted .has-error, form.submitted .ng-invalid {
 }
 .titlearea img {
 	margin-right: 20px;
-	float:right;
+	margin-left: 20px;	
+/* 	float:right; */
 }
+.titlearea .dbname {
+	padding-top: 48px;
+}
+
 /*spacing borders for tab in tab*/
 .embeddedTab {
 	padding: 20px;	
@@ -178,4 +183,17 @@ label.sub {
 }
 .animation.ng-leave.ng-leave-active {
   opacity: 0;
+}
+
+.menutitle {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #EFEFEF;}
+}
+
+@media print { 
+
+  .titlearea{
+     display: none;
+  }
+ 
 }

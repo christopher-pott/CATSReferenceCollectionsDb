@@ -264,7 +264,9 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
     $scope.record = state.sample;
 
     $scope.statusMeta = {
-            isFirstOpen: true,
+            isSampleOpen: true,
+            isArtworkOpen: true,
+            isAnalysisOpen: true,
             isFirstDisabled: false
     };
 
@@ -333,9 +335,10 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
 }).
 controller('ImageUploadController', function ($scope, $upload, $timeout, state) {
 
-    /*See upload.js in angular-file-upload for an example controller*/
+    /*See upload.js in angular-file-upload for an example file upload controller*/
 
-//    $scope.usingFlash = FileAPI && FileAPI.upload != null;
+    $scope.alerts = [];
+
     $scope.fileReaderSupported = window.FileReader != null && (window.FileAPI == null || FileAPI.html5 != false);
     $scope.uploadRightAway = false;
     
@@ -347,11 +350,7 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
     $scope.deleteImage = function(i) {
         state.deleteImage = {index : i};
      };
-//    $scope.changeAngularVersion = function() {
-//        window.location.hash = $scope.angularVersion;
-//        window.location.reload(true);
-//    };
-    
+
     $scope.hasUploader = function(index) {
         return $scope.upload[index] != null;
     };
@@ -362,9 +361,6 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
             $scope.upload[index] = null;
         }
     };
-    
-//    $scope.angularVersion = window.location.hash.length > 1 ? (window.location.hash.indexOf('/') === 1 ? 
-//            window.location.hash.substring(2): window.location.hash.substring(1)) : '1.2.20';
 
     $scope.onFileSelect = function($files) {
 
@@ -400,7 +396,7 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
                 $scope.start(i);
             }
         }
-  
+
         $scope.start = function(index) {
             $scope.progress[index] = 0;
             $scope.errorMsg = null;
@@ -416,18 +412,17 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
                 var image = {};
                 image.name = $scope.selectedFiles[0].name;
                 image.url = response.data;
-             //   image.url = "http://cspic.smk.dk/globus/40412628/img0572.jpg";
-                $timeout(function() {
-                    state.uploadedImage = image;
-                    $scope.upload = [];
-                    $scope.uploadResult = [];
-                    $scope.selectedFiles = [];
-                    $scope.dataUrls = [];
-                },1500);
+                state.uploadedImage = image;
+                uploadSuccess("Image successfully uploaded");
             }, function(response) {
                 /*error*/
                 if (response.status > 0){
-                    $scope.errorMsg = response.status + ': ' + response.data;
+                    if (response.status == 409){
+                        uploadFailed(" An image with this name already exists. Please rename the image and try again.");
+                    }
+                    else{
+                        uploadFailed(" The image could not be saved");
+                    }
                 }
             }, function(evt) {
                 /*progress*/
@@ -435,6 +430,34 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
             });
         }
     };
+    
+    /* 
+     * User status notifications
+     */
+    var uploadSuccess = function(message) {
+
+        $scope.alerts.push({type: 'success', msg: message, icon: 'glyphicon glyphicon-ok'});
+
+        $timeout(function(){
+            $scope.alerts.splice(0, 1);
+            
+            $timeout(function() {
+//                $scope.upload = [];
+//                $scope.uploadResult = [];
+//                $scope.selectedFiles = [];
+//                $scope.dataUrls = [];
+            },1000);
+        }, 3000);
+    };
+    
+    var uploadFailed = function(message) {
+
+        $scope.alerts.push({type: 'danger', msg: message, 
+                            icon: 'glyphicon glyphicon-warning-sign'});
+         $timeout(function(){
+             $scope.alerts.splice(0, 1);
+         }, 3000);
+     };    
 });
 
 var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, catsAPIservice) {
@@ -530,8 +553,9 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, catsAPIservi
         $scope.record.sampleAnalysis = [{id: "1", type: "", description:"", referenceNumber:"", 
                                         date:"", employee:"", owner:"", originLocation:"", 
                                         location:"", results:"", active: true}];
-        $scope.record.images = [{name: "kms4250", description: " a landscape", url: "http://cspic.smk.dk/globus/GLOBUS%202005/Globus%20Februar%202005/KMS4250.jpg"},
-                                {name: "kms4245", description: "another landscape", url: "http://cspic.smk.dk/globus/40412628/img0572.jpg"}];
+//        $scope.record.images = [{name: "kms4250", description: " a landscape", url: "http://cspic.smk.dk/globus/GLOBUS%202005/Globus%20Februar%202005/KMS4250.jpg"},
+//                                {name: "kms4245", description: "another landscape", url: "http://cspic.smk.dk/globus/40412628/img0572.jpg"}];
+        $scope.record.images = [];
     };
 
     /* Update images whenever a new one is uploaded */

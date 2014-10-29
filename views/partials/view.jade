@@ -1,7 +1,7 @@
 div#viewContainer
 	div.col-sm-6
 		accordion(close-others="false")
-			accordion-group(heading="Sample metadata", is-open="statusMeta.isFirstOpen")
+			accordion-group(heading="Sample metadata", is-open="statusMeta.isSampleOpen")
 				div.row(ng-show="record.referenceNumber")
 					div.col-sm-4
 						label Reference number
@@ -193,106 +193,107 @@ div#viewContainer
 							div.col-sm-4
 								label Source
 							div.col-sm-4{{record.stretcherSource}}
-			accordion(close-others="false")
-				accordion-group(ng-show="item.type.name", heading="Analysis {{$index + 1}} : {{item.type.name}}", is-open="status.open", ng-repeat="item in record.sampleAnalysis")
-					div.row(ng-show="item.referenceNumber")
-						div.col-sm-4
-							label Ref. number
-						div.col-sm-4{{item.referenceNumber}}
-					div.row(ng-show="item.date")
-						div.col-sm-4
-							label Date
-						div.col-sm-4{{item.date}}
-					div.row(ng-show="item.employee")
-						div.col-sm-4
-							label Employee
-						div.col-sm-4{{item.employee}}
-					div.row(ng-show="item.owner.name")
-						div.col-sm-4
-							label Owner
-						div.col-sm-4{{item.owner.name}}
-					div.row(ng-show="item.originLocation")
-						div.col-sm-4
-							label Location in artwork
-						div.col-sm-4{{item.originLocation}}
-					div.row(ng-show="item.location")
-						div.col-sm-4
-							label Report location
-						div.col-sm-4{{item.location}}
-					div(ng-show="item.type.name == 'X-radiography'")
-						div.row(ng-show="item.xrayType.name")
+			accordion-group(heading="Analysis description(s)", is-open="statusMeta.isAnalysisOpen", ng-show="record.sampleAnalysis.length > 0")
+				accordion(close-others="false")
+					accordion-group(ng-show="item.type.name", heading="Analysis {{$index + 1}} : {{item.type.name}}", is-open="status.open", ng-repeat="item in record.sampleAnalysis")
+						div.row(ng-show="item.referenceNumber")
 							div.col-sm-4
-								label Type
-							div.col-sm-4{{item.xrayType.name}}
-						div.row(ng-show="item.xrayFilmType.name")
+								label Ref. number
+							div.col-sm-4{{item.referenceNumber}}
+						div.row(ng-show="item.date")
 							div.col-sm-4
-								label Film type
-							div.col-sm-4{{item.xrayFilmType.name}}
-						div.row(ng-show="item.xrayKv")
+								label Date
+							div.col-sm-4{{item.date}}
+						div.row(ng-show="item.employee")
 							div.col-sm-4
-								label Kv
-							div.col-sm-4{{item.xrayKv}}
-						div.row(ng-show="item.xrayMa")
+								label Employee
+							div.col-sm-4{{item.employee}}
+						div.row(ng-show="item.owner.name")
 							div.col-sm-4
-								label mA
-							div.col-sm-4{{item.xrayMa}}
-						div.row(ng-show="item.xrayTime")
+								label Owner
+							div.col-sm-4{{item.owner.name}}
+						div.row(ng-show="item.originLocation")
 							div.col-sm-4
-								label Time
-							div.col-sm-4{{item.xrayTime}}
-						div.row(ng-show="item.xrayFocus")
+								label Location in artwork
+							div.col-sm-4{{item.originLocation}}
+						div.row(ng-show="item.location")
 							div.col-sm-4
-								label Focus
-							div.col-sm-4{{item.xrayFocus}}
-						div.row(ng-show="item.xrayDistance")
+								label Report location
+							div.col-sm-4{{item.location}}
+						div(ng-show="item.type.name == 'X-radiography'")
+							div.row(ng-show="item.xrayType.name")
+								div.col-sm-4
+									label Type
+								div.col-sm-4{{item.xrayType.name}}
+							div.row(ng-show="item.xrayFilmType.name")
+								div.col-sm-4
+									label Film type
+								div.col-sm-4{{item.xrayFilmType.name}}
+							div.row(ng-show="item.xrayKv")
+								div.col-sm-4
+									label Kv
+								div.col-sm-4{{item.xrayKv}}
+							div.row(ng-show="item.xrayMa")
+								div.col-sm-4
+									label mA
+								div.col-sm-4{{item.xrayMa}}
+							div.row(ng-show="item.xrayTime")
+								div.col-sm-4
+									label Time
+								div.col-sm-4{{item.xrayTime}}
+							div.row(ng-show="item.xrayFocus")
+								div.col-sm-4
+									label Focus
+								div.col-sm-4{{item.xrayFocus}}
+							div.row(ng-show="item.xrayDistance")
+								div.col-sm-4
+									label Distance
+								div.col-sm-4{{item.xrayDistance}}
+							div.row(ng-show="item.xrayFilter.name")
+								div.col-sm-4
+									label Filter
+								div.col-sm-4{{item.xrayFilter.name}}
+						div(ng-show="item.type.name == 'Photographic'")
+							div.row(ng-show="item.mediaType.name")
+								div.col-sm-4
+									label Type
+								div.col-sm-4{{item.mediaType.name}}
+							div.row(ng-show="item.mediaFilm.name")
+								div.col-sm-4
+									label Film
+								div.col-sm-4{{item.mediaFilm.name}}
+							div.row(ng-show="item.mediaFormat.name")
+								div.col-sm-4
+									label Format
+								div.col-sm-4{{item.mediaFormat.name}}
+							div.row(ng-show="item.mediaFilter.name")
+								div.col-sm-4
+									label Filter
+								div.col-sm-4{{item.mediaFilter.name}}
+							div.row(ng-show="item.mediaLighting")
+								div.col-sm-4
+									label Lighting
+								div.col-sm-4
+									span(ng-repeat="light in item.mediaLighting")
+										{{light.name}}{{$last ? '' : ', '}}
+							div.row(ng-show="item.mediaScope")
+								div.col-sm-4
+									label Scope
+								div.col-sm-4
+									span(ng-repeat="scope in item.mediaScope")
+										{{scope.name}}{{$last ? '' : ', '}}
+						div.row(ng-show="item.description")
 							div.col-sm-4
-								label Distance
-							div.col-sm-4{{item.xrayDistance}}
-						div.row(ng-show="item.xrayFilter.name")
+								label Method/Description
+							div.col-sm-8
+								{{item.description}}
+						div.row(ng-show="item.results")
 							div.col-sm-4
-								label Filter
-							div.col-sm-4{{item.xrayFilter.name}}
-					div(ng-show="item.type.name == 'Photographic'")
-						div.row(ng-show="item.mediaType.name")
-							div.col-sm-4
-								label Type
-							div.col-sm-4{{item.mediaType.name}}
-						div.row(ng-show="item.mediaFilm.name")
-							div.col-sm-4
-								label Film
-							div.col-sm-4{{item.mediaFilm.name}}
-						div.row(ng-show="item.mediaFormat.name")
-							div.col-sm-4
-								label Format
-							div.col-sm-4{{item.mediaFormat.name}}
-						div.row(ng-show="item.mediaFilter.name")
-							div.col-sm-4
-								label Filter
-							div.col-sm-4{{item.mediaFilter.name}}
-						div.row(ng-show="item.mediaLighting")
-							div.col-sm-4
-								label Lighting
-							div.col-sm-4
-								span(ng-repeat="light in item.mediaLighting")
-									{{light.name}}{{$last ? '' : ', '}}
-						div.row(ng-show="item.mediaScope")
-							div.col-sm-4
-								label Scope
-							div.col-sm-4
-								span(ng-repeat="scope in item.mediaScope")
-									{{scope.name}}{{$last ? '' : ', '}}
-					div.row(ng-show="item.description")
-						div.col-sm-4
-							label Method/Description
-						div.col-sm-8
-							{{item.description}}
-					div.row(ng-show="item.results")
-						div.col-sm-4
-							label Results
-						div.col-sm-8
-							{{item.results}}
-			accordion(close-others="false")
-				accordion-group(heading="Artwork", is-open="status.open", is-open="statusMeta.isFirstOpen", ng-show="record.artwork.inventoryNum")
+								label Results
+							div.col-sm-8
+								{{item.results}}
+			accordion-group(heading="Artwork metadata", is-open="statusMeta.isArtworkOpen")
+				accordion(close-others="false")
 					div.row(ng-show="record.artwork.inventoryNum")
 						div.col-sm-4
 							label Inv. number
@@ -321,14 +322,11 @@ div#viewContainer
 						div.col-sm-4
 							label Owner
 						div.col-sm-4{{record.artwork.owner}}
-	div(ng-controller="CarouselImageCtrl", ng-show="showImages").row
-		div(style="width: 600px").col-sm-5
+	div.col-sm-6
+		div(ng-controller="CarouselImageCtrl", ng-show="showImages", style="max-width:600px").row
 			carousel(interval="myInterval", disable-animation="true")
 				slide(ng-repeat="slide in slides", active="slide.active")
 					img(ng-src="{{slide.image}}", style="margin:auto")
 					div.carousel-caption
 						h4 {{slide.title}}
 						p {{slide.text}}
-	
-
-

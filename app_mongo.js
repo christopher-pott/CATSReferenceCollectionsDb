@@ -938,16 +938,19 @@ app.get('/vocab', function(req, res) {
  * IMAGE operations
  ********************/
 /*
- * The new body-parser module only handles urlencoded and json bodies. 
- * That means for multipart bodies (file uploads) you need an additional
- * module like busboy or formadible : this is the OLD version
+ * Saves incoming file directly to the image server filesystem. Ideally, this would be our 
+ * interface to a DAM but as it stands we don't have this in place yet. 
+ * 
+ * Response: 
+ * If the image is successfully saved, we return a url at which it can be accessed.
+ * If an image of that name aready exists, we return a "conflict" response.
  */
 app.post('/image', function(req, res){
 
     if (!req.isAuthenticated()){
         res.send(401);
     };
-    
+
     var readPath = req.files.file.path;
     var writePath = "/mnt/fotoarkiv/globus/catsdb/";
     var name = req.files.file.name;
@@ -958,14 +961,20 @@ app.post('/image', function(req, res){
             res.send(500); /*"Internal server Error"*/
         }
         else {
-            fs.writeFile(writePath + name, data, function(err) {
-                if(err) {
-                    console.log(err);
-                    res.send(500); /*"Internal server Error"*/
+            fs.exists(writePath + name, function (exists) {
+                if(exists){
+                    res.send(409); /*"Conflict"*/
                 } else {
-                    var url = "http://cspic.smk.dk/globus/catsdb/" + name;
-                    console.log("The file was saved to " + url);
-                    res.status(201).send(url); 
+                    fs.writeFile(writePath + name, data, function(err) {
+                        if(err) {
+                            console.log(err);
+                            res.send(500); /*"Internal server Error"*/
+                        } else {
+                            var url = "http://cspic.smk.dk/globus/catsdb/" + name;
+                            console.log("The file was saved to " + url);
+                            res.status(201).send(url); /*"Created"*/
+                        }
+                    })
                 }
             })
         }

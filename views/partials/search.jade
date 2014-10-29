@@ -599,8 +599,9 @@ div#searchContainer
 										tr(ng-repeat='f in selectedFiles')
 											td
 												strong {{ f.name }}
-												div.sel-file
-													img(ng-show="dataUrls[$index]", ng-src="{{dataUrls[$index]}}")
+												p
+													div.sel-file
+														img(ng-show="dataUrls[$index]", ng-src="{{dataUrls[$index]}}")
 											td {{f.size}}B
 											td
 												span
@@ -615,12 +616,13 @@ div#searchContainer
 												span(ng-show="uploadResult.length == 0")
 													span.glyphicon.glyphicon-remove
 											td
-												button.btn-xs.btn-primary(ng-click="start($index)", ng-enable="progress[$index] < 0")
+												button.btn.btn-xs.btn-primary(ng-click="start($index)", ng-enable="progress[$index] < 0")
 													span.glyphicon.glyphicon-upload
 													|  Upload
-												button.btn-xs.btn-warning(ng-click="cancel($index)")
+												button.btn.btn-xs.btn-warning(ng-click="cancel($index)")
 													span.glyphicon.glyphicon-ban-circle
 													|  Cancel
+								alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
 						br
 						div.row
 							div.group.col-sm-12
@@ -631,7 +633,7 @@ div#searchContainer
 											th Name
 											th Description
 											th(style="width: 220px") Image
-											th Delete
+											th Remove
 									tbody
 										tr(ng-repeat='image in record.images')
 											td 
@@ -708,7 +710,7 @@ div#searchContainer
 				tbody
 					tr(ng-repeat="res in searchResultsList")
 						td: a(href= "", ng-click="viewSample(res)") {{res.referenceNumber}}
-						td{{res.sampleType.name}}
+						td: a(href= "", ng-click="viewSample(res)") {{res.sampleType.name}}
 						td{{res.artwork.inventoryNum}}
 						td(ng-show="res.sampleType.id !== 'pigment'"){{res.artwork.productionDateEarliest | date:'yyyy'}} - {{res.artwork.productionDateLatest | date:'yyyy'}}
 						td(ng-show="res.sampleType.id == 'pigment'"){{res.productionDate | date:'yyyy'}}

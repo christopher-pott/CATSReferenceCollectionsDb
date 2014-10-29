@@ -3,53 +3,54 @@ extends layout
 block body
 	div(ng-controller='AppCtrl').titlearea.group
 		div.div.row 
-			div.hidden-lg.col-xs-2
-				h3: a(href='browse') CATS Reference Collections
-			div.col-lg-4.hidden-sm.hidden-xs.hidden-md
-				h2: a(href='browse') CATS Reference Collections
-			div.col-lg-3.col-sm-3.col-md-3
-				form(role="form").form-inline
-					div.form-group
-						label.sr-only Search
-						div.input-group
-							input(type="text", ng-model="searchTerm", placeholder="Enter search term").form-control
-							span.input-group-btn
-								button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
-			div.col-lg-3.col-sm-5.col-md-5.login
-				button(ng-show="!loggedin", ng-click="loginUser()").btn.btn-default
-					span.glyphicon.glyphicon-user 
-						|Login
-				button(ng-show="loggedin", ng-click="logout()").btn.btn-default
-					span.glyphicon.glyphicon-user 
-						|Logout {{email}}
-				script(type="text/ng-template")#myLoginContent
-					div.modal-header
-						h3 Login
-					div.modal-body
-						form(role="form", name="form", novalidate, ng-class="{submitted:submitted}")
+			div.col-sm-7.col-md-8.col-lg-5
+				div.col-sm-12
+					a(href='browse'): img(src="/images/catsdb.png")
+			div.col-sm-4
+				row
+					div.login
+						button(ng-show="!loggedin", ng-click="loginUser()").btn.btn-default
+							span.glyphicon.glyphicon-user 
+								|Login
+						button(ng-show="loggedin", ng-click="logout()").btn.btn-default
+							span.glyphicon.glyphicon-user 
+								|Logout {{email}}
+						script(type="text/ng-template")#myLoginContent
+							div.modal-header
+								h3 Login
+							div.modal-body
+								form(role="form", name="form", novalidate, ng-class="{submitted:submitted}")
+									div.form-group
+										label.control_label(for="email") Email
+										input(type="email", ng-model="email", ng-required="true", ng-model-options="{updateOn: 'blur'}",
+												required, placeholder="Email").form-control
+									div.form-group
+										label.control_label(for="password") Password
+										input(type="password", ng-model="password", ng-required="true", ng-model-options="{updateOn: 'blur'}",
+												required, placeholder="Password").form-control
+									div.form-group(ng-show="changePassword")
+										label.control_label New Password
+										input(type="password", ng-model="newPassword", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
+												required, placeholder="New password").form-control
+									div.form-group(ng-show="changePassword")
+										label.control_label New Password (repeat)
+										input(type="password", ng-model="newPasswordRepeat", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
+												required, placeholder="New password (repeat)").form-control
+									alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
+									button(ng-click="login(form, email, password, newPassword, newPasswordRepeat, changePassword)", type="button").btn.btn-primary.btn-block Login
+							div.modal-footer
+								label.checkbox-inline.control_label Change password
+									input(type="checkbox", ng-model="changePassword")
+				row
+					div.col-sm-10
+						form(role="form").form-inline
 							div.form-group
-								label.control_label(for="email") Email
-								input(type="email", ng-model="email", ng-required="true", ng-model-options="{updateOn: 'blur'}",
-										required, placeholder="Email").form-control
-							div.form-group
-								label.control_label(for="password") Password
-								input(type="password", ng-model="password", ng-required="true", ng-model-options="{updateOn: 'blur'}",
-										required, placeholder="Password").form-control
-							div.form-group(ng-show="changePassword")
-								label.control_label New Password
-								input(type="password", ng-model="newPassword", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
-										required, placeholder="New password").form-control
-							div.form-group(ng-show="changePassword")
-								label.control_label New Password (repeat)
-								input(type="password", ng-model="newPasswordRepeat", ng-required="changePassword", ng-model-options="{updateOn: 'blur'}",
-										required, placeholder="New password (repeat)").form-control
-							alert(ng-repeat="alert in alerts", type="{{alert.type}}", close="closeAlert($index)").animation: i(class="{{alert.icon}}")  {{alert.msg}}
-							button(ng-click="login(form, email, password, newPassword, newPasswordRepeat, changePassword)", type="button").btn.btn-primary.btn-block Login
-					div.modal-footer
-						label.checkbox-inline.control_label Change password
-							input(type="checkbox", ng-model="changePassword")
-			div.col-lg-2.col-sm-2
-				img(src="/images/logo2.jpg")
+								label.sr-only Search
+								div.input-group
+									input(type="text", ng-model="searchTerm", placeholder="Enter search term").form-control
+									span.input-group-btn
+										button(ng-click="searchClicked(searchTerm)").btn.btn-default: i.glyphicon.glyphicon-search
+
 	div(ng-view)
 
 	// div
