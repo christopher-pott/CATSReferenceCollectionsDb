@@ -89,6 +89,10 @@ form.submitted .has-error, form.submitted .ng-invalid {
 	padding-top: 48px;
 }
 
+.searchreshdr {
+	padding-bottom: 10px;
+}
+
 /*spacing borders for tab in tab*/
 .embeddedTab {
 	padding: 20px;	

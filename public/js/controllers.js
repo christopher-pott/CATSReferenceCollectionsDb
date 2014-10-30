@@ -142,9 +142,10 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     /* Clicking on a reference number will direct over to view mode
      * and save the sample details so the view controller can retrieve them
      */
-    $scope.viewSample = function(sample) {
+    $scope.viewSample = function(index) {
         $location.path('/view');
-        state.sample = sample;
+        state.sample = state.resultList[index];
+        state.itemIndex = index;
         state.create = false;
     };
 
@@ -258,10 +259,13 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
 controller('BrowseController', function ($scope) {
 
 }).
-controller('ViewController', function ($scope, state, catsAPIservice) {
+controller('ViewController', function ($scope, state, catsAPIservice, $location) {
 
     /* Retrieve the sample details from the state service*/
-    $scope.record = state.sample;
+  //  $scope.record = state.sample;
+    $scope.itemIndex = state.itemIndex;
+    $scope.numResults = state.resultList.length;
+    $scope.record = state.resultList[$scope.itemIndex];
 
     $scope.statusMeta = {
             isSampleOpen: true,
@@ -269,6 +273,27 @@ controller('ViewController', function ($scope, state, catsAPIservice) {
             isAnalysisOpen: true,
             isFirstDisabled: false
     };
+    
+    $scope.nextItem = function(){
+        $scope.itemIndex = $scope.itemIndex + 1;
+        $scope.itemIndex = $scope.itemIndex % state.resultList.length;
+        $scope.record = state.resultList[$scope.itemIndex];
+        state.itemIndex = $scope.itemIndex;
+//        $scope.$apply();
+    };
+    
+    $scope.previousItem = function(){
+        $scope.itemIndex = $scope.itemIndex - 1;
+        $scope.itemIndex = ($scope.itemIndex < 0) ? (state.resultList.length - 1) : $scope.itemIndex;
+        $scope.record = state.resultList[$scope.itemIndex];
+        state.itemIndex = $scope.itemIndex;
+//        $scope.$apply();
+    };
+    
+    $scope.backToSearch = function() {
+        $location.path('/search');
+    };
+
 
 }).
 controller('DatepickerCntrl', function ($scope) {
@@ -836,14 +861,26 @@ function CarouselImageCtrl($scope, state) {
 
     var slides = $scope.slides = [];
     
+    /* Update images whenever search result index changes*/
+    $scope.$watch(
+        // This is the listener function
+        function() { return state.itemIndex; },
+        // This is the change handler
+        function(newValue, oldValue) {
+            if ( newValue !== oldValue ) {
+                loadSlides(newValue);
+            }
+        }
+    );
+    
     /*just for testing*/
-    $scope.addSlide = function() {
-        var notVeryRandomKittenNumber = 600 + slides.length;
-        slides.push({
-            image: 'http://placekitten.com/' + notVeryRandomKittenNumber + '/600',
-            text: 'cats'
-        });
-    };
+//    $scope.addSlide = function() {
+//        var notVeryRandomKittenNumber = 600 + slides.length;
+//        slides.push({
+//            image: 'http://placekitten.com/' + notVeryRandomKittenNumber + '/600',
+//            text: 'cats'
+//        });
+//    };
 
     $scope.addArtworkSlide = function(invNum, externalurl, title) {
         var imageurl = externalurl.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
@@ -855,29 +892,37 @@ function CarouselImageCtrl($scope, state) {
         });
     };
 
-    /*add artwork image*/
-    if(state.sample && state.sample.artwork && state.sample.artwork.externalurl){
-        $scope.addArtworkSlide(state.sample.artwork.inventoryNum,
-                               state.sample.artwork.externalurl, 
-                               state.sample.artwork.title);
-    }
-    
-    /*add other images*/
-    if(state.sample && state.sample.images){
-        angular.forEach(state.sample.images, function(image) {
-            var imageurl = image.url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
-            + "&mode=width&width=600";
-            slides.push({
-                title: image.name,
-                image: imageurl,
-                text: image.description
+    var loadSlides = function (index) {
+        
+        slides = $scope.slides = [];
+        var sample = state.resultList[index];
+        
+        /*add artwork image*/
+        if(sample && sample.artwork && sample.artwork.externalurl){
+            $scope.addArtworkSlide(sample.artwork.inventoryNum,
+                                   sample.artwork.externalurl, 
+                                   sample.artwork.title);
+        }
+        
+        /*add other images*/
+        if(sample && sample.images){
+            angular.forEach(sample.images, function(image) {
+                var imageurl = image.url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+                + "&mode=width&width=600";
+                slides.push({
+                    title: image.name,
+                    image: imageurl,
+                    text: image.description
+                });
             });
-        });
-    }
+        }
+        
+        if(slides.length > 0){
+            $scope.showImages = true;
+        }
+    };
     
-    if(slides.length > 0){
-        $scope.showImages = true;
-    }
+    loadSlides(state.itemIndex);
     
     /*just for test*/
 //    for (var i=0; i<4; i++) {
