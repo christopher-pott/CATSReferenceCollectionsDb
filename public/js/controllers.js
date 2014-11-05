@@ -183,13 +183,14 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
     /* Needed for older browsers which don't support click() on href's  */
     var fakeClick = function(anchorObj) {
     	/*try to click()*/
-    	if (anchorObj.click){
-    		anchorObj.click();
-    	}else if(document.createEvent) {
-    	/*otherwise, try this (thankyou slashdot)*/	
+//    	if (anchorObj.click){
+//    		anchorObj.click();
+//    	    anchorObj.fireEvent("onclick");
+//    	}else{
+	    if(document.createEvent) {
     	    var evt = document.createEvent("MouseEvents"); 
     	    evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null); 
-    	    var allowDefault = anchorObj.dispatchEvent(evt);
+    	    anchorObj.dispatchEvent(evt);
     	}
     }
     

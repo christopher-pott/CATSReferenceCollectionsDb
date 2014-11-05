@@ -26,6 +26,7 @@ div#searchContainer
 									div(ng-controller="DatepickerCntrl").col-sm-8
 										div.input-group
 											input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-localdate, datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", close-text="Close").form-control
+											//input(ng-readonly="record.sampleType.id == 'noninvasive'", type="text", datepicker-popup="{{format}}", ng-model="record.sampleDate", is-open="opened").form-control
 											span.input-group-btn
 												button(type="button", ng-click="open($event)", ng-disabled="record.sampleType.id == 'noninvasive'").btn.btn-default: i.glyphicon.glyphicon-calendar
 								div.form-group 
