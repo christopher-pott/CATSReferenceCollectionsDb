@@ -387,6 +387,10 @@ div#viewContainer
 						div.col-sm-4
 							label Artist(s)
 						div.col-sm-8{{record.artwork.artist}}
+					div.row(ng-show="record.artwork.nationality")
+						div.col-sm-4
+							label Artist nationality
+						div.col-sm-8{{record.artwork.nationality}}
 					div.row(ng-show="record.artwork.technique")
 						div.col-sm-4
 							label  Technique / Material
@@ -399,6 +403,10 @@ div#viewContainer
 						div.col-sm-4
 							label Production date latest
 						div.col-sm-8{{record.artwork.productionDateLatest | date:'dd/MM/yyyy'}}
+					div.row(ng-show="record.artwork.dimensions")
+						div.col-sm-4
+							label Dimensions
+						div.col-sm-8{{record.artwork.dimensions}}
 					div.row(ng-show="record.artwork.owner")
 						div.col-sm-4
 							label Owner

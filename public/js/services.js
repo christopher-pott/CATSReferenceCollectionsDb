@@ -64,8 +64,8 @@ serviceMod.factory('catsAPIservice', function($http) {
             return $http.get(url);
         },
         Excel : function(term, filter) {
-            var url = "Excel?" 
-                    + ((!!term) ? "fulltext=" + term : "");
+            var url = "Excel?fulltext=" 
+                    + ((!!term) ? term : "");
             if (filter && filter.isOpen){
                 url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 

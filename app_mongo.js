@@ -363,6 +363,38 @@ app.get('/Excel', function(req, res){
                 caption:'Artwork Inventory Num.',
                 type:'string',
                 width:20
+            },{
+                caption:'Artwork Title',
+                type:'string',
+                width:20
+            },{
+                caption:'Artist',
+                type:'string',
+                width:20
+            },{
+                caption:'Artist nationality',
+                type:'string',
+                width:20
+            },{
+                caption:'Artwork Technique',
+                type:'string',
+                width:20
+            },{
+                caption:'Artwork production date earliest',
+                type:'string',
+                width:20
+            },{
+                caption:'Artwork production date latest',
+                type:'string',
+                width:20
+            },{
+                caption:'Artwork dimensions',
+                type:'string',
+                width:20
+            },{
+                caption:'Artwork owner',
+                type:'string',
+                width:20
             }];
 
             conf.rows = [];
@@ -436,8 +468,17 @@ app.get('/Excel', function(req, res){
                 /*analysis field*/
                 conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
 
-                /*artwork field*/
+                /*artwork fields*/
                 conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.title) ? body[i].artwork.title : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.artist) ? body[i].artwork.artist : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.nationality) ? body[i].artwork.nationality : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.technique) ? body[i].artwork.technique : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.productionDateEarliest) ? body[i].artwork.productionDateEarliest : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.productionDateLatest) ? body[i].artwork.productionDateLatest : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.dimensions) ? body[i].artwork.dimensions : null;
+                conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.owner) ? body[i].artwork.owner : null;
+
             }
             var result = nodeExcel.execute(conf);
             res.setHeader('Content-Type', 'application/vnd.openxmlformats');
