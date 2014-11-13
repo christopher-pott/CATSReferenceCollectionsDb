@@ -14,11 +14,16 @@ db.samples.ensureIndex(
         { name: "TextIndex" }
 );
 
-/* Add a unique constraint to the vocabs "type" field, so we will only insert the
- * vocabulary default lists (at node startup) if they don't already exist
+/* Add a unique constraint to the vocabs and users, so we will only insert the
+ * default data (at startup) if they don't already exist
  */
 db.vocabs.ensureIndex(
         { "type": 1 },
+        { unique: true }
+);
+
+db.users.ensureIndex(
+        { "username": 1 },
         { unique: true }
 );
 
@@ -39,6 +44,20 @@ for (var i=0; i < defaults.length; i++){
         }
     });
 }
+
+/* Setup a default user on startup (if not present). Password is "admin" and should be changed upon first use.
+ */
+var default_admin = {username: 'admin@smk.dk', password : '$2a$10$j4GD2P.isxPBgMCcEiFrPOBbRl4uTpeG.qQKe.trtnNj1M1yrF.te', role : 'admin'};
+
+db.users.insert(default_admin, function(err, doc) {
+    if (err || !doc){
+        if(err && err.code != 11000) {
+            console.log("Default admin not added : " + err);
+        }
+    } else {
+        console.log(doc.type + " default admin inserted successfully");
+    }
+});
 
 //Public API
 module.exports = db;

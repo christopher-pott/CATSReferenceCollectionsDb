@@ -645,28 +645,39 @@ app.get('/searchSize', function(req, res) {
 
 /* This will create or update the record depending on the existence of
  * the "_id" parameter in the body
+ * 
+ * body may or may not contain an '_id', which may or may not be an existing one
  */
 app.post('/sample', function(req, res) {
 
-	/*the owner or admin... how to check if the cookie matches the name?
-	 * let them change their own password when logged in : this is all*/
     if (!req.isAuthenticated()){
         res.send(401);
+        return;
     };
 
     var body = req.body;
+    
+    if(!body || JSON.stringify(body) == '{}'){
+        res.send(400); /*bad request, no body*/
+        return;
+    }
 
     /* MongoDB creates _id as an ObjectID, but doesn't retrieve _id as an ObjectID, so
-     * we have to recreate it each time.
-     */
-    body._id = db.ObjectId(body._id);
+     * we have to recreate it each time */
+    try{
+        body._id = db.ObjectId(body._id);
+    }catch (err){
+        res.send(400); /*bad request, id probably not hex*/
+        return;
+    }
+
     var query = {'_id' : body._id };
     var options = { 'upsert': true };
 
     db.samples.update(query, body, options, function (err, upserted) {
         if (err || !upserted){
             console.log(body.sampleType + " not saved");
-            throw err;
+            res.send(500); /*server error*/
         } else {
             console.log('upsert successful ');
             res.send(upserted);
@@ -686,19 +697,32 @@ app.options('/sample', function(req, res){
 
 app.delete('/sample', function(req, res){
     
+    var id;
+
     if (!req.isAuthenticated()){
         res.send(401);
-    };
-
-    /* If successful returns the number of deleted records
-     */
-    var id = db.ObjectId(req.query.id);
+        return;
+    }
+    if(!req.query || !req.query.id){
+        res.send(400);
+        return;
+    }    
+    try{
+        id = db.ObjectId(req.query.id);
+    }catch (err){
+        res.send(400);
+        return;
+    }
     console.log("DELETE " + id);
+
     db.samples.remove({"_id": id}, function(err, numberRemoved){
-        if (err || !numberRemoved){
+        if (err){
             console.log("delete failed");
             res.send(err);
         } else {
+            /* If successful returns the number of deleted records
+             * Should only be an error if the operation failed
+             * Even if resource is not found, delete has succeeded*/
             console.log("delete successful");
             res.send(numberRemoved);
         }
@@ -712,20 +736,18 @@ app.delete('/sample', function(req, res){
 /* Updates or inserts (upserts) a new user record in mongodb using mongojs.
  * Returns the record _id.
  * 
- * Usage: curl -H "Content-Type: application/json" 
- *             --cookie "connect.sid=s%3AIzaNbY6BuBKwcZxkdKI73Mo4.S6hhH7mzJPooqfXPI4TPIdKZws3Cxq3lDYmL%2FEtqgNw" 
- *             -d '{"username":"a_user@smk.dk", "password":"a_password"}' 
- *             http://localhost:3000/user
- *
- *             (To get the session cookie, first login)
- *             
- *             The first admin user needs creating in the database like this.....password is "admin"....change it!
- *             db.users.update({username: "cpo@smk.dk"},{ "_id" : ObjectId("53fae078e001c8c6af798ecd"), "username" : "cpo@smk.dk", "password" : "$2a$10$j4GD2P.isxPBgMCcEiFrPOBbRl4uTpeG.qQKe.trtnNj1M1yrF.te", "role" : "admin" }, {upsert:"true"})
- * */
+ * Usage: POST with body = {"username": email, "password": password, "role": role}
+ * 
+ * Command line hint: curl -H "Content-Type: application/json" 
+ *                     --cookie "connect.sid=s%3AIzaNbY6BuBKwcZxkdKI73Mo4.S6hhH7mzJPooqfXPI4TPIdKZws3Cxq3lDYmL%2FEtqgNw" 
+ *                    -d '{"username":"a_user@smk.dk", "password":"a_password"}' 
+ *                     http://localhost:3000/user
+ */
 app.post('/user', function(req, res){
 	
-    if (!req.isAuthenticated()){  /*session cookie must be present*/
+    if (!req.isAuthenticated()){
         res.send(401); /*unauthorised*/
+        return;
     };
 
     /* send user details in request body rather than as url parameters to avoid 
@@ -734,14 +756,15 @@ app.post('/user', function(req, res){
     var password = req.body.password;
     var role = req.body.role;
     
-    /*missing name or password*/
     if(!username || !password){
         res.send(400); /*bad request*/
+        return;
     } 
     
     /*only admin can edit others passwords*/
     if(req.user.username != username && req.user.role != "admin"){ 
         res.send(401); /*unauthorised*/
+        return;
     };
     
     /*Only admin can alter role*/
@@ -762,16 +785,16 @@ app.post('/user', function(req, res){
         options.update = {$set: {"username": username, "password": hash, "role": role}};   /*data to write to the record*/
 
         if (err || !hash){
-            console.log("user " + username + " not saved");
-            throw err;
+            console.log("could not encrypt password");
+            res.send(err);
         } else {
         	db.users.findAndModify(options, function (err, record, lastErr) {
     	        if (err || !record){
     	            console.log("user " + username + " not saved");
-    	            throw err;
+    	            res.send(err);
     	        } else {
     	            console.log('user upsert successful, username: ' + record.username);
-    	            res.send(record); /*or maybe just 200, or 201*/
+    	            res.send(record);
     	        }
     	    });
         }
@@ -790,17 +813,23 @@ app.options('/user', function(req, res){
 
 /*
  * Delete a user profile
+ * If successful returns the number of deleted records
+ *
  * Usage: user?username=someuser@smk.dk
  */
 app.delete('/user', function(req, res){
     
     if (!req.isAuthenticated() || req.user.role != "admin"){
         res.send(401);
+        return;
     };
 
-    /* If successful returns the number of deleted records
-     */
+    if(!req.query || !req.query.username){
+        res.send(400);
+        return;
+    }
     var username = req.query.username;
+    
     console.log("DELETE " + username);
 
     db.users.remove({"username": username}, function(err, numberRemoved){
@@ -820,19 +849,31 @@ app.delete('/user', function(req, res){
 
 /* Updates or inserts (upserts) a new artwork record in mongodb using mongojs.
  * Returns the record _id.
+ * 
+ * Usage: POST with body = 
+ * 
  * */
 app.post('/artwork', function(req, res){
 
     if (!req.isAuthenticated()){
         res.send(401);
+        return;
     };
 
     var body = req.body;
 
-    /* MongoDB creates _id as an ObjectID, but doesn't retrieve _id as an ObjectID, so
-     * we have to recreate it each time for the query.
-     */
-    body._id = db.ObjectId(body._id);
+    if(!body || JSON.stringify(body) == '{}'){
+        res.send(400); /*bad request, no body*/
+        return;
+    }
+    
+    try{
+        body._id = db.ObjectId(body._id);
+    }catch (err){
+        res.send(400); /*bad request, id probably not hex*/
+        return;
+    }
+    
     var options = {};
     options.query = {'_id' : body._id};  /*query by _id*/
     options.upsert = true;               /*if query doesn't find a record then insert a new one */
@@ -845,7 +886,7 @@ app.post('/artwork', function(req, res){
     db.artworks.findAndModify(options, function (err, record, lastErr) {
         if (err || !record){
             console.log("artwork " + body.title + " not saved");
-            throw err;
+            res.send(err);
         } else {
             console.log('artwork upsert successful, _id: ' + record._id);
             res.send(record);
