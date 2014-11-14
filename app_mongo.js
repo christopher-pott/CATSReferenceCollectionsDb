@@ -4,18 +4,21 @@
 
 var express = require('express'),
     fs = require('fs'),
+    logger = require("./logging"),
     nodeExcel = require('excel-export'),
     routes = require('./routes'),
     api = require('./routes/api'),
     http = require('http'),
     path = require('path'),
     db = require("./db_mongo"),
+  //  logger = require("./logging"),
     Q = require('q'),
     bcrypt = require('bcrypt-nodejs'),
     SALT_WORK_FACTOR = 10,
     passport = require('passport');
 
 var app = module.exports = express();
+
 
 /****************
  * Configuration
@@ -24,27 +27,34 @@ var app = module.exports = express();
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.use(express.logger('dev'));
+
+logger.debug("Overriding 'Express' logger");
+app.use(express.logger({format: 'dev', stream: logger.stream }));
+
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
+
 /*Passport middleware : must be before 'router'*/
 app.use(express.cookieParser());
 app.use(express.session({ secret: 'keyboard cat' }));
 app.use(passport.initialize());
 app.use(passport.session());
 /*End Passport middleware*/
+
 app.use(app.router);
 
-//development only
+/* development only */
 if (app.get('env') === 'development') {
   app.use(express.errorHandler());
 }
 
-//production only
+/* production only */
 if (app.get('env') === 'production') {
   // TODO
 }
+
+
 
 /**************************
  * Passport authentication 
@@ -118,15 +128,22 @@ passport.deserializeUser(function(id, done) {
 
 /*Passport authentication Routes*/
 
-/* login */
+/* login :
+ * Returns: user, or null if authentication failed
+*/
 app.post('/login', passport.authenticate('local'), function(req, res) {
-    /*user is null if authentication failed*/
+    logger.info('user ' + req.user.username.toString() + ' logged in');
     res.send(req.user); 
 });
 
-/* log out */ 
+/* logout */ 
 app.post('/logout', function(req, res){ 
-	req.logOut(); 
+    if(req.isAuthenticated()){
+        logger.info('user ' + req.user.username.toString() + ' logging out');
+        req.logOut(); 
+    }else{
+        logger.info('logout request, but user not logged in');
+    }
 	res.send(200); 
 });
 
@@ -202,7 +219,7 @@ app.get('/Excel', function(req, res){
     .toArray(function(err, items) {
 
         if(err || !items){
-        	console.error(err);
+            logger.error(err);
         	res.end();
         }
         
@@ -515,7 +532,7 @@ app.get('/searchsmk', function(req, res) {
     });
     proxy.on('error', function(err) {
         // Solr is down or otherwise not visible
-        console.log("couldn't contact solr");
+        logger.error("couldn't contact solr");
         res.send(502);  //"502 : Bad Gateway"
     });
     req.pipe(proxy, {
@@ -535,48 +552,48 @@ app.get('/searchsmk', function(req, res) {
  *
  *                results.then(function(result){
  *                    //this is called when all promises in getArtworks have completed
- *                    console.log(result);
+ *                    logger.info(result);
  *                    res.send(result);
  *                }, function (err) {
  *                    //this is called if any of the promises have failed 
- *                    console.error(err); 
+ *                    logger.error(err); 
  *               });
  */
-function getArtworks(samples) {
-    
-    /* define the array of promises required by Q.all() as input */
-    var promises = [];  
-
-    /* A regular for loop didn't work here*/
-    samples.forEach(function(sample) {
-        
-        /* use Q.defer() to create a deferred. Deferred is used to
-         * implement custom methods returning promises*/
-        var deferred = Q.defer();
-
-        if (sample.artwork_id){
-
-            /*'find' requires this format for _id*/
-            var id = db.ObjectId(sample.artwork_id); 
-
-            /*query database for the artwork*/
-            db.artworks.find({"_id" : id}).toArray(function(err, artworks) {
-
-                sample.artwork = artworks[0];
-                /* Calling resolve with a non-promise value causes promise to be 
-                 * fulfilled with that value */
-                deferred.resolve(sample);
-            });
-        }else{
-            /*we still need the sample in the results even if there's no artwork*/
-            deferred.resolve(sample);
-        }
-        /*add to promises array*/
-        promises.push(deferred.promise);
-    })
-    /* when all are promises are resolved, return the results */
-    return Q.all(promises);
- }
+//function getArtworks(samples) {
+//    
+//    /* define the array of promises required by Q.all() as input */
+//    var promises = [];  
+//
+//    /* A regular for loop didn't work here*/
+//    samples.forEach(function(sample) {
+//        
+//        /* use Q.defer() to create a deferred. Deferred is used to
+//         * implement custom methods returning promises*/
+//        var deferred = Q.defer();
+//
+//        if (sample.artwork_id){
+//
+//            /*'find' requires this format for _id*/
+//            var id = db.ObjectId(sample.artwork_id); 
+//
+//            /*query database for the artwork*/
+//            db.artworks.find({"_id" : id}).toArray(function(err, artworks) {
+//
+//                sample.artwork = artworks[0];
+//                /* Calling resolve with a non-promise value causes promise to be 
+//                 * fulfilled with that value */
+//                deferred.resolve(sample);
+//            });
+//        }else{
+//            /*we still need the sample in the results even if there's no artwork*/
+//            deferred.resolve(sample);
+//        }
+//        /*add to promises array*/
+//        promises.push(deferred.promise);
+//    })
+//    /* when all are promises are resolved, return the results */
+//    return Q.all(promises);
+// }
 
 /*
  * Uses text index and mongo full text search to retrieve a list of samples
@@ -600,10 +617,9 @@ app.get('/search', function(req, res) {
         .toArray(function(err, items) {
             if(err || !items){
               /*this is called if any of the promises have failed */
-              console.error(err);
+              logger.error(err);
               res.end();  /*?check*/
             }else{
-              console.log(items);
               res.send(items);
             }
         });
@@ -632,7 +648,7 @@ app.get('/searchSize', function(req, res) {
             if(err || !count){
                 res.send("0");
             }else{
-                console.log("searchSize: " + count);
+                logger.info("searchSize: " + count);
                 res.send(count.toString());
             }
         });
@@ -676,10 +692,10 @@ app.post('/sample', function(req, res) {
 
     db.samples.update(query, body, options, function (err, upserted) {
         if (err || !upserted){
-            console.log(body.sampleType + " not saved");
+            logger.info(body.sampleType + " not saved");
             res.send(500); /*server error*/
         } else {
-            console.log('upsert successful ');
+            logger.info('upsert successful ');
             res.send(upserted);
         }
     });
@@ -713,17 +729,17 @@ app.delete('/sample', function(req, res){
         res.send(400);
         return;
     }
-    console.log("DELETE " + id);
+    logger.info("DELETE " + id);
 
     db.samples.remove({"_id": id}, function(err, numberRemoved){
         if (err){
-            console.log("delete failed");
+            logger.error("delete failed");
             res.send(err);
         } else {
             /* If successful returns the number of deleted records
              * Should only be an error if the operation failed
              * Even if resource is not found, delete has succeeded*/
-            console.log("delete successful");
+            logger.info("delete successful");
             res.send(numberRemoved);
         }
     });
@@ -785,15 +801,16 @@ app.post('/user', function(req, res){
         options.update = {$set: {"username": username, "password": hash, "role": role}};   /*data to write to the record*/
 
         if (err || !hash){
-            console.log("could not encrypt password");
+            logger.error("could not encrypt password");
             res.send(err);
         } else {
         	db.users.findAndModify(options, function (err, record, lastErr) {
     	        if (err || !record){
-    	            console.log("user " + username + " not saved");
+    	            logger.error("user " + username + " not saved");
     	            res.send(err);
     	        } else {
-    	            console.log('user upsert successful, username: ' + record.username);
+    	            logger.info('user upsert successful, username: ' + record.username);
+    	       //     logger.info('user upsert successful, username: ' + record.username);
     	            res.send(record);
     	        }
     	    });
@@ -830,14 +847,14 @@ app.delete('/user', function(req, res){
     }
     var username = req.query.username;
     
-    console.log("DELETE " + username);
+    logger.info("DELETE " + username);
 
     db.users.remove({"username": username}, function(err, numberRemoved){
         if (err || !numberRemoved){
-            console.log("delete failed");
+            logger.error("delete failed");
             res.send(err);
         } else {
-            console.log("delete successful");
+            logger.info("delete successful");
             res.send(numberRemoved);
         }
     });
@@ -885,10 +902,10 @@ app.post('/artwork', function(req, res){
      * cannot*/
     db.artworks.findAndModify(options, function (err, record, lastErr) {
         if (err || !record){
-            console.log("artwork " + body.title + " not saved");
+            logger.error("artwork " + body.title + " not saved");
             res.send(err);
         } else {
-            console.log('artwork upsert successful, _id: ' + record._id);
+            logger.info('artwork upsert successful, _id: ' + record._id);
             res.send(record);
         }
     });
@@ -902,7 +919,7 @@ app.get('/artwork', function(req, res) {
     if (invNum){
         var rg = new RegExp('^'+ invNum + '$', "i");
         var query = {"inventoryNum" :  { "$regex" : rg }};
-        console.log("get artwork query : " + JSON.stringify(query));
+        logger.info("get artwork query : " + JSON.stringify(query));
 
         /* Regex will be inefficient, but we must have a case insensitive search for
          * inventory numbers as we don't want to duplicate records.
@@ -912,7 +929,7 @@ app.get('/artwork', function(req, res) {
             res.send(items);
         })
     }else if (id){
-        console.log("get artwork by id: " + id);
+        logger.info("get artwork by id: " + id);
 
         db.artworks.find({"_id" : id})
         .toArray(function(err, items) {
@@ -963,10 +980,10 @@ app.post('/vocab', function(req, res){
             };
             db.vocabs.update(query, b, options, function (err, created) {
                 if (err || !created){
-                    console.log(body.sampleType + " not created");
+                    logger.info(body.sampleType + " not created");
                     throw err;
                 } else {
-                    console.log('created successful ');
+                    logger.info('created successful ');
                     res.send(created);
                 }
             });
@@ -982,10 +999,10 @@ app.post('/vocab', function(req, res){
             };
             db.vocabs.update(query, b, options, function (err, updated) {
                 if (err || !updated){
-                    console.log(body.sampleType + " not updated");
+                    logger.info(body.sampleType + " not updated");
                     throw err;
                 } else {
-                    console.log('update successful ');
+                    logger.info('update successful ');
                     res.send(updated);
                 }
             });
@@ -1002,13 +1019,13 @@ app.get('/vocab', function(req, res) {
         /*if a type is provided, just fetch that type, otherwise return all vocabs*/
         query = {"type" :  type}
     }
-    console.log("get vocab query : " + JSON.stringify(query));
+    logger.info("get vocab query : " + JSON.stringify(query));
 
     db.vocabs.find(query)
     .toArray(function(err, items) {
         /*if error creating array, or if array is empty*/
         if (err || !items || !items.length){
-            console.log("vocab " + type + " not found");
+            logger.info("vocab " + type + " not found");
             res.send(404); /*"not found", will triggger .error() handler*/
         } else {
             res.send(items);
@@ -1039,7 +1056,7 @@ app.post('/image', function(req, res){
 
     fs.readFile(readPath, function (err, data) {
         if(err) {
-            console.log(err);
+            logger.error(err);
             res.send(500); /*"Internal server Error"*/
         }
         else {
@@ -1049,11 +1066,11 @@ app.post('/image', function(req, res){
                 } else {
                     fs.writeFile(writePath + name, data, function(err) {
                         if(err) {
-                            console.log(err);
+                            logger.error(err);
                             res.send(500); /*"Internal server Error"*/
                         } else {
                             var url = "http://cspic.smk.dk/globus/catsdb/" + name;
-                            console.log("The file was saved to " + url);
+                            logger.info("The file was saved to " + url);
                             res.status(201).send(url); /*"Created"*/
                         }
                     })
@@ -1075,5 +1092,7 @@ app.get('*', routes.index);
  ***************/
 
 http.createServer(app).listen(app.get('port'), function () {
-    console.log('Express server listening on port ' + app.get('port'));
+    logger.info('Express server listening on port ' + app.get('port'));
 });
+
+
