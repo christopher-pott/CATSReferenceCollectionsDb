@@ -1,9 +1,36 @@
-/**********************
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: app_mongo.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: app_mongo.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**********************
  * Module dependencies
  **********************/
 
 var express = require('express'),
-    cors = require('cors'),
     fs = require('fs'),
     logger = require("./logging"),
     nodeExcel = require('excel-export'),
@@ -15,8 +42,7 @@ var express = require('express'),
     Q = require('q'),
     bcrypt = require('bcrypt-nodejs'),
     SALT_WORK_FACTOR = 10,
-    passport = require('passport'),
-    negotiator = require('negotiator');
+    passport = require('passport');
 
 var app = module.exports = express();
 
@@ -44,8 +70,6 @@ app.use(passport.session());
 /*End Passport middleware*/
 
 app.use(app.router);
-app.use(cors());
-
 
 /* development only */
 if (app.get('env') === 'development') {
@@ -136,7 +160,7 @@ passport.deserializeUser(function(id, done) {
  */
 app.post('/login', passport.authenticate('local'), function(req, res) {
     logger.info('user ' + req.user.username.toString() + ' logged in');
-    res.status(200).send(req.user); 
+    res.send(req.user); 
 });
 
 /* logout */ 
@@ -152,7 +176,7 @@ app.post('/logout', function(req, res){
 
 /* route to test if the user is logged in or not */
 app.get('/loggedin', function(req, res) {
-    res.status(200).send(req.isAuthenticated() ? req.user : '0');
+    res.send(req.isAuthenticated() ? req.user : '0');
 });
 
 
@@ -160,10 +184,8 @@ app.get('/loggedin', function(req, res) {
  * Helper functions
  ********************/
 
-/**
- * buildSampleQuery
- *
- * Builds this mongo query used for searching samples:
+/* 
+ * buildSampleQuery() builds the mongo query used for searching samples:
  * 
  * ({$and:[{$or: [{"productionDate" : {$lte: endDate}}, {"artwork.productionDateEarliest" : {$lte: endDate}}]},
  *         {$or: [{"productionDate" : {$gte: startDate}}, {"artwork.productionDateLatest" : {$gte: startDate}}]},
@@ -173,7 +195,7 @@ app.get('/loggedin', function(req, res) {
  * })
  *
  * Usage: accepts a request url containing any combination of these 4 queries:
- *        ?fulltext=search string&sampletype=Paint Cross Section&startdate=1850&enddate=1900
+ *        ?fulltext=search string&amp;sampletype=Paint Cross Section&amp;startdate=1850&amp;enddate=1900
  */
 function buildSampleQuery(req) {
 
@@ -207,27 +229,35 @@ function buildSampleQuery(req) {
     return query;
 }
 
+
+/********************
+ * Define the Routes
+ ********************/
+
+/* index and view partials */
+app.get('/', routes.index);
+app.get('/partials/:name', routes.partials);
+
+/* JSON API */
+app.get('/api/name', api.name);
+
 /**
  *  Excel export (requires 'excel-export' module)
  */
-function buildSampleExcel(query) {
+app.get('/Excel', function(req, res){
 
-    var result = null;
+    /*Search without limits*/
+    var query = buildSampleQuery(req);
 
-    /* use Q.defer() to create a deferred. Deferred is used to
-     * implement custom methods returning promises. We need to make a
-     * promise as the database query is asynch and this function may return
-     * before it completes. The calling function can use .then() to handle the
-     * completed promise*/
-    var deferred = Q.defer();
-    
     db.samples.find(query)
     .toArray(function(err, items) {
 
         if(err || !items){
             logger.error(err);
-            
-        }else if(items){
+            res.end();
+        }
+
+        if(items){
             /*build excel sheet*/
             var body = items;
             var conf ={};
@@ -419,7 +449,7 @@ function buildSampleExcel(query) {
                          }];
 
             conf.rows = [];
-            for (i = 0; i<body.length; i++){
+            for (i = 0; i&lt;body.length; i++){
                 var ii = 0;
                 /*shared fields */
                 conf.rows[i] = [];
@@ -427,7 +457,7 @@ function buildSampleExcel(query) {
                 conf.rows[i][ii++] = (body[i].referenceNumber) ? body[i].referenceNumber : null;
                 conf.rows[i][ii++] = (body[i].originLocation) ? body[i].originLocation : null;
                 conf.rows[i][ii++] = (body[i].sampleDate) ? body[i].sampleDate : null;
-                conf.rows[i][ii++] = (body[i].owner && body[i].owner.name) ? body[i].owner.name : null;
+                conf.rows[i][ii++] = (body[i].owner &amp;&amp; body[i].owner.name) ? body[i].owner.name : null;
                 conf.rows[i][ii++] = (body[i].employee) ? body[i].employee : null;
                 conf.rows[i][ii++] = (body[i].sampleLocation) ? body[i].sampleLocation : null;
                 conf.rows[i][ii++] = (body[i].remarks) ? body[i].remarks : null;
@@ -445,7 +475,7 @@ function buildSampleExcel(query) {
                 /*paint fields*/
                 conf.rows[i][ii++] = (body[i].paintPriming) ? true : null;
                 conf.rows[i][ii++] = (body[i].paintLayerDescription) ? body[i].paintLayerDescription : null;
-                conf.rows[i][ii++] = (body[i].paintLayer && body[i].paintLayer[0].layerType.name) ? 
+                conf.rows[i][ii++] = (body[i].paintLayer &amp;&amp; body[i].paintLayer[0].layerType.name) ? 
                         body[i].paintLayer.map(function(elem){
                             /*format all layer data for a single cell*/
                             var layer = "";
@@ -464,22 +494,22 @@ function buildSampleExcel(query) {
                         }).join("\n\n") : null;
 
                         /*pigment fields*/
-                        conf.rows[i][ii++] = (body[i].pigmentColourClass && body[i].pigmentColourClass.name) ? body[i].pigmentColourClass.name : null;
+                        conf.rows[i][ii++] = (body[i].pigmentColourClass &amp;&amp; body[i].pigmentColourClass.name) ? body[i].pigmentColourClass.name : null;
                         conf.rows[i][ii++] = (body[i].pigmentSource) ? body[i].pigmentSource : null;
                         conf.rows[i][ii++] = (body[i].pigmentProdNumber) ? body[i].pigmentProdNumber : null;
                         conf.rows[i][ii++] = (body[i].pigmentSecondryProvenance) ? body[i].pigmentSecondryProvenance : null;
                         conf.rows[i][ii++] = (body[i].pigmentOrigin) ? body[i].pigmentOrigin : null;
                         conf.rows[i][ii++] = (body[i].pigmentComposition) ? body[i].pigmentComposition : null;
-                        conf.rows[i][ii++] = (body[i].pigmentName && body[i].pigmentName.name) ? body[i].pigmentName.name : null;
+                        conf.rows[i][ii++] = (body[i].pigmentName &amp;&amp; body[i].pigmentName.name) ? body[i].pigmentName.name : null;
                         conf.rows[i][ii++] = (body[i].pigmentOtherName) ? body[i].pigmentOtherName : null;
-                        conf.rows[i][ii++] = (body[i].pigmentForm && body[i].pigmentForm.name) ? body[i].pigmentForm.name : null;
+                        conf.rows[i][ii++] = (body[i].pigmentForm &amp;&amp; body[i].pigmentForm.name) ? body[i].pigmentForm.name : null;
                         conf.rows[i][ii++] = (body[i].productionDate) ? body[i].productionDate : null;
-                        conf.rows[i][ii++] = (body[i].pigmentContainer && body[i].pigmentContainer.name) ? body[i].pigmentContainer.name : null;
+                        conf.rows[i][ii++] = (body[i].pigmentContainer &amp;&amp; body[i].pigmentContainer.name) ? body[i].pigmentContainer.name : null;
 
                         /*stretcher fields*/
                         conf.rows[i][ii++] = (body[i].stretcherType) ? body[i].stretcherType.map(function(elem){return elem.name;}).join(", ") : null;
                         conf.rows[i][ii++] = (body[i].stretcherMaterialType) ? body[i].stretcherMaterialType.map(function(elem){return elem.name;}).join(", ") : null;
-                        conf.rows[i][ii++] = (body[i].stretcherCondition && body[i].stretcherCondition.name) ? body[i].stretcherCondition.name : null;
+                        conf.rows[i][ii++] = (body[i].stretcherCondition &amp;&amp; body[i].stretcherCondition.name) ? body[i].stretcherCondition.name : null;
                         conf.rows[i][ii++] = (body[i].stretcherJointTechnique) ? body[i].stretcherJointTechnique.map(function(elem){return elem.name;}).join(", ") : null;
                         conf.rows[i][ii++] = (body[i].stretcherDimensions) ? body[i].stretcherDimensions : null;
                         conf.rows[i][ii++] = (body[i].stretcherProductionDateEarliest) ? body[i].stretcherProductionDateEarliest : null;
@@ -487,44 +517,30 @@ function buildSampleExcel(query) {
                         conf.rows[i][ii++] = (body[i].stretcherSource) ? body[i].stretcherSource : null;
 
                         /*analysis field*/
-                        conf.rows[i][ii++] = (body[i].sampleAnalysis && body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
+                        conf.rows[i][ii++] = (body[i].sampleAnalysis &amp;&amp; body[i].sampleAnalysis[0].type) ? body[i].sampleAnalysis.map(function(elem){return elem.type.name;}).join(", ") : null;
 
                         /*artwork fields*/
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.title) ? body[i].artwork.title : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.artist) ? body[i].artwork.artist : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.nationality) ? body[i].artwork.nationality : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.technique) ? body[i].artwork.technique : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.productionDateEarliest) ? body[i].artwork.productionDateEarliest : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.productionDateLatest) ? body[i].artwork.productionDateLatest : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.dimensions) ? body[i].artwork.dimensions : null;
-                        conf.rows[i][ii++] = (body[i].artwork && body[i].artwork.owner) ? body[i].artwork.owner : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.inventoryNum) ? body[i].artwork.inventoryNum : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.title) ? body[i].artwork.title : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.artist) ? body[i].artwork.artist : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.nationality) ? body[i].artwork.nationality : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.technique) ? body[i].artwork.technique : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.productionDateEarliest) ? body[i].artwork.productionDateEarliest : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.productionDateLatest) ? body[i].artwork.productionDateLatest : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.dimensions) ? body[i].artwork.dimensions : null;
+                        conf.rows[i][ii++] = (body[i].artwork &amp;&amp; body[i].artwork.owner) ? body[i].artwork.owner : null;
+
             }
-            result = nodeExcel.execute(conf);
+            var result = nodeExcel.execute(conf);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+            res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
+            res.end(result, 'binary');
         }
-        /* Calling resolve with a non-promise value causes promise to be 
-         * fulfilled with that value */
-        deferred.resolve(result);
     });
-    /* return the promises to be resolved later */
-    return deferred.promise;
-};
-
-
-/********************
- * Define the Routes
- ********************/
-
-/* index and view partials */
-app.get('/', routes.index);
-app.get('/partials/:name', routes.partials);
-
-/* JSON API */
-app.get('/api/name', api.name);
-
+});
 
 /**********************
- * PROXY operations
+ * SEARCH operations
  **********************/
 /*
  * Search Corpus(solr) for SMK artworks
@@ -540,7 +556,7 @@ app.get('/searchsmk', function(req, res) {
             host: 'solr.smk.dk',           //'csdev-seb',
             port: 8080,                    // 8180,
             path: '/solr/prod_CATS/' +     //'/solr-example/dev_cats/
-            'select?q=id_s%3A' + id + '&wt=json&indent=true',  /*id_s also works on verso & multiworks*/
+            'select?q=id_s%3A' + id + '&amp;wt=json&amp;indent=true',  /*id_s also works on verso &amp; multiworks*/
             method: 'GET'
     };
     var proxy = http.request(options, function (resp) {
@@ -558,193 +574,142 @@ app.get('/searchsmk', function(req, res) {
     });
 });
 
+/*
+ * Uses text index and mongo full text search to retrieve a list of samples
+ * Also fetches and appends the related artworks.
+ * 
+ * Usage: 1. search?type=sample&amp;fulltext=blue&amp;sampletype=Paint%20Cross%20Section&amp;startDate=&amp;endDate==&amp;pageNum=1&amp;pageSize=50
+ */
+app.get('/search', function(req, res) {
+
+    var searchType = req.query.type;
+    /*var pageNum = req.query.pageNum;*/
+    var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
+
+    if(searchType === 'sample'){
+
+        var query = buildSampleQuery(req);
+
+        db.samples.find(query)
+        //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
+        .limit(pageSize)
+        .toArray(function(err, items) {
+            if(err || !items){
+                /*this is called if any of the promises have failed */
+                logger.error(err);
+                res.end();  /*?check*/
+            }else{
+                res.send(items);
+            }
+        });
+    }
+});
+
+/*
+ * Returns the size of the search results
+ * 
+ * Usage: 1. search?type=sample&amp;fulltext=smk
+ */
+app.get('/searchSize', function(req, res) {
+
+    var searchType = req.query.type;
+    /*var pageNum = req.query.pageNum;*/
+    var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
+
+    if(searchType === 'sample'){
+
+        var query = buildSampleQuery(req);
+
+        db.samples.find(query)
+        .count(function(err, count) {
+            /* if you pass an integer, express framework will use it to set the
+             * HTTP status code. To avoid this, we need to cast it to a string */
+            if(err || !count){
+                res.send("0");
+            }else{
+                logger.info("searchSize: " + count);
+                res.send(count.toString());
+            }
+        });
+    }
+});
+
 /********************
  * SAMPLE operations
  ********************/
-/** 
- * Retrieve all samples
+
+/* Create a sample
+ * This will create or update the record depending on the existence of
+ * the "_id" parameter in the body
  * 
- * Returns JSON or an Excel .xlxs binary, depending on the media type accepted by the client.
- * 
- * Optionally accepts the following filter parameters :
- *        fulltext (mongodb full text search on all samples)
- *        sampletype
- *        startDate
- *        endDate
- *        pageNum
- *        pageSize
- *        count (if 'true' only returns a result count)
- * 
- * Usage: 1. All samples         : sample 
- *        2. Samples with filter : sample?type=sample&fulltext=blue&sampletype=Paint%20Cross%20Section
- *                                 &startDate=&endDate==&pageNum=1&pageSize=50
- */
-app.get('/sample', function(req, res) {
-
-    /*use the HTTP content negotiator library to parse requested media types*/
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json', 'application/vnd.openxmlformats'];
-    var preferredMedia = media.mediaType(supportedMedia);
-
-    if (preferredMedia == 'application/json'){
-
-    //  var pageNum = req.query.pageNum;
-        var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
-        var query = buildSampleQuery(req);
-        
-        if(req.query.count == 'true'){
-            /*only return a count*/
-            db.samples.find(query)
-            .count(function(err, count) {
-                if(err || !count){
-                    res.status(200).send("0");
-                }else{
-                    logger.info("searchSize: " + count);
-                    res.status(200).send(count.toString());
-                }
-            });
-        }else{    
-            db.samples.find(query)
-          //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
-            .limit(pageSize)
-            .toArray(function(err, items) {
-                if(err || !items){
-                    logger.error(err);
-                    res.status(500).send(err);
-                }else{
-                    res.status(200).send(items);
-                }
-            });
-        }
-    }else if (preferredMedia == 'application/vnd.openxmlformats'){
-
-        var query = buildSampleQuery(req); 
-        var result = buildSampleExcel(query);
-        
-        result.then(function(report){
-            //this is called if promise has completed with success
-            if(report == null){
-                res.send(500);
-            }else{
-                res.setHeader('Content-Type', preferredMedia);
-                res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
-                res.end(report, 'binary');
-            }
-        }, function (err) {
-            //this is called if promise completed with failure
-            res.send(500);
-       });
-    }else{
-        res.send(406); /* "not acceptable" : we don't support the requested client media */
-    }
-});
-
-/** 
- * Retrieve a single sample
- * 
- * Usage: sample/{sample _id}
- */
-app.get('/sample/:id', function(req, res) {
-
-    /*use the HTTP content negotiator library to parse requested media types*/
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json'];
-    var preferredMedia = media.mediaType(supportedMedia);
-
-    if (preferredMedia == 'application/json'){
-        var id = req.params.id;
-
-        try{
-            id = db.ObjectId(id);
-        }catch (err){
-            res.send(400); /*bad request, id probably not hex*/
-            return;
-        }
-        var query = {'_id' : id};
-
-        db.samples.find(query)
-        .toArray(function(err, items) {
-            if(err || !items){
-                logger.error(err);
-                res.status(500).send(err);
-            }else{
-                res.status(200).send(items);
-            }
-        });
-    }else{
-        res.send(406); /* "not acceptable" : we don't support the requested client media */
-    }
-});
-
-/** 
- * Create a sample
- * 
- * Create or update the record depending on the existence of the "_id" parameter in the body
- * Probably not very RESTful as the client doesn't know if a new resource will be created.
- * 
- * Body may or may not contain an '_id', which may or may not be an existing one
- * 
- * Returns the relative path of the updated object in the 'location' header.
+ * body may or may not contain an '_id', which may or may not be an existing one
  */
 app.post('/sample', function(req, res) {
 
     if (!req.isAuthenticated()){
         res.send(401);
         return;
-    }
+    };
+
     var body = req.body;
 
     if(!body || JSON.stringify(body) == '{}'){
         res.send(400); /*bad request, no body*/
         return;
     }
+
+    /* MongoDB creates _id as an ObjectID, but doesn't retrieve _id as an ObjectID, so
+     * we have to recreate it each time */
     try{
         body._id = db.ObjectId(body._id);
     }catch (err){
         res.send(400); /*bad request, id probably not hex*/
         return;
     }
+
     var query = {'_id' : body._id };
     var options = { 'upsert': true };
 
-    db.samples.update(query, body, options, function (err, response) {
-        if (err || !response){
+    db.samples.update(query, body, options, function (err, upserted) {
+        if (err || !upserted){
             logger.info(body.sampleType + " not saved");
             res.send(500); /*server error*/
         } else {
             logger.info('upsert successful ');
-            var status = 201;
-            var _id =  response.upserted[0]._id;
-
-            if (response.updatedExisting){
-                status = 200;
-            }
-            res.header('Location', 'sample/' + _id);
-            res.status(status).send(response);
+            res.send(upserted);
         }
     });
 });
 
-/**
- * Delete a sample
- *  
- * If successful returns the number of deleted records. Should only be an error if the 
- * operation failed, even if resource is not found, delete has succeeded.
+/* Sample options
+ * DELETE will fail with 404 if the browser uses CORS and
+ * sends an OPTIONS request which doesn't get answered
  */
-app.delete('/sample/:id', function(req, res){
+app.options('/sample', function(req, res){
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'DELETE');
+    res.end();
+});
+
+/* Delete a sample
+ * If successful returns the number of deleted records
+ * Should only be an error if the operation failed,
+ * even if resource is not found, delete has succeeded.
+ */
+app.delete('/sample', function(req, res){
+
+    var id;
 
     if (!req.isAuthenticated()){
         res.send(401);
         return;
     }
-//    if (!req.params){
-//        res.send(400);
-//        return;
-//    }
-    var id = req.params.id;
-
+    if(!req.query || !req.query.id){
+        res.send(400);
+        return;
+    }
     try{
-        id = db.ObjectId(id);
+        id = db.ObjectId(req.query.id);
     }catch (err){
         res.send(400);
         return;
@@ -757,7 +722,7 @@ app.delete('/sample/:id', function(req, res){
             res.status(500).send(err);
         } else {
             logger.info("delete successful");
-            res.status(200).send(numberRemoved);
+            res.send(numberRemoved);
         }
     });
 });
@@ -766,17 +731,14 @@ app.delete('/sample/:id', function(req, res){
  * USER operations
  *********************/
 
-/**
- * Updates or inserts (upserts) a new user record in mongodb using mongojs. 
- * Probably not very RESTful as the client doesn't know if a new resource will be created.
- * 
- * Returns the relative path of the updated object in the the location header.
+/* Updates or inserts (upserts) a new user record in mongodb using mongojs.
+ * Returns the record _id.
  * 
  * Usage: POST with body = {"username": email, "password": password, "role": role}
  * 
  * Command line hint: curl -H "Content-Type: application/json" 
  *                     --cookie "connect.sid=s%3AIzaNbY6BuBKwcZxkdKI73Mo4.S6hhH7mzJPooqfXPI4TPIdKZws3Cxq3lDYmL%2FEtqgNw" 
- *                     -d '{"username":"a_user@smk.dk", "password":"a_password"}' 
+ *                    -d '{"username":"a_user@smk.dk", "password":"a_password"}' 
  *                     http://localhost:3000/user
  */
 app.post('/user', function(req, res){
@@ -798,7 +760,7 @@ app.post('/user', function(req, res){
     } 
 
     /*only admin can edit others passwords*/
-    if(req.user.username != username && req.user.role != "admin"){ 
+    if(req.user.username != username &amp;&amp; req.user.role != "admin"){ 
         res.send(401); /*unauthorised*/
         return;
     };
@@ -818,7 +780,7 @@ app.post('/user', function(req, res){
     password = encrypt(password,  function(err, hash) {
 
         /*called when encrypt resolved*/	
-        options.update = {$set: {"username": username, "password": hash, "role": role}};  /*data to write to the record*/
+        options.update = {$set: {"username": username, "password": hash, "role": role}};   /*data to write to the record*/
 
         if (err || !hash){
             logger.error("could not encrypt password");
@@ -830,15 +792,25 @@ app.post('/user', function(req, res){
                     res.status(500).send(err);
                 } else {
                     logger.info('user upsert successful, username: ' + record.username);
-                    res.header('Location', 'user/' + record._id);
-                    res.status(200).send(record);
+                    //     logger.info('user upsert successful, username: ' + record.username);
+                    res.send(record);
                 }
             });
         }
     });
 });
 
-/**
+/*
+ * Sample options : DELETE will fail with 404 if the browser uses CORS and
+ * sends an OPTIONS request which doesn't get answered
+ */
+app.options('/user', function(req, res){
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'DELETE');
+    res.end();
+});
+
+/*
  * Delete a user profile
  * If successful returns the number of deleted records
  *
@@ -857,13 +829,15 @@ app.delete('/user', function(req, res){
     }
     var username = req.query.username;
 
+    logger.info("DELETE " + username);
+
     db.users.remove({"username": username}, function(err, numberRemoved){
         if (err || !numberRemoved){
             logger.error("delete failed");
             res.status(500).send(err);
         } else {
             logger.info("delete successful");
-            res.status(200).send(numberRemoved);
+            res.send(numberRemoved);
         }
     });
 });
@@ -872,15 +846,12 @@ app.delete('/user', function(req, res){
  * ARTWORK operations
  *********************/
 
-/**
- * Updates or inserts (upserts) a new artwork record in mongodb using mongojs
- * Probably not very RESTful as the client doesn't know if a new resource will be created
- *
- * Returns the relative path of the updated object in the the location header
+/* Updates or inserts (upserts) a new artwork record in mongodb using mongojs.
+ * Returns the record _id.
  * 
- * Usage: POST with {artworkbody}
+ * Usage: POST with body = 
  * 
- */
+ * */
 app.post('/artwork', function(req, res){
 
     if (!req.isAuthenticated()){
@@ -917,88 +888,35 @@ app.post('/artwork', function(req, res){
             res.status(500).send(err);
         } else {
             logger.info('artwork upsert successful, _id: ' + record._id);
-            res.header('Location', 'artwork/' + record._id);
-            res.status(200).send(record);
+            res.send(record);
         }
     });
 });
 
-/**
- * Retrieve artwork(s) 
- * If successful returns the artwork object in json
- * 
- * Optionally accepts the following filter parameter : 
- *         invNum
- *
- * Usage: artwork?invNum=KMS456
- */
 app.get('/artwork', function(req, res) {
 
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json'];
-    var preferredMedia = media.mediaType(supportedMedia);
+    var invNum = req.query.invNum;
+    var id = db.ObjectId(req.query.id);
 
-    if (preferredMedia == 'application/json'){
+    if (invNum){
+        var rg = new RegExp('^'+ invNum + '$', "i");
+        var query = {"inventoryNum" :  { "$regex" : rg }};
+        logger.info("get artwork query : " + JSON.stringify(query));
 
-        var query = {};
-        var invNum = req.query.invNum;
-
-        if(invNum){
-            /* Regex will be inefficient, but we must have a case insensitive search for
-             * inventory numbers as we don't want to duplicate records */
-            var rg = new RegExp('^'+ invNum + '$', "i");
-            query = {"inventoryNum" :  { "$regex" : rg }};
-        }
-
+        /* Regex will be inefficient, but we must have a case insensitive search for
+         * inventory numbers as we don't want to duplicate records.
+         * */
         db.artworks.find(query)
         .toArray(function(err, items) {
-            if (err || !items){
-                logger.error("failed to retrieve artworks with query : " + JSON.stringify(query));
-                res.status(500).send(err);
-            } else {
-                logger.info("found artworks");
-                res.status(200).send(items);
-            }
+            res.send(items);
         })
-    }else{
-        res.send(406); /* "not acceptable" : we don't support the requested client media */
-    }
-});
+    }else if (id){
+        logger.info("get artwork by id: " + id);
 
-/**
- * Retrieve an artwork by id
- * If successful returns the artwork object in json
- *
- * Usage: user/{artwork _id}
- */
-app.get('/artwork/:id', function(req, res) {
-    
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json'];
-    var preferredMedia = media.mediaType(supportedMedia);
-
-    if (preferredMedia == 'application/json'){
-
-        var id = req.params.id;
-
-        try{
-            id = db.ObjectId(id);
-        }catch (err){
-            res.send(400); 
-            return;
-        }
         db.artworks.find({"_id" : id})
         .toArray(function(err, items) {
-            if (err || !items){
-                logger.error("failed to retrieve artwork id : " + id);
-                res.status(500).send(err);
-            } else {
-                logger.info("found artwork by id: " + id);
-                res.status(200).send(items);
-            }
+            res.send(items);
         })
-    }else{
-        res.send(406); /* "not acceptable" : we don't support the requested client media */
     }
 });
 
@@ -1006,30 +924,24 @@ app.get('/artwork/:id', function(req, res) {
  * VOCAB operations
  ********************/
 
-/**
- * Updates or inserts (upserts) a new vocab item in mongodb using mongojs.
- * Probably not very RESTful as the client doesn't know if a new resource will be created.
- *
- * Returns the relative path of the updated object in the the location header and the whole
- * vocab list in the body
+/* Updates or inserts (upserts) a new vocab in mongodb using mongojs.
  * 
  * Expected input:
- * {item : {name: 'Material Sample', secondaryname: '', grp:'Physical samples'}}
+ * {type : 'sampleType', item : {name: 'Material Sample', secondaryname: '', grp:'Physical samples'}}
  * 
  * Behaviour: "item" will be added to the "items" array of the same "sampleType":
- * {type : ':type', items : [{name: 'Material Sample', secondaryname: '', grp:'Physical samples'},
+ * {type : 'sampleType', items : [{name: 'Material Sample', secondaryname: '', grp:'Physical samples'},
  *                                {name: 'Paint Cross Section', secondaryname: '', grp:'Physical samples'} ]}
- *
+ *                                
  * Returns: the whole vocab list
  * */
-app.post('/vocab/:type/items', function(req, res){
+app.post('/vocab', function(req, res){
 
     if (!req.isAuthenticated()){
         res.send(401);
         return;
     };
 
-    var type = req.params.type;
     var body = req.body;
 
     if(!body || JSON.stringify(body) == '{}'){
@@ -1037,7 +949,7 @@ app.post('/vocab/:type/items', function(req, res){
         return;
     }
 
-    var query = {'type' : type, 'items.name' : body.item.name};
+    var query = {'type' : body.type, 'items.name' : body.item.name};
     db.vocabs.find(query).toArray(function(err, items) {
         /*if vocab doesn't exist*/
         if (err || !items || items.length == 0){
@@ -1046,125 +958,82 @@ app.post('/vocab/:type/items', function(req, res){
              * note: db.vocabs.update({type:'colours'}, {$addToSet: {items: {name:'pulk', secondaryname:'', grp:'xxxx'}}})
              */
             var options = {};
-            var query = {'type': type};
+            var query = {'type': body.type};
             var update = {$addToSet:
-                {items:
-                    {name :
-                        body.item.name,
-                        secondaryname : body.item.secondaryname,
-                        grp : body.item.grp
-                    }
-                }
+            {items:
+            {name :
+                body.item.name,
+                secondaryname : body.item.secondaryname,
+                grp : body.item.grp
+            }
+            }
             };
             db.vocabs.update(query, update, options, function (err, created) {
                 if (err || !created){
-                    logger.error(type + " not created");
+                    logger.err(body.sampleType + " not created");
                     res.send(500);
                 } else {
                     logger.info('created successful ');
-                    res.header('Location', 'vocab/' + type);
-                    res.status(200).send(created);
+                    res.send(created);
                 }
             });
 
         } else {
             /*overwrites an existing entry*/
             var options = {};  
-            var query = {'type': type,'items.name': body.item.name};
+            var query = {'type': body.type,'items.name': body.item.name};
             var update = {$set:
-                {"items.$.name": body.item.name,
-                    "items.$.secondaryname": body.item.secondaryname,
-                    "items.$.grp": body.item.grp
-                }
+            {"items.$.name": body.item.name,
+                "items.$.secondaryname": body.item.secondaryname,
+                "items.$.grp": body.item.grp
+            }
             };
             db.vocabs.update(query, update, options, function (err, updated) {
                 if (err || !updated){
-                    logger.error(type + " not updated");
+                    logger.err(body.sampleType + " not updated");
                     res.send(500);
                 } else {
-                    logger.info('update successful');
-                    res.header('Location', 'vocab/' + type);
-                    res.status(200).send(updated);
+                    logger.info('update successful ');
+                    res.send(updated);
                 }
             });
         }
     });
 });
 
-/**
- * Retrieve a single vocab by type
- * If successful returns the vocab object in json
- *
- * Usage: vocab/{type}
- */
-app.get('/vocab/:type', function(req, res) {
-    
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json'];
-    var preferredMedia = media.mediaType(supportedMedia);
-
-    if (preferredMedia == 'application/json'){
-
-        var type = req.params.type;
-        var query = {"type" : type};
-    
-        db.vocabs.find(query)
-        .toArray(function(err, items) {
-            if (err || !items || !items.length){
-                logger.error("vocab " + type + " not found");
-                res.send(404); 
-            } else {
-                logger.info('get vocab successful');
-                res.status(200).send(items);
-            }
-        })
-    }else{
-        res.send(406); 
-    }
-});
-
-/**
- * Retrieve all vocabs
- * If successful returns all the vocab objects in json
- *
- * Usage: vocab
- */
 app.get('/vocab', function(req, res) {
-    
-    var media = new negotiator(req);
-    var supportedMedia = ['application/json'];
-    var preferredMedia = media.mediaType(supportedMedia);
 
-    if (preferredMedia == 'application/json'){
-        db.vocabs.find()
-        .toArray(function(err, items) {
-            if (err || !items || !items.length){
-                logger.error("vocabs not found");
-                res.send(404); 
-            } else {
-                logger.info('get all vocabs successful');
-                res.status(200).send(items);
-            }
-        })
-    }else{
-        res.send(406); 
+    var type = req.query.type;
+    var query = {};
+
+    if (type != undefined){
+        /*if a type is provided, just fetch that type, otherwise return all vocabs*/
+        query = {"type" :  type}
     }
+    logger.info("get vocab query : " + JSON.stringify(query));
+
+    db.vocabs.find(query)
+    .toArray(function(err, items) {
+        /*if error creating array, or if array is empty*/
+        if (err || !items || !items.length){
+            logger.info("vocab " + type + " not found");
+            res.send(404); /*"not found", will triggger .error() handler*/
+        } else {
+            res.send(items);
+        }
+    })
 });
 
 /********************
  * IMAGE operations
  ********************/
-/**
- * Save an image
+/*
+ * Saves incoming file directly to the image server filesystem. Ideally, this would be our 
+ * interface to a DAM but as it stands we don't have this in place yet. 
  * 
- * Very basic implementation saves the incoming file directly to the image server filesystem. 
- * Ideally, this would be our interface to a DAM but as it stands we don't have this in place yet. 
- * 
- * Responses:
- * 201 (Created): Body & location header contain the object url
- * 401 (Unauthorised) : User is not logged in
- * 409 (Conflict): An image of that name aready exists
- * 500 (internal Server Error): Problem reading or writing the file
+ * Response: 
+ * If the image is successfully saved, we return a url at which it can be accessed.
+ * If an image of that name aready exists, we return a "conflict" response.
  */
 app.post('/image', function(req, res){
 
@@ -1173,28 +1042,27 @@ app.post('/image', function(req, res){
     };
 
     var readPath = req.files.file.path;
-    var writePath = "/mnt/fotoarkiv/globus/catsdb/"; /*TODO: move to config*/
+    var writePath = "/mnt/fotoarkiv/globus/catsdb/";
     var name = req.files.file.name;
 
     fs.readFile(readPath, function (err, data) {
         if(err) {
             logger.error(err);
-            res.status(500).send(err); /*"Internal server Error"*/
+            res.send(500); /*"Internal server Error"*/
         }
         else {
             fs.exists(writePath + name, function (exists) {
                 if(exists){
-                    res.send(409);
+                    res.send(409); /*"Conflict"*/
                 } else {
                     fs.writeFile(writePath + name, data, function(err) {
                         if(err) {
                             logger.error(err);
                             res.status(500).send(err);
                         } else {
-                            var url = "http://cspic.smk.dk/globus/catsdb/" + name; /*TODO: move to config*/
+                            var url = "http://cspic.smk.dk/globus/catsdb/" + name;
                             logger.info("The file was saved to " + url);
-                            res.header('Location', url);
-                            res.status(201).send(url); 
+                            res.status(201).send(url); /*"Created"*/
                         }
                     })
                 }
@@ -1219,3 +1087,26 @@ http.createServer(app).listen(app.get('port'), function () {
 });
 
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Global</h3><ul><li><a href="global.html#encrypt">encrypt</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha10</a> on Sat Nov 15 2014 09:22:14 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

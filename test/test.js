@@ -28,13 +28,15 @@ var admin_credentials = {username:'admin@smk.dk', password:'admin'};
 
 /* vocab */
 var vocab = {type : 'binders', item : {name: 'bubble gum', secondaryname: 'hubba-bubba', grp:'Glue'}};
+var vocab2 = {item : {name: 'chewing gum', secondaryname: 'wrigleys', grp:'Glue'}};
+
 var update_existing_vocab = {type : 'binders', item : {name: 'SuperGlue', secondaryname: 'lim', grp:'Glue'}};
 var reset_existing_vocab = {type : 'binders', item : {name: 'glue', secondaryname: 'lim', grp:'Glue'}};
 var number_of_vocabs = 26;
 var vocab_type = "binders";
 
 /* search */
-var search = "type=sample&fulltext=" + sample_reference_number + 
+var search = "&fulltext=" + sample_reference_number + 
              "&sampletype=Paint Cross Section&startdate=&enddate=&pageNum=1&pageSize=5";
 var smk_artwork = "KMS1";
 
@@ -105,6 +107,7 @@ describe('Server Route Tests', function(){
             .send(default_credentials) 
             .end(function(err, res) {
                 if (err) { throw err; }
+                res.header['location'].should.include('user/');
                 res.status.should.equal(200);
                 done();
             });
@@ -297,7 +300,8 @@ describe('Server Route Tests', function(){
             .send(sample) 
             .end(function(err, res) {
                 if (err) { throw err; }
-                res.status.should.equal(200);
+                res.header['location'].should.equal('sample/' + sample_id);
+                res.status.should.equal(201);
                 done();
             });
         });
@@ -309,10 +313,11 @@ describe('Server Route Tests', function(){
             })
         });  
     });
-    describe("GET search ", function() {
-        it('search for the test sample',function(done){  
+    describe("GET sample", function() {
+        it('search for the test sample (accept header, json)',function(done){
             request(app)
-              .get('/search?' + search)
+              .get('/sample?' + search)
+              .set('Accept', 'application/json')
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
@@ -321,29 +326,73 @@ describe('Server Route Tests', function(){
                 done();
             });
         });
-    });
-    describe("GET search size ", function() {
-        it('read the number of items in the search result',function(done){  
+        it('request the test sample (no accept, returns json)',function(done){
             request(app)
-              .get('/searchSize?' + search)
+              .get('/sample/' + sample_id)
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
-                  res.text.should.equal('1');
-                  res.status.should.equal(200);
+                res.header['content-type'].should.equal('application/json; charset=utf-8');
+                res.status.should.equal(200);
                 done();
             });
         });
-    });
-    describe("GET excel ", function() {
-        it('generate an excel sheet for the test sample',function(done){  
+        it('generate a report for the test sample (.xlsx)',function(done){  
             request(app)
-              .get('/excel?' + search)
+              .get('/sample?' + search)
+              .set('Accept', 'application/vnd.openxmlformats')
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
              // res.body[0].referenceNumber.should.equal(sample_reference_number);
                 res.status.should.equal(200);
+                done();
+            });
+        });
+        it('request the test sample with no supported media type',function(done){  
+            request(app)
+              .get('/sample?' + search)
+              .set('Accept', 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,text/html;level=2;q=0.4')
+              .set('cookie', cookie)
+              .send()
+              .end(function(err,res){
+                res.status.should.equal(406);
+                done();
+            });
+        });
+        it('request the test sample with no media type (returns json)',function(done){  
+            request(app)
+              .get('/sample?' + search)
+              .set('cookie', cookie)
+              .send()
+              .end(function(err,res){
+                res.header['content-type'].should.equal('application/json; charset=utf-8');
+                res.status.should.equal(200);
+                done();
+            });
+        });
+        it('request the test sample with complex, supported and unsupported media types (returns json)',function(done){  
+            request(app)
+              .get('/sample?' + search)
+              .set('Accept', 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,text/html;level=2;q=0.4, */*;q=0.5')
+              .set('cookie', cookie)
+              .send()
+              .end(function(err,res){
+                res.header['content-type'].should.equal('application/json; charset=utf-8');
+                res.status.should.equal(200);
+                done();
+            });
+        });
+    });
+    describe("GET search size ", function() {
+        it('read the number of items in the search result',function(done){  
+            request(app)
+              .get('/sample?count=true' + search)
+              .set('cookie', cookie)
+              .send()
+              .end(function(err,res){
+                  res.text.should.equal('1');
+                  res.status.should.equal(200);
                 done();
             });
         });
@@ -362,7 +411,7 @@ describe('Server Route Tests', function(){
         });
         it('un-authenticated DELETE rejected', function(done){
             request(app)
-                .delete('/sample')
+                .delete('/sample/' + sample_id)
                 .end(function(err, res) {
                     if (err) { throw err; }
                     res.status.should.equal(401);
@@ -381,31 +430,28 @@ describe('Server Route Tests', function(){
         });
         it('delete attempt on unknown sample', function(done){
             request(app)
-                .delete('/sample?id=' + unknown_sample_id)
+                .delete('/sample/' + unknown_sample_id)
                 .set('cookie', cookie)
                 .end(function(err, res) {
                     if (err) { throw err; }
-                    res.status.should.equal(200); // is successful, even if
-                                                    // resource is not found
+                    res.status.should.equal(200); // is successful, even if resource is not found
                     done();
                 });
         });
-        it('delete sample attempt with missing query', function(done){
+        it('delete sample attempt with missing id', function(done){
             request(app)
-                .delete('/sample')
+                .delete('/sample/')
                 .set('cookie', cookie)
                 .end(function(err, res) {
                     if (err) { throw err; }
-                    res.status.should.equal(400); 
+                    res.status.should.equal(404); 
                     done();
                 });
         });
         it('delete sample attempt with bad _id', function(done){
             request(app)
-                .post('/sample?id=' + "bad id")
-                .set('Content-Type', 'application/json')
+                .delete('/sample/' + "eeerrghhhh!")
                 .set('cookie', cookie)
-                .send({"_id" : "this isn't hex" }) 
                 .end(function(err, res) {
                     if (err) { throw err; }
                     res.status.should.equal(400);
@@ -414,7 +460,7 @@ describe('Server Route Tests', function(){
         });
         it('delete test sample', function(done){
             request(app)
-                .delete('/sample?id=' + sample_id)
+                .delete('/sample/' + sample_id)
                 .set('cookie', cookie)
                 .end(function(err, res) {
                     if (err) { throw err; }
@@ -495,6 +541,7 @@ describe('Server Route Tests', function(){
             .send(artwork) 
             .end(function(err, res) {
                 if (err) { throw err; }
+                res.header['location'].should.include('artwork/');
                 res.status.should.equal(200);
                 done();
             });
@@ -503,14 +550,14 @@ describe('Server Route Tests', function(){
             db.artworks.find({"inventoryNum": inventory_number}).toArray(function(err, artworks) {
                 if(err){throw err;}
                 artworks.length.should.equal(1);
-                done();
+                done(); 
             })
         });
     });
     describe("GET artwork ", function() {
         it('retrieve the test artwork by _id',function(done){  
             request(app)
-              .get('/artwork?id=' + artwork_id)
+              .get('/artwork/' + artwork_id)
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
@@ -563,7 +610,7 @@ describe('Server Route Tests', function(){
         });
         it('un-authenticated POST rejected', function(done){
             request(app)
-                .post('/vocab')
+                .post('/vocab/' + vocab_type  + '/items')
                 .set('Content-Type', 'application/json')
                 .send({})
                 .end(function(err, res) {
@@ -584,7 +631,7 @@ describe('Server Route Tests', function(){
         });
         it('create vocab attempt with no body', function(done){
             request(app)
-                .post('/vocab')
+                .post('/vocab/' + vocab_type  + '/items')
                 .set('Content-Type', 'application/json')
                 .set('cookie', cookie)
                 .send({}) // missing body here
@@ -594,18 +641,32 @@ describe('Server Route Tests', function(){
                     done();
                 });
         });
+//        it('create a new vocab', function(done){
+//            request(app)
+//                .post('/vocab')
+//                .set('Content-Type', 'application/json')
+//                .set('cookie', cookie)
+//                .send(vocab) 
+//                .end(function(err, res) {
+//                    if (err) { throw err; }
+//                    res.header['location'].should.equal('vocab/' + vocab_type);
+//                    res.status.should.equal(200);
+//                    done();
+//                });
+//        });
         it('create a new vocab', function(done){
             request(app)
-                .post('/vocab')
+                .post('/vocab/' + vocab_type  + '/items')
                 .set('Content-Type', 'application/json')
                 .set('cookie', cookie)
                 .send(vocab) 
                 .end(function(err, res) {
                     if (err) { throw err; }
+                    res.header['location'].should.equal('vocab/' + vocab_type);
                     res.status.should.equal(200);
                     done();
                 });
-        });
+        });        
         it('remove the new vocab from db (cleanup)', function(done){
       // db.vocabs.update( {$and:[{ "items.name" : "emulsion" },{type:
         // "binders"}]} , { $pull: { "items": {name: "emulsion"} } } )
@@ -621,24 +682,26 @@ describe('Server Route Tests', function(){
         });
         it('update an existing vocab', function(done){
             request(app)
-                .post('/vocab')
+                .post('/vocab/' + vocab_type  + '/items')
                 .set('Content-Type', 'application/json')
                 .set('cookie', cookie)
                 .send(update_existing_vocab) 
                 .end(function(err, res) {
                     if (err) { throw err; }
+                    res.header['location'].should.equal('vocab/' + vocab_type);
                     res.status.should.equal(200);
                     done();
                 });
         });
         it('reset the existing vocab to previous value', function(done){
             request(app)
-                .post('/vocab')
+                .post('/vocab/' + vocab_type  + '/items')
                 .set('Content-Type', 'application/json')
                 .set('cookie', cookie)
                 .send(update_existing_vocab) 
                 .end(function(err, res) {
                     if (err) { throw err; }
+                    res.header['location'].should.equal('vocab/' + vocab_type);
                     res.status.should.equal(200);
                     done();
                 });
@@ -658,7 +721,7 @@ describe('Server Route Tests', function(){
         });
         it('retrieve one vocab',function(done){  
             request(app)
-              .get('/vocab?type=' + vocab_type)
+              .get('/vocab/' + vocab_type)
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
@@ -694,27 +757,27 @@ describe('Server Route Tests', function(){
         });
     });
     describe("OPTIONS", function() {
-        it('request options for users',function(done){ 
+        it('request options for users (test CORS)',function(done){ 
             request(app)
               .options('/user')
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
-                res.header['access-control-allow-methods'].should.equal('DELETE');
+                res.header['access-control-allow-methods'].should.equal('GET,HEAD,PUT,PATCH,POST,DELETE');
                 res.header['access-control-allow-origin'].should.equal('*');
-                res.status.should.equal(200);
+                res.status.should.equal(204);
                 done();
             });
         });
-        it('request options for samples',function(done){ 
+        it('request options for samples (test CORS)',function(done){ 
             request(app)
-              .options('/sample')
+              .options('/sample/'+ unknown_sample_id)
               .set('cookie', cookie)
               .send()
               .end(function(err,res){
-                res.header['access-control-allow-methods'].should.equal('DELETE');
+                res.header['access-control-allow-methods'].should.equal('GET,HEAD,PUT,PATCH,POST,DELETE');
                 res.header['access-control-allow-origin'].should.equal('*');
-                res.status.should.equal(200);
+                res.status.should.equal(204);
                 done();
             });
         });

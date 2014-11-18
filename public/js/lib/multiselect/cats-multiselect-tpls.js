@@ -41,18 +41,18 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
   }])
   .factory('vocabService', ['$http', function ($http) {
        return {
-           updateVocab : function(data) {
+           updateVocab : function(type, item) {
                return $http({
-                   url : 'vocab',
+                   url : 'vocab/' + type + '/items',
                    method : "POST",
-                   data : data,
+                   data : item,
                    headers : {
                        'Content-Type' : 'application/json'
                    }
                });
            },
            getVocab : function(type) {
-               var url = "vocab?type=" + type;
+               var url = "vocab/" + type;
                return $http.get(url);
            },
            loggedin : function() {
@@ -515,15 +515,14 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
       /* Saves the value stored in scope 'vocab' to the vocabulary collection on mongo
        * and adds it to the list in the vocab editor popup 
        * */
-      var v = {'type' : type, 
-               'item' : {'name': $scope.vocab.name,
-                         'secondaryname': $scope.vocab.secName,
-                         'grp': $scope.vocab.grpName,
-                        }
+      var item = {'item' : {'name': $scope.vocab.name,
+                            'secondaryname': $scope.vocab.secName,
+                            'grp': $scope.vocab.grpName
+                           }
       };
       $scope.loading = true;
       /*save the new vocab to mongodb*/
-      vocabService.updateVocab(v)
+      vocabService.updateVocab(type, item)
       .success(function (resp) {
           /*read the updated vocab group back from mongodb*/
           vocabService.getVocab(type)

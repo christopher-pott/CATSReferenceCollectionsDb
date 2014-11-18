@@ -7,17 +7,24 @@ var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 serviceMod.factory('catsAPIservice', function($http) {
 	return {
 		search : function(term, filter) {
-			var url = "search?type=sample&pageSize=100" 
+			var url = "sample?pageSize=100" 
 			        + ((!!term) ? "&fulltext=" + term : "");
 			if (filter && filter.isOpen){
 			    url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
                     + ((!!filter.earliestDate) ? "&startdate=" + filter.earliestDate : "") 
                     + ((!!filter.latestDate) ? "&enddate=" + filter.latestDate : "");
 			}
-			return $http.get(url);
+			//return $http.get(url);
+            return $http({
+                url : url,
+                method : "GET",
+                headers : {
+                    'Accept' : 'application/json'
+                }
+            });			
 		},
         searchSize : function(term, filter) {
-            var url = "searchSize?type=sample" 
+            var url = "sample?count=true" 
                     + ((!!term) ? "&fulltext=" + term : "");
             if (filter && filter.isOpen){
                 url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
@@ -38,7 +45,7 @@ serviceMod.factory('catsAPIservice', function($http) {
 		},
 		delete : function(id) {
 			return $http({
-				url : 'sample?id=' + id,
+				url : 'sample/' + id,
 				method : "DELETE"
 			});
 		},
@@ -53,18 +60,18 @@ serviceMod.factory('catsAPIservice', function($http) {
 			});
 		},
 		readArtwork : function(id) {
-			var url = "artwork?id=" + id;
+			var url = "artwork/" + id;
 			return $http.get(url);
 		},
         getVocab : function(type) {
             var url = "vocab"; 
             if (type != undefined){
-                url += "?type=" + type;
+                url += "/" + type;
             } 
             return $http.get(url);
         },
         Excel : function(term, filter) {
-            var url = "Excel?fulltext=" 
+            var url = "sample?fulltext=" 
                     + ((!!term) ? term : "");
             if (filter && filter.isOpen){
                 url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 
@@ -74,7 +81,10 @@ serviceMod.factory('catsAPIservice', function($http) {
             return $http({
                 url : url,
                 method : "GET",
-                responseType: 'arraybuffer' /*important!*/
+                responseType: 'arraybuffer', /*important!*/
+                headers : {
+                    'Accept' : 'application/vnd.openxmlformats'
+                }
             });
         },
         login : function(email, password) {
