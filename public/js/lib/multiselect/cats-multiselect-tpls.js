@@ -61,14 +61,14 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
            }
       };
    }])
-  .factory("multistate", function() {
+   .factory("multistate", [ function() {
     'use strict';
     var multistate = {};
 
     return {
         multistate : multistate,
     };
-  })
+   }])
 
   .directive('catsmultiselect', ['$parse', '$document', '$compile', '$interpolate', 'catsoptionParser', 'multistate', 'vocabService',
 
@@ -411,7 +411,9 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
         }
   }])
 
-  .controller('ModalVocabCtrl', function ($scope, $modal, multistate) {
+  .controller('ModalVocabCtrl', [ '$scope', '$modal', 'multistate', 
+
+  function ($scope, $modal, multistate) {
 
       $scope.items = ['item1', 'item2', 'item3'];
  
@@ -461,23 +463,18 @@ angular.module('ui.catsmultiselect', [ 'catsmultiselect.tpl.html', 'ui.bootstrap
               }
           }
      }
-  })
+  }])
 // Please note that $modalInstance represents a modal window (instance) dependency.
 // It is not the same as the $modal service used above.
 
-var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups, vocabService, pnt) {
+var ModalVocabInstanceCtrl = ['$scope', '$modalInstance', '$timeout', 'groups', 'vocabService', 'pnt',
+
+function ($scope, $modalInstance, $timeout, groups, vocabService, pnt) {
 
   $scope.vocab = {};
   $scope.groups = groups;
   $scope.loading = false;
   $scope.alerts = [];
-//  $scope.selected = false;
-
-  
-  //$scope.items = items;
-//  $scope.selected = {
-//  //  item: $scope.items[0]
-//  };
 
   $scope.ok = function () {
     $modalInstance.close();
@@ -563,7 +560,7 @@ var ModalVocabInstanceCtrl = function ($scope, $modalInstance, $timeout, groups,
       $scope.vocab.grpName = "";
       return;
   };
-};
+}];
 
 angular.module('catsmultiselect.tpl.html', [])
 

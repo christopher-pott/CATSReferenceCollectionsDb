@@ -26,7 +26,16 @@ var app = module.exports = express();
  ****************/
 
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
+
+if (app.get('env') === 'development') {
+    app.set('views', __dirname + '/views');
+}
+/* production only */
+if (app.get('env') === 'production') {
+    app.set('views', __dirname + '/dist/views');
+    app.use('/dist', express.static(__dirname + '/dist'));
+
+}
 app.set('view engine', 'jade');
 
 logger.debug("Overriding 'Express' logger");
@@ -34,7 +43,10 @@ app.use(express.logger({format: 'dev', stream: logger.stream }));
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+app.use('/public', express.static(__dirname + '/public'));
 
 /*Passport middleware : must be before 'router'*/
 app.use(express.cookieParser());

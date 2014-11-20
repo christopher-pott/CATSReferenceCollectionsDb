@@ -13,6 +13,13 @@
     "tests"
   ],
   "dependencies": {
-    "angular-toggle-switch": "~0.3.2"
+    "angular": "1.2.16",
+    "angular-animate": "1.2.16",
+    "angular-route": "1.2.16",
+    "angular-bootstrap": "0.11.0",
+    "angular-toggle-switch": "0.3.2",
+    "ng-file-upload": "1.6.12",
+    "bootstrap": "3.1.1",
+    "amitava82/angular-multiselect": "*"
   }
 }

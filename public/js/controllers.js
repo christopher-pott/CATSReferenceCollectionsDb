@@ -6,8 +6,10 @@
  * */
 
 angular.module('myApp.controllers', ['ui.bootstrap', 'angularFileUpload']).
-controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPIservice) {
-    
+controller('AppCtrl', ['$scope', '$http', 'state', '$location', '$modal', 'catsAPIservice', 
+
+function ($scope, $http, state, $location, $modal, catsAPIservice) {
+
     /* Initialize the search filter and the lists it requires */
     state.filter = {};
     state.uploadedImage = {};
@@ -74,8 +76,10 @@ controller('AppCtrl', function ($scope, $http, state, $location, $modal, catsAPI
         state.searchTerm = searchTerm;
         state.searchRequested = true;
     };
-}).
-controller('SearchController', function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
+}]).
+controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$modal', '$log', '$location',
+
+function ($q, $scope, catsAPIservice, state, $modal, $log, $location) {
 
     $scope.loggedin = state.loggedin;
     $scope.sampleTypes = state.sampleTypes;
@@ -256,11 +260,15 @@ controller('SearchController', function ($q, $scope, catsAPIservice, state, $mod
         
         createExportDoc(searchTerm, filter);
     }
-}).
-controller('BrowseController', function ($scope) {
+}]).
+controller('BrowseController', ['$scope', 
 
-}).
-controller('ViewController', function ($scope, state, catsAPIservice, $location) {
+function ($scope) {
+
+}]).
+controller('ViewController', ['$scope', 'state', 'catsAPIservice', '$location',
+
+function ($scope, state, catsAPIservice, $location) {
 
     /* Retrieve the sample details from the state service*/
   //  $scope.record = state.sample;
@@ -294,11 +302,11 @@ controller('ViewController', function ($scope, state, catsAPIservice, $location)
     $scope.backToSearch = function() {
         $location.path('/search');
     };
+}]).
+controller('DatepickerCntrl', ['$scope', 
 
+function ($scope) {
 
-}).
-controller('DatepickerCntrl', function ($scope) {
-    
     $scope.open = function($event) {
         $event.preventDefault();
         $event.stopPropagation();
@@ -314,8 +322,10 @@ controller('DatepickerCntrl', function ($scope) {
     $scope.initDate = new Date('1970-01-01T01:00:00.000Z');
     $scope.formats = ['dd/MM/yyyy'];
     $scope.format = $scope.formats[0];
-}).
-controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice) {
+}]).
+controller('RegisterCtrl', ['$scope', '$modal', '$log', 'state', 'catsAPIservice', 
+
+function ($scope, $modal, $log, state, catsAPIservice) {
 
     /* Open the modal dialog */
     $scope.open = function (size) {
@@ -358,8 +368,10 @@ controller('RegisterCtrl', function ($scope, $modal, $log, state, catsAPIservice
             }
         }
     );
-}).
-controller('ImageUploadController', function ($scope, $upload, $timeout, state) {
+}]).
+controller('ImageUploadController', ['$scope', '$upload', '$timeout', 'state',
+
+function ($scope, $upload, $timeout, state) {
 
     /*See upload.js in angular-file-upload for an example file upload controller*/
 
@@ -484,9 +496,11 @@ controller('ImageUploadController', function ($scope, $upload, $timeout, state) 
              $scope.alerts.splice(0, 1);
          }, 3000);
      };    
-});
+}]);
 
-var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, catsAPIservice) {
+var loginModalInstanceCtrl = ['$scope', '$modalInstance', 'state', '$timeout', 'catsAPIservice',
+
+function ($scope, $modalInstance, state, $timeout, catsAPIservice) {
 
     $scope.alerts = [];
 
@@ -559,9 +573,11 @@ var loginModalInstanceCtrl = function ($scope, $modalInstance, state, $timeout, 
 
         $scope.alerts.splice(index, 1);
     };
-}
+}];
  
-var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, catsAPIservice, state, vocabsArray) {
+var ModalInstanceCtrl = ['$timeout', '$scope', '$modalInstance', 'catsAPIservice', 'state', 'vocabsArray',
+
+function ($timeout, $scope, $modalInstance, catsAPIservice, state, vocabsArray) {
 
     $scope.artwork = {};
     $scope.mainTabs = { tabOneState : true};
@@ -853,9 +869,11 @@ var ModalInstanceCtrl = function ($timeout, $scope, $modalInstance, catsAPIservi
         $modalInstance.dismiss('cancel');
         state.searchRequested = true;
     };
-};
+}];
 
-function CarouselImageCtrl($scope, state) {
+var CarouselImageCtrl = ['$scope', 'state',
+
+function ($scope, state) {
 
     $scope.showImages = false;
     $scope.myInterval = -1;
@@ -929,9 +947,11 @@ function CarouselImageCtrl($scope, state) {
 //    for (var i=0; i<4; i++) {
 //        $scope.addSlide();
 //    }
-};
+}];
 
-function ImageUploadCtrl($scope) {
+var ImageUploadCtrl = ['$scope',
+
+function ($scope) {
     
     $scope.data = 'none';
 
@@ -943,4 +963,4 @@ function ImageUploadCtrl($scope) {
         }
         r.readAsBinaryString(f);
     }
-}
+}];

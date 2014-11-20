@@ -28,7 +28,6 @@
     "commit": "73f181bc73eb0bb0b0bd094bbbdf706ca45ce6c0"
   },
   "_source": "git://github.com/cgarvis/angular-toggle-switch.git",
-  "_target": "~0.3.2",
-  "_originalSource": "angular-toggle-switch",
-  "_direct": true
+  "_target": "0.3.2",
+  "_originalSource": "angular-toggle-switch"
 }
