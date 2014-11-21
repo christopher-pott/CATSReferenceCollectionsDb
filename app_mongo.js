@@ -29,6 +29,7 @@ app.set('port', process.env.PORT || 3000);
 
 if (app.get('env') === 'development') {
     app.set('views', __dirname + '/views');
+    app.use(express.errorHandler());
 }
 /* production only */
 if (app.get('env') === 'production') {
@@ -57,17 +58,6 @@ app.use(passport.session());
 
 app.use(app.router);
 app.use(cors());
-
-
-/* development only */
-if (app.get('env') === 'development') {
-    app.use(express.errorHandler());
-}
-
-/* production only */
-if (app.get('env') === 'production') {
-    // TODO
-}
 
 
 /**************************
@@ -726,7 +716,13 @@ app.post('/sample', function(req, res) {
         } else {
             logger.info('upsert successful ');
             var status = 201;
-            var _id =  response.upserted[0]._id;
+            
+            var _id = '';
+            if(req.body._id){
+                _id = req.body._id;
+            }else if(response.upserted){
+                _id = response.upserted[0]._id;
+            }
 
             if (response.updatedExisting){
                 status = 200;

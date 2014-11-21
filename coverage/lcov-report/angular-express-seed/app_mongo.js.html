@@ -199,16 +199,16 @@
     <h1>Code coverage report for <span class="entity">angular-express-seed/app_mongo.js</span></h1>
     <h2>
         
-        Statements: <span class="metric">82.3% <small>(372 / 452)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Statements: <span class="metric">81.56% <small>(376 / 461)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Branches: <span class="metric">63.55% <small>(204 / 321)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Branches: <span class="metric">63.08% <small>(205 / 325)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
         Functions: <span class="metric">79.71% <small>(55 / 69)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         
-        Lines: <span class="metric">84.65% <small>(364 / 430)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
+        Lines: <span class="metric">83.83% <small>(368 / 439)</small></span> &nbsp;&nbsp;&nbsp;&nbsp;
         
         Ignored: <span class="metric"><span class="ignore-none">none</span></span> &nbsp;&nbsp;&nbsp;&nbsp;
     </h2>
@@ -1432,7 +1432,20 @@
 1214
 1215
 1216
-1217</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
+1217
+1218
+1219
+1220
+1221
+1222
+1223
+1224
+1225
+1226
+1227
+1228
+1229
+1230</td><td class="line-coverage"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1460,6 +1473,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1479,17 +1505,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -2148,7 +2163,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-yes">1</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2596,6 +2617,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2621,6 +2646,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -2676,7 +2702,17 @@ var app = module.exports = express();
  ****************/
 &nbsp;
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
+&nbsp;
+<span class="missing-if-branch" title="else path not taken" >E</span>if (app.get('env') === 'development') {
+    app.set('views', __dirname + '/views');
+    app.use(express.errorHandler());
+}
+/* production only */
+<span class="missing-if-branch" title="if path not taken" >I</span>if (app.get('env') === 'production') {
+<span class="cstat-no" title="statement not covered" >    app.set('views', __dirname + '/dist/views');</span>
+<span class="cstat-no" title="statement not covered" >    app.use('/dist', express.static(__dirname + '/dist'));</span>
+&nbsp;
+}
 app.set('view engine', 'jade');
 &nbsp;
 logger.debug("Overriding 'Express' logger");
@@ -2684,7 +2720,10 @@ app.use(express.logger({format: 'dev', stream: logger.stream }));
 &nbsp;
 app.use(express.bodyParser());
 app.use(express.methodOverride());
+&nbsp;
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/bower_components', express.static(__dirname + '/bower_components'));
+app.use('/public', express.static(__dirname + '/public'));
 &nbsp;
 /*Passport middleware : must be before 'router'*/
 app.use(express.cookieParser());
@@ -2695,17 +2734,6 @@ app.use(passport.session());
 &nbsp;
 app.use(app.router);
 app.use(cors());
-&nbsp;
-&nbsp;
-/* development only */
-<span class="missing-if-branch" title="else path not taken" >E</span>if (app.get('env') === 'development') {
-    app.use(express.errorHandler());
-}
-&nbsp;
-/* production only */
-<span class="missing-if-branch" title="if path not taken" >I</span>if (app.get('env') === 'production') {
-    // TODO
-}
 &nbsp;
 &nbsp;
 /**************************
@@ -3364,7 +3392,13 @@ app.post('/sample', function(req, res) {
         } else {
             logger.info('upsert successful ');
             var status = 201;
-            var _id =  response.upserted[0]._id;
+            
+            var _id = '';
+            <span class="missing-if-branch" title="else path not taken" >E</span>if(req.body._id){
+                _id = req.body._id;
+            }else <span class="cstat-no" title="statement not covered" >if(response.upserted){</span>
+<span class="cstat-no" title="statement not covered" >                _id = response.upserted[0]._id;</span>
+            }
 &nbsp;
             <span class="missing-if-branch" title="if path not taken" >I</span>if (response.updatedExisting){
 <span class="cstat-no" title="statement not covered" >                status = 200;</span>
@@ -3742,7 +3776,7 @@ app.post('/vocab/:type/items', function(req, res){
 });
 &nbsp;
 /**
- * Retrieve a vocab by type
+ * Retrieve a single vocab by type
  * If successful returns the vocab object in json
  *
  * Usage: vocab/{type}
@@ -3769,7 +3803,7 @@ app.get('/vocab/:type', function(req, res) {
             }
         })
     }else{
-<span class="cstat-no" title="statement not covered" >        res.send(406); </span>/* "not acceptable" : we don't support the requested client media */
+<span class="cstat-no" title="statement not covered" >        res.send(406); </span>
     }
 });
 &nbsp;
@@ -3790,27 +3824,31 @@ app.get('/vocab', function(req, res) {
         .toArray(function(err, items) {
             <span class="missing-if-branch" title="if path not taken" >I</span>if (err || !items || !items.length){
 <span class="cstat-no" title="statement not covered" >                logger.error("vocabs not found");</span>
-<span class="cstat-no" title="statement not covered" >                res.send(404); </span>/*"not found", will triggger .error() handler*/
+<span class="cstat-no" title="statement not covered" >                res.send(404); </span>
             } else {
                 logger.info('get all vocabs successful');
                 res.status(200).send(items);
             }
         })
     }else{
-<span class="cstat-no" title="statement not covered" >        res.send(406); </span>/* "not acceptable" : we don't support the requested client media */
+<span class="cstat-no" title="statement not covered" >        res.send(406); </span>
     }
 });
 &nbsp;
 /********************
  * IMAGE operations
  ********************/
-/*
- * Saves incoming file directly to the image server filesystem. Ideally, this would be our 
- * interface to a DAM but as it stands we don't have this in place yet. 
+/**
+ * Save an image
  * 
- * Response: 
- * If the image is successfully saved, we return a url at which it can be accessed.
- * If an image of that name aready exists, we return a "conflict" response.
+ * Very basic implementation saves the incoming file directly to the image server filesystem. 
+ * Ideally, this would be our interface to a DAM but as it stands we don't have this in place yet. 
+ * 
+ * Responses:
+ * 201 (Created): Body &amp; location header contain the object url
+ * 401 (Unauthorised) : User is not logged in
+ * 409 (Conflict): An image of that name aready exists
+ * 500 (internal Server Error): Problem reading or writing the file
  */
 app.post('/image', <span class="fstat-no" title="function not covered" >function(req, res){</span>
 &nbsp;
@@ -3819,7 +3857,7 @@ app.post('/image', <span class="fstat-no" title="function not covered" >function
     };
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    var readPath = req.files.file.path;</span>
-<span class="cstat-no" title="statement not covered" >    var writePath = "/mnt/fotoarkiv/globus/catsdb/";</span>
+<span class="cstat-no" title="statement not covered" >    var writePath = "/mnt/fotoarkiv/globus/catsdb/"; </span>/*TODO: move to config*/
 <span class="cstat-no" title="statement not covered" >    var name = req.files.file.name;</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    fs.readFile(readPath, <span class="fstat-no" title="function not covered" >function (err, data) {</span></span>
@@ -3830,16 +3868,17 @@ app.post('/image', <span class="fstat-no" title="function not covered" >function
         else {
 <span class="cstat-no" title="statement not covered" >            fs.exists(writePath + name, <span class="fstat-no" title="function not covered" >function (exists) {</span></span>
 <span class="cstat-no" title="statement not covered" >                if(exists){</span>
-<span class="cstat-no" title="statement not covered" >                    res.send(409); </span>/*"Conflict"*/
+<span class="cstat-no" title="statement not covered" >                    res.send(409);</span>
                 } else {
 <span class="cstat-no" title="statement not covered" >                    fs.writeFile(writePath + name, data, <span class="fstat-no" title="function not covered" >function(err) {</span></span>
 <span class="cstat-no" title="statement not covered" >                        if(err) {</span>
 <span class="cstat-no" title="statement not covered" >                            logger.error(err);</span>
 <span class="cstat-no" title="statement not covered" >                            res.status(500).send(err);</span>
                         } else {
-<span class="cstat-no" title="statement not covered" >                            var url = "http://cspic.smk.dk/globus/catsdb/" + name;</span>
+<span class="cstat-no" title="statement not covered" >                            var url = "http://cspic.smk.dk/globus/catsdb/" + name; </span>/*TODO: move to config*/
 <span class="cstat-no" title="statement not covered" >                            logger.info("The file was saved to " + url);</span>
-<span class="cstat-no" title="statement not covered" >                            res.status(201).send(url); </span>/*"Created"*/
+<span class="cstat-no" title="statement not covered" >                            res.header('Location', url);</span>
+<span class="cstat-no" title="statement not covered" >                            res.status(201).send(url); </span>
                         }
                     })
                 }
@@ -3869,7 +3908,7 @@ http.createServer(app).listen(app.get('port'), function () {
 
 </div>
 <div class="footer">
-    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Tue Nov 18 2014 14:50:32 GMT+0100 (CET)</div>
+    <div class="meta">Generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Fri Nov 21 2014 10:44:58 GMT+0100 (CET)</div>
 </div>
 
 <script src="../prettify.js"></script>

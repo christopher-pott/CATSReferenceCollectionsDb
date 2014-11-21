@@ -27,41 +27,7 @@ module.exports = function(grunt) {
                     src: './views/index.jade'
                 }]
             }
-        },
-
-    
-//        uglify: {
-//            options: {
-//                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-//            },
-//            my_target: {
-//                files: [{
-//                        'build/grunt/dist/app-only.min.js': [
-//                             'public/js/app.js',
-//                             'public/js/services.js',
-//                             'public/js/filters.js',
-//                             'public/js/directives.js',
-//                             'public/js/controllers.js',
-//                             'public/js/lib/multiselect/cats-multiselect-tpls.js',
-//                             'public/js/lib/multiselect/cats-artistselect-tpls.js',
-//                             'bower_components/amitava82/angular-multiselect/src/multiselect-tpls.js'
-//                          ]
-//                }]
-//            }
-//        },
-//        concat: {
-//            options: {
-//                // define a string to put between each file in the concatenated output
-//                separator: ';'
-//            },
-//            dist: {
-//                // the files to concatenate
-//                src: [  
-//                    'build/grunt/dist/app-only.min.js'
-//                    ],
-//                dest: 'build/grunt/dist/<%= pkg.name %>.js'
-//            }
-//        }
+        }
   });
 
   // Load the plugins that provide the tasks

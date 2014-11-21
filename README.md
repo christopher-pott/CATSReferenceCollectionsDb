@@ -17,21 +17,35 @@ HTML, and let AngularJS take care of interpolation on the browser side._
 
 ## How to use angular-express-seed
 
-Clone the angular-express-seed repository, run `npm install` to grab the dependencies, and start hacking!
+Clone the repository and run:
+
+	npm install
 
 ### Running the app
 
-Runs like a typical express app:
+Production mode (uses minified and concatenated js files):
 
-    node app.js
+To create the production files, just run grunt:
+
+	grunt
+	
+To start the app:	
+
+    NODE_ENV=production node app_mongo.js
+    
+Development mode:
+   
+    NODE_ENV=development node app_mongo.js
 
 ### Running tests
 
-Coming soon!
+To run tests and coverage report on the Node.js server, use the following command:
 
-### Receiving updates from upstream
+    istanbul cover _mocha -- -R spec
 
-Just fetch the changes and merge them into your project with git.
+The coverage report can be found at: 
+   
+   /coverage/lcov-report/angular-express-seed/app_mongo.js.html
 
 
 ## Directory Layout

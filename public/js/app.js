@@ -14,7 +14,9 @@ angular.module('myApp', [
   'ui.catsartistselect',
   'toggle-switch'
 ]).
-config(function ($routeProvider, $locationProvider) {
+config(['$routeProvider', '$locationProvider' , 
+
+function ($routeProvider, $locationProvider) {
     
     /* controllers can be defined here OR using ng-controller directive in the view (jade file),
      * but not both places
@@ -37,4 +39,4 @@ config(function ($routeProvider, $locationProvider) {
     });
 
   $locationProvider.html5Mode(true);
-});
+}]);
