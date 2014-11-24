@@ -14,6 +14,7 @@ function ($scope, $http, state, $location, $modal, catsAPIservice) {
     state.filter = {};
     state.uploadedImage = {};
     state.deleteImage = {index:''};
+    state.searchRequested = false;
     
     catsAPIservice.getVocab("sampleTypes")
     .success(function (resp) {

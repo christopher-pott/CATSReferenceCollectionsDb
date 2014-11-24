@@ -745,10 +745,7 @@ app.delete('/sample/:id', function(req, res){
         res.send(401);
         return;
     }
-//    if (!req.params){
-//        res.send(400);
-//        return;
-//    }
+
     var id = req.params.id;
 
     try{
