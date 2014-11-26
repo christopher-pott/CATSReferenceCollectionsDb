@@ -722,7 +722,7 @@ div#searchContainer
 							tr
 								th Sample Ref num
 								th Type
-								th Artwork ref num
+								th Item
 								th Date/period
 								th Analysis
 								th Institution
@@ -733,7 +733,8 @@ div#searchContainer
 							tr(ng-repeat="res in searchResultsList")
 								td: a(href= "", ng-click="viewSample($index)") {{res.referenceNumber}}
 								td: a(href= "", ng-click="viewSample($index)") {{res.sampleType.name}}
-								td{{res.artwork.inventoryNum}}
+								td(ng-show="res.sampleType.id !== 'pigment'"){{res.artwork.inventoryNum}}
+								td(ng-show="res.sampleType.id == 'pigment'"){{res.pigmentName.name}}
 								td(ng-show="res.sampleType.id !== 'pigment'"){{res.artwork.productionDateEarliest | date:'yyyy'}} - {{res.artwork.productionDateLatest | date:'yyyy'}}
 								td(ng-show="res.sampleType.id == 'pigment'"){{res.productionDate | date:'yyyy'}}
 								td
