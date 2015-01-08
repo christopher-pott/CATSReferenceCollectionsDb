@@ -6,19 +6,24 @@ The technology stack for this application is a node/Express Server, Angularjs fr
 
 ## How to use
 
-Clone the repository and run:
+Install git, npm, bower
+Clone the repository and install the dependencies:
 
+    git clone https://github.com/StatensMuseumforKunst/CATSReferenceCollectionsDb.git
     npm install
+    bower install
 
 ### Running the application
 
-Production mode (uses minified and concatenated js files):
-
-To create the production files, just run grunt:
+To run the tests and create the production files, just run grunt:
 
     grunt
-	
-To start the app:	
+
+To create the production files without tests (tests require mongod to be running and the correct version of PhantomJS to be installed) use the following command instead:
+
+    grunt clean copy jadeUsemin
+
+To start the app in production mode (uses minified and concatenated js files):
 
     NODE_ENV=production node app_mongo.js
     
@@ -26,6 +31,10 @@ Otherwise, to run in development mode, just use:
 
     NODE_ENV=development node app_mongo.js
     
+Server runtime logs will be written to /tmp/catsdb.log (this is configurable in logging.js).
+    
+### Managing the application lifetime    
+
 Install 'supervisor' to ensure the application is kept running, even after reboot
 
     sudo apt-get update
@@ -43,16 +52,19 @@ Add the following to /etc/supervisor/supervisord.conf
     stdout_logfile=/home/cpo/log/mongod.log
         
     [program:catsdb]
-    command=NODE_ENV=production node app_mongo.js
-    directory=/home/cpo/git/CATSReferenceSamplesDb
+    command=node app_mongo.js
+    directory=/home/cpo/git/CATSReferenceCollectionsDb
     user=root
     autostart=true
     autorestart=true
     redirect_stderr=true
+    environment=NODE_ENV="production"
 
 Run supervisor
 
     sudo service supervisor start
+    
+Logs can be found at /var/log/supervisor/supervisord.log.
 
 ### Running tests
 
