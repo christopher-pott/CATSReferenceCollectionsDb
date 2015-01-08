@@ -20,7 +20,7 @@
     "angular-toggle-switch": "0.3.2",
     "ng-file-upload": "1.6.12",
     "bootstrap": "3.1.1",
-    "amitava82/angular-multiselect": "*"
+    "amitava82-angular-multiselect": "*"
   },
   "devDependencies": {
     "angular-mocks": "~1.3.3",
