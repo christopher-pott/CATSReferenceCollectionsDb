@@ -6,7 +6,8 @@ The technology stack for this application is a node/Express Server, Angularjs fr
 
 ## How to use
 
-Install git, npm, bower
+Install git, npm, bower, mongo (this was tested with version 2.6.5)
+
 Clone the repository and install the dependencies:
 
     git clone https://github.com/StatensMuseumforKunst/CATSReferenceCollectionsDb.git
