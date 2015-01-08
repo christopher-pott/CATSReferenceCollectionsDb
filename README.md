@@ -23,8 +23,36 @@ To start the app:
     NODE_ENV=production node app_mongo.js
     
 Otherwise, to run in development mode, just use:
-   
+
     NODE_ENV=development node app_mongo.js
+    
+Install 'supervisor' to ensure the application is kept running, even after reboot
+
+    sudo apt-get update
+    sudo apt-get install supervisor
+
+Add the following to /etc/supervisor/supervisord.conf 
+
+    [program:mongod]
+    command=/usr/bin/mongod
+    directory=/home/cpo
+    user=root
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+    stdout_logfile=/home/cpo/log/mongod.log
+        
+    [program:catsdb]
+    command=NODE_ENV=production node app_mongo.js
+    directory=/home/cpo/git/CATSReferenceSamplesDb
+    user=root
+    autostart=true
+    autorestart=true
+    redirect_stderr=true
+
+Run supervisor
+
+    sudo service supervisor start
 
 ### Running tests
 
