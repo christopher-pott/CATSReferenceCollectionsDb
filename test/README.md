@@ -42,9 +42,6 @@ To run this, just call this command:
 
 ```grunt```
 
-###Module overload!
-
-Naturally, Each of these test tools needs importing, but in addition to this we import a number of modules to provide grunt interfaces to them all. This results in a great number of 'dev-dependencies' which make the 'package.json' and the 'node_modules' directory seem a little overwhelming. However, they don't really require any deep knowledge of their workings and most of them are only referenced briefly in the grunt configuration itself.
 
 
 
