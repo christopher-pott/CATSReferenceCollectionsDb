@@ -19,7 +19,7 @@ var express = require('express'),
     negotiator = require('negotiator');
 
 var app = module.exports = express();
-
+var MongoStore = require('connect-mongo')(express);
 
 /****************
  * Configuration
@@ -51,7 +51,15 @@ app.use('/public', express.static(__dirname + '/public'));
 
 /*Passport middleware : must be before 'router'*/
 app.use(express.cookieParser());
-app.use(express.session({ secret: 'keyboard cat' }));
+
+/*Use connect-mongo to persist sessions to db instead of RAM*/
+app.use(express.session({
+    secret: 'rory gallagher',
+    store: new MongoStore({
+        db: 'cats'
+    })
+  }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 /*End Passport middleware*/
@@ -141,7 +149,7 @@ app.post('/login', passport.authenticate('local'), function(req, res) {
     res.status(200).send(req.user); 
 });
 
-/* logout */ 
+/* logout */
 app.post('/logout', function(req, res){
     if(req.isAuthenticated()){
         logger.info('user ' + req.user.username.toString() + ' logging out');

@@ -15,7 +15,7 @@ _Note: Although Jade supports interpolation, you should be doing that mostly on 
 server and browser templating will convolute your app. Instead, use Jade as a syntactic sugar for
 HTML, and let AngularJS take care of interpolation on the browser side._
 
-## How to use angular-express-seed
+## How to use catsdb
 
 Clone the repository and run:
 
@@ -33,20 +33,15 @@ To start the app:
 
     NODE_ENV=production node app_mongo.js
     
-Development mode:
+Otherwise, to run in development mode, just use:
    
     NODE_ENV=development node app_mongo.js
 
 ### Running tests
 
-To run tests and coverage report on the Node.js server, use the following command:
+When called, grunt will automatically run the tests, both backend and frontend.
 
-    istanbul cover _mocha -- -R spec
-
-The coverage report can be found at: 
-   
-   /coverage/lcov-report/angular-express-seed/app_mongo.js.html
-
+An explanation of the tests and testing tools used in this application can be found at /test/README.md
 
 ## Directory Layout
     

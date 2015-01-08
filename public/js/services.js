@@ -4,6 +4,25 @@
 
 var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 
+/* 
+ *  All the catsAPI services use http.get/post which return an HttpPromise:
+ *  
+ *  Returns a promise object with the standard then method and two http specific methods: 
+ *  success and error. The then method takes two arguments a success and an error callback
+ *  which will be called with a response object. The success and error methods take a single
+ *  argument - a function that will be called when the request succeeds or fails respectively.
+ *  
+ *  The arguments passed into these functions are destructured representations of the response 
+ *  object passed into the then method. The response object has these properties:
+ *  
+ *  data – {string|Object} – The response body transformed with the transform functions.
+ *  status – {number} – HTTP status code of the response.
+ *  headers – {function([headerName])} – Header getter function.
+ *  config – {Object} – The configuration object that was used to generate the request.
+ *  statusText – {string} – HTTP status text of the response.
+ *
+*/
+
 serviceMod.factory('catsAPIservice', ['$http', 
 function($http) {
     return {

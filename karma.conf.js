@@ -33,8 +33,11 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    //comment out the preprocessors section for DEBUGGING
     preprocessors: {
-        'public/js/services.js' :  ['coverage'] 
+        'public/js/services.js' :  ['coverage'],
+        'public/js/controllers.js' :  ['coverage'] 
+
     },
 
 
@@ -63,11 +66,16 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    // set to 'Chrome' for DEBUGGING
     browsers: ['PhantomJS'],
+//    browsers: ['Chrome'],
 
 
     // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
+    // if true, Karma captures browsers, runs the tests and exits. 
+    // Set false for DEBUGGING
     singleRun: true
+//    singleRun: false
+
   });
 };

@@ -4,8 +4,8 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         /*run backend tests*/
-        simplemocha: {
-            backend: {
+        mocha_istanbul: {
+            coverage: {
                 src: 'test/node/test_node.js'
             }
         },
@@ -50,10 +50,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jade-usemin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-simple-mocha');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-mocha-istanbul')
   
   /* Default task(s) to run when 'grunt' command is used*/
-  grunt.registerTask('default', ['simplemocha', 'karma', 'clean', 'copy', 'jadeUsemin']);
+  grunt.registerTask('default', ['mocha_istanbul', 'karma', 'clean', 'copy', 'jadeUsemin']);
 };

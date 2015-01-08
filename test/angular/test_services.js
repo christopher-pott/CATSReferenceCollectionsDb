@@ -30,7 +30,8 @@ describe('myApp.services', function() {
 
         it("catsAPIservice.search should build the correct url from the arguments", function () {
         
-            /*this will only get hit if catsAPIservice.search builds the url correctly*/
+            /*this will only get hit if catsAPIservice.search builds the url correctly
+             * it will mock the http service and send a response */
             httpBackend.whenGET(search_url).respond("ok");
         
             catsAPIservice.search(search_term, search_filter).then(function(response) {
