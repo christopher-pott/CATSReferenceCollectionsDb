@@ -30,12 +30,12 @@ Otherwise, to run in development mode, just use:
 
 When called, grunt will automatically run the tests, both backend and frontend.
 
-An explanation of the tests and testing tools used in this application can be found at /test/README.md
+An explanation of the tests and testing tools used in this application can be found [here](/test/README.md).
 
 
 ## Example App
 
-The CATS instance of the database can be viewed [here](https://github.com/btford/angular-express-blog). Editing records requires login credentials.
+The CATS live instance of the database can be found [here](http://www.cats-cons.dk/). Editing records requires login credentials.
 
 ## Contact
 CATS
