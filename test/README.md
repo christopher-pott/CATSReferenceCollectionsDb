@@ -10,7 +10,7 @@ Here is what we are testing on the server: The Server API tests build and send a
 
 To run just the server tests (with coverage information from the **Istanbul** tool) then run this command from the project root (however, we use 'grunt' instead, see below):
 
-```istanbul cover _mocha -- test/node/ -R spec```
+    istanbul cover _mocha -- test/node/ -R spec
 
 The test results are output to stdout. The coverage report can be found at /coverage/lcov-report/angular-express-seed/index.html
 
@@ -25,7 +25,7 @@ Here is what we are testing: calling each method, stubbing the services used by 
 
 The unit tests can be run from project root with the following command (however, we use 'grunt' instead, see below):
 
-```karma start```
+    karma start
 
 The test results are output to stdout. The coverage report can be found at /coverage/PhantomJS 1.9.8/index.html
 
@@ -40,7 +40,9 @@ We use the **grunt** build tool to manage the build. This must be run before eac
 
 To run this, just call this command:
 
-```grunt```
+    grunt
+
+
 
 
 
