@@ -8,7 +8,7 @@ The technology stack for this application is a node/Express Server, Angularjs fr
 
 Clone the repository and run:
 
-```npm install```
+    npm install
 
 ### Running the application
 
@@ -16,7 +16,7 @@ Production mode (uses minified and concatenated js files):
 
 To create the production files, just run grunt:
 
-	grunt
+    grunt
 	
 To start the app:	
 
@@ -28,9 +28,7 @@ Otherwise, to run in development mode, just use:
 
 ### Running tests
 
-When called, grunt will automatically run the tests, both backend and frontend.
-
-An explanation of the tests and testing tools used in this application can be found [here](/test/README.md).
+When called, grunt will automatically run the tests, both backend and frontend. An explanation of the tests and testing tools used in this application can be found [here](/test/README.md).
 
 
 ## Example App
