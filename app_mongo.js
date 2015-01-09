@@ -10,6 +10,7 @@ var express = require('express'),
     routes = require('./routes'),
     api = require('./routes/api'),
     http = require('http'),
+    https = require('https');
     path = require('path'),
     db = require("./db_mongo"),
     Q = require('q'),
@@ -25,7 +26,8 @@ var MongoStore = require('connect-mongo')(express);
  * Configuration
  ****************/
 
-app.set('port', process.env.PORT || 3000);
+/*set port to whatever is in the environment variable PORT, or 3000 if there's nothing there.*/
+app.set('port', process.env.PORT || 3443);
 
 if (app.get('env') === 'development') {
     app.set('views', __dirname + '/views');
@@ -1168,10 +1170,12 @@ app.get('/vocab', function(req, res) {
  * IMAGE operations
  ********************/
 /**
- * Save an image
+ * Save an image : incomplete
  * 
- * Very basic implementation saves the incoming file directly to the image server filesystem. 
- * Ideally, this would be our interface to a DAM but as it stands we don't have this in place yet. 
+ * Very basic implementation saves the incoming file directly to SMKs image server filesystem which
+ * we've used for testing. Ideally, this would be our interface to a DAM but as it stands we don't 
+ * have this in place yet. As it stands, this will always return '500' unless the 'writePath' is 
+ * hardcoded below.
  * 
  * Responses:
  * 201 (Created): Body & location header contain the object url
@@ -1186,11 +1190,11 @@ app.post('/image', function(req, res){
     };
 
     var readPath = req.files.file.path;
-    var writePath = "/mnt/fotoarkiv/globus/catsdb/"; /*TODO: move to config*/
+    var writePath = ''; /*TODO: move to config*/
     var name = req.files.file.name;
 
     fs.readFile(readPath, function (err, data) {
-        if(err) {
+        if(err || !writePath) {
             logger.error(err);
             res.status(500).send(err); /*"Internal server Error"*/
         }
@@ -1227,8 +1231,43 @@ app.get('*', routes.index);
  * Start Server
  ***************/
 
-http.createServer(app).listen(app.get('port'), function () {
-    logger.info('Express server listening on port ' + app.get('port'));
+//http.createServer(app).listen(app.get('port'), function () {
+//    logger.info('Express server listening on port ' + app.get('port'));
+//});
+
+
+/*To generate self-certified certificates for local test :
+ *    
+ *    place in /etc/ssl/certs
+ *    
+ *    private key
+ *    openssl genrsa 1024 > catskey.pem
+ *    
+ *    
+ *    openssl req -x509 -new -key catskey.pem > cats-key-cert.pem
+ *    
+ *    To generate certificate request (csr) to send to authority:
+ *    openssl req -newkey rsa:2048 -new -nodes -keyout catsdb-key.pem -out catsdb-csr.pem
+ *    
+ *    OR to create a self signed for local testing
+ *    
+ *    openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout catsdb-key.pem -out catsdb-cert.pem
+ *    
+ *To force chrome to trust them :
+ *    click through warnings
+ *    settings -> advanced settings -> https
+ *    my certificates -> localhost(or whatever it's named) -> export as "PKCS #7, single certificate"
+ *    delete my certificates -> localhost
+ *    authorities -> import the above file
+ */
+var options = {
+    key: fs.readFileSync('/etc/ssl/certs/catsdb-key.pem'),
+    cert: fs.readFileSync('/etc/ssl/certs/catsdb-cert.pem')
+};
+
+https.createServer(options, app).listen(app.get('port'), function () {
+   logger.info('Express server listening on port ' + app.get('port'));
 });
+
 
 
