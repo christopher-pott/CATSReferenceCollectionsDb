@@ -171,6 +171,10 @@ div#viewContainer
 							div.col-sm-4
 								label Chemical composition
 							div.col-sm-8{{record.pigmentComposition}}
+						div.row(ng-show="record.pigmentLabelName")
+							div.col-sm-4
+								label Pigment Label
+							div.col-sm-8{{record.pigmentLabelName}}
 						div.row(ng-show="record.pigmentName.name")
 							div.col-sm-4
 								label Pigment name
