@@ -1231,34 +1231,15 @@ app.get('*', routes.index);
  * Start Server
  ***************/
 
-//http.createServer(app).listen(app.get('port'), function () {
-//    logger.info('Express server listening on port ' + app.get('port'));
-//});
-
-
-/*To generate self-certified certificates for local test :
- *    
- *    place in /etc/ssl/certs
- *    
- *    private key
- *    openssl genrsa 1024 > catskey.pem
- *    
- *    
- *    openssl req -x509 -new -key catskey.pem > cats-key-cert.pem
+/*To generate certificates :
+ *
+ *    http://stackoverflow.com/questions/12871565/how-to-create-pem-files-for-https-web-server
  *    
  *    To generate certificate request (csr) to send to authority:
  *    openssl req -newkey rsa:2048 -new -nodes -keyout catsdb-key.pem -out catsdb-csr.pem
  *    
- *    OR to create a self signed for local testing
- *    
+ *    OR to create a self signed for local testing (expires 10 years)
  *    openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout catsdb-key.pem -out catsdb-cert.pem
- *    
- *To force chrome to trust them :
- *    click through warnings
- *    settings -> advanced settings -> https
- *    my certificates -> localhost(or whatever it's named) -> export as "PKCS #7, single certificate"
- *    delete my certificates -> localhost
- *    authorities -> import the above file
  */
 var options = {
     key: fs.readFileSync('/etc/ssl/certs/catsdb-key.pem'),
@@ -1269,5 +1250,10 @@ https.createServer(options, app).listen(app.get('port'), function () {
    logger.info('Express server listening on port ' + app.get('port'));
 });
 
-
-
+/*For testing, or if encryption is not required, comment out the lines above and
+  use this regular http server instead.
+  
+http.createServer(app).listen(app.get('port'), function () {
+    logger.info('Express server listening on port ' + app.get('port'));
+});
+*/

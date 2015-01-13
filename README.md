@@ -32,7 +32,7 @@ Otherwise, to run in development mode, just use:
 
     NODE_ENV=development node app_mongo.js
     
-Server runtime logs will be written to /tmp/catsdb.log (this is configurable in logging.js).
+Server runtime logs will be written to ./catsdb.log (logs are configurable in logging.js).
     
 ### Managing the application lifetime    
 
