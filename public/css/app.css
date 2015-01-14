@@ -191,7 +191,19 @@ label.sub {
 
 .menutitle {
   padding-bottom: 20px;
-  border-bottom: 1px solid #EFEFEF;}
+  border-bottom: 1px solid #EFEFEF;
+}
+
+/*Remove filter toggle switch background shading*/
+#searchContainer span.switch-right.ng-binding,
+#searchContainer span.knob.ng-binding{
+	background-image: none;
+	background-color: inherit;
+	/*font-size: 14px;*/
+}
+#searchContainer span.switch-left.ng-binding{
+	background-image: none;
+	/*font-size: 14px;*/
 }
 
 @media print { 

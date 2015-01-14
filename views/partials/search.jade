@@ -687,7 +687,7 @@ div#searchContainer
 		accordion(close-others="false",ng-click="filterChanged()").col-sm-10.col-lg-8
 			accordion-group(is-open="filter.isOpen")
 				accordion-heading
-					toggle-switch(model="switchStatus", knob-label="Filter", popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right")
+					toggle-switch(model="switchStatus", knob-label="Filter", popover="Filter the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="right").filter
 				div.row
 					div.form-group.row
 						label.col-sm-2.col-lg-1 Sample type
