@@ -572,7 +572,6 @@ module.exports = {
                          {grp:'',name:'glass box', secondaryname:''},
                          {grp:'',name:'glass container in glass container', secondaryname:''},
                          {grp:'',name:'glass container in plastic container', secondaryname:''},
-                         {grp:'',name:'glass container, in glass container', secondaryname:''},
                          {grp:'',name:'glass jar', secondaryname:'glasbeholder'},
                          {grp:'',name:'original container', secondaryname:'originalemballage'},
                          {grp:'',name:'plastic bag in glass container', secondaryname:''},
