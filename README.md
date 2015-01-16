@@ -6,7 +6,7 @@ The technology stack for this application is a node/Express Server, Angularjs fr
 
 ## How to use
 
-Install git, npm, node, bower, mongo (this was tested with version 2.6.5)
+Install git, npm, node, bower, mongo (this was tested with version 2.6.5) and graphicsmagick.
 
 Clone the repository and install the dependencies:
 
@@ -26,11 +26,11 @@ To create the production files without tests (tests require mongod to be running
 
 To start the app in production mode (uses minified and concatenated js files):
 
-    NODE_ENV=production node app_mongo.js
+    NODE_ENV=production node app.js
     
 Otherwise, to run in development mode, just use:
 
-    NODE_ENV=development node app_mongo.js
+    NODE_ENV=development node app.js
     
 Server runtime logs will be written to ./catsdb.log (logs are configurable in logging.js).
     
@@ -53,7 +53,7 @@ Add the following to /etc/supervisor/supervisord.conf
     stdout_logfile=/home/cpo/log/mongod.log
         
     [program:catsdb]
-    command=node app_mongo.js
+    command=node app.js
     directory=/home/cpo/git/CATSReferenceCollectionsDb
     user=root
     autostart=true

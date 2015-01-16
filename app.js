@@ -17,7 +17,9 @@ var express = require('express'),
     bcrypt = require('bcrypt-nodejs'),
     SALT_WORK_FACTOR = 10,
     passport = require('passport'),
-    negotiator = require('negotiator');
+    negotiator = require('negotiator'),
+    gm = require('gm'),
+    config = require('./config');
 
 var app = module.exports = express();
 var MongoStore = require('connect-mongo')(express);
@@ -27,7 +29,7 @@ var MongoStore = require('connect-mongo')(express);
  ****************/
 
 /*set port to whatever is in the environment variable PORT, or 3000 if there's nothing there.*/
-app.set('port', process.env.PORT || 3443);
+//app.set('port', process.env.PORT || 3443);
 
 if (app.get('env') === 'development') {
     app.set('views', __dirname + '/views');
@@ -44,8 +46,24 @@ app.set('view engine', 'jade');
 logger.debug("Overriding 'Express' logger");
 app.use(express.logger({format: 'dev', stream: logger.stream }));
 
-app.use(express.bodyParser());
-app.use(express.methodOverride());
+/* BodyParser is bundled In Express 3, so no 'require' needed
+ * BodyParser allows Express to handle JSON, URLEncoded and multipart bodies in requests.
+ * However, we'll define them separately, because we want to set a limit
+ * for multiparts only (default limits are 1mb for json and urlencoded and we don't want to
+ * increase these).
+ * 
+ * These apply to incoming bodies on all routes.
+ * */
+//app.use(express.bodyParser());
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(express.multipart({
+    keepExtensions: true,
+    limit: 1024 * 1024 * 20,    /*upload file size limit*/
+    defer: true                 /*don't stream to temp files*/
+  }));
+
+app.use(express.methodOverride());  
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/bower_components', express.static(__dirname + '/bower_components'));
@@ -1181,6 +1199,7 @@ app.get('/vocab', function(req, res) {
  * 201 (Created): Body & location header contain the object url
  * 401 (Unauthorised) : User is not logged in
  * 409 (Conflict): An image of that name aready exists
+ * 413 (Request entity too large) : Handled and returned by express.multipart module
  * 500 (internal Server Error): Problem reading or writing the file
  */
 app.post('/image', function(req, res){
@@ -1188,37 +1207,66 @@ app.post('/image', function(req, res){
     if (!req.isAuthenticated()){
         res.send(401);
     };
+    
+    /* If bodyParser "defer" option is set, then we need to wait for the end of 
+     * the "Formidable" form before we can read the file
+     * */
+    req.form.on('progress', function(bytesReceived, bytesExpected) {
+        logger.info(((bytesReceived / bytesExpected)*100) + "% uploaded");
+    });
+    req.form.on('end', function() {
+        var readPath = req.files.file.path;
+        var writePath = config.imageDir;
+        var name = req.files.file.name;
 
-    var readPath = req.files.file.path;
-    var writePath = ''; /*TODO: move to config*/
-    var name = req.files.file.name;
+        fs.readFile(readPath, function (err, data) {
+            if(err || !writePath) {
+                logger.error(err);
+                res.status(500).send(err); /*"Internal server Error"*/
+            }
+            else {
+                fs.exists(writePath + name, function (exists) {
+                    if(exists){
+                        res.send(409);
+                    } else {
+                        fs.writeFile(writePath + name, data, function(err) {
+                            if(err) {
+                                logger.error(err);
+                                res.status(500).send(err);
+                            } else {
+                                var url = "https://" + req.get('host') + "/image/" + name;
+                                logger.info("The file was saved to " + url);
+                                res.header('Location', url);
+                                res.status(201).send(url); 
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    });
+});
 
-    fs.readFile(readPath, function (err, data) {
-        if(err || !writePath) {
-            logger.error(err);
-            res.status(500).send(err); /*"Internal server Error"*/
-        }
-        else {
-            fs.exists(writePath + name, function (exists) {
-                if(exists){
-                    res.send(409);
-                } else {
-                    fs.writeFile(writePath + name, data, function(err) {
-                        if(err) {
-                            logger.error(err);
-                            res.status(500).send(err);
-                        } else {
-                            var url = "http://cspic.smk.dk/globus/catsdb/" + name; /*TODO: move to config*/
-                            logger.info("The file was saved to " + url);
-                            res.header('Location', url);
-                            res.status(201).send(url); 
-                        }
-                    })
-                }
-            })
-        }
-    })
-}); 
+/**
+ * Retrieve an image 
+ */
+app.get('/image/:name', function(req, res, next){
+
+    var name = req.params.name;
+    var width = req.query.width;
+    
+    var readPath = config.imageDir + name;
+    logger.info("readpath, width: " + readPath + ", " + width);
+
+    gm(readPath)
+    .resize(width)
+    .stream(function streamOut (err, stdout, stderr) {
+        if (err) return next(err);
+        stdout.pipe(res); //pipe to response
+        stdout.on('error', next);
+    });
+});
+
 
 /********************
  * RECORD operations
@@ -1246,8 +1294,8 @@ var options = {
     cert: fs.readFileSync('/etc/ssl/certs/catsdb-cert.pem')
 };
 
-https.createServer(options, app).listen(app.get('port'), function () {
-   logger.info('Express server listening on port ' + app.get('port'));
+https.createServer(options, app).listen(config.port, function () {
+   logger.info('Express server listening on port ' + config.port);
 });
 
 /*For testing, or if encryption is not required, comment out the lines above and

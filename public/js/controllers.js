@@ -404,8 +404,18 @@ controller('ImageUploadController', ['$scope', '$upload', '$timeout', 'state',
     $scope.uploadRightAway = false;
 
     $scope.getThumbnail = function(url) {
-        return url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
-        + "&mode=width&width=200";
+        var width = 200,
+            imageurl,
+            smkInternal = 'http://cspic.smk.dk/';
+        if (url.indexOf(smkInternal) !== -1){
+            imageurl = url.replace(smkInternal, 'http://cspic.smk.dk/?pic=') 
+                       + "&mode=width&width=" + width;
+        } else {
+            imageurl = url + "?mode=width&width=" + width;
+        }
+        return imageurl;
+//        return url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+//        + "&mode=width&width=200";
     };
 
     $scope.deleteImage = function(i) {
@@ -505,6 +515,9 @@ controller('ImageUploadController', ['$scope', '$upload', '$timeout', 'state',
                 if (response.status > 0){
                     if (response.status === 409){
                         uploadFailed(" An image with this name already exists. Please rename the image and try again.");
+                    }
+                    else if (response.status === 413){
+                        uploadFailed(" The image is too large. Please resize the image (>20mb) and try again.");
                     }
                     else{
                         uploadFailed(" The image could not be saved");
@@ -922,8 +935,16 @@ var CarouselImageCtrl = ['$scope', 'state',
 //  };
 
     $scope.addArtworkSlide = function(invNum, externalurl, title) {
-        var imageurl = externalurl.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
-        + "&mode=width&width=600";
+        var width = 600,
+            imageurl,
+            smkInternal = 'http://cspic.smk.dk/';
+        if (externalurl.indexOf(smkInternal) !== -1){
+            imageurl = externalurl.replace(smkInternal, 'http://cspic.smk.dk/?pic=') 
+                       + "&mode=width&width=" + width;
+        } else {
+            imageurl = imageurl + "?mode=width&width=" + width;
+        }
+       
         slides.push({
             title: invNum,
             image: imageurl,
@@ -946,8 +967,17 @@ var CarouselImageCtrl = ['$scope', 'state',
         /*add other images*/
         if(sample && sample.images){
             angular.forEach(sample.images, function(image) {
-                var imageurl = image.url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
-                + "&mode=width&width=600";
+                var width = 600,
+                    imageurl,
+                    smkInternal = 'http://cspic.smk.dk/';
+                if (image.url.indexOf(smkInternal) !== -1){
+                    imageurl = image.url.replace(smkInternal, 'http://cspic.smk.dk/?pic=') 
+                               + "&mode=width&width=" + width;
+                } else {
+                    imageurl = image.url + "?mode=width&width=" + width;
+                }
+//                var imageurl = image.url.replace('http://cspic.smk.dk/', 'http://cspic.smk.dk/?pic=')
+//                + "&mode=width&width=600";
                 slides.push({
                     title: image.name,
                     image: imageurl,
