@@ -252,6 +252,7 @@ function buildSampleExcel(query) {
     var deferred = Q.defer();
     
     db.samples.find(query)
+    .sort('referenceNumber')
     .toArray(function(err, items) {
 
         if(err || !items){
