@@ -26,8 +26,8 @@ var serviceMod = angular.module('myApp.services', []).value('version', '0.1');
 serviceMod.factory('catsAPIservice', ['$http', 
 function($http) {
     return {
-        search : function(term, filter) {
-            var url = "sample?pageSize=100" 
+        search : function(term, filter, items, page) {
+            var url = "sample?pageSize=" + items + "&pageNum=" + page
                 + ((!!term) ? "&fulltext=" + term : "");
             if (filter && filter.isOpen){
                 url +=((!!filter.sampleType) ? "&sampletype=" + filter.sampleType.name : "") 

@@ -5,7 +5,7 @@ div#viewContainer
 			button.btn.btn-xs(ng-click="previousItem()", popover="Navigate to the previous search result item", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 				span.glyphicon.glyphicon-chevron-left
 			span
-				|  {{itemIndex + 1}} of {{numResults}}  
+				|  {{itemIndex + ((searchResultsPageNum - 1) * itemsPerPage)  + 1}} of {{searchResultsTotalSize}}
 			button.btn.btn-xs(ng-click="nextItem()", popover="Navigate to the next search result item", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 					span.glyphicon.glyphicon-chevron-right
 			button.btn.btn-xs(ng-click="backToSearch()", popover="Return to the search results", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default

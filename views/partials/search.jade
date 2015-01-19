@@ -712,17 +712,15 @@ div#searchContainer
 			h3 Search Results
 			div.row.searchreshdr
 				div.col-sm-10
-					h5(ng-show="searchResultsListSize == 1") The search returned {{searchResultsListSize}} result 
-						|(the first 100 results are displayed below)
-					h5(ng-show="searchResultsListSize != 1") The search returned {{searchResultsListSize}} results
-						|(the first 100 results are displayed below)
+					h5(ng-show="searchResultsTotalSize == 1") The search returned {{searchResultsTotalSize}} result 
+					h5(ng-show="searchResultsTotalSize != 1") The search returned {{searchResultsTotalSize}} results
 				div.col-sm-2
 					button(ng-click="exportClicked(searchTerm, filter)", popover="Generate and download a .xlsx spreadsheet of the search results", popover-trigger="mouseenter", popover-popup-delay="1500", popover-placement="left").btn.btn-default
 						span.glyphicon.glyphicon-download 
 							|Export all results	
 			div.row	
 				div.col-lg-12
-					table.table.table-hover(ng-show="searchResultsListSize")
+					table.table.table-hover(ng-show="searchResultsTotalSize")
 						thead
 							tr
 							tr
@@ -736,7 +734,7 @@ div#searchContainer
 								th(ng-show="loggedin") Edit
 								th(ng-show="loggedin") Delete
 						tbody
-							tr(ng-repeat="res in searchResultsList")
+							tr(ng-repeat="res in searchResultsPage")
 								td: a(href= "", ng-click="viewSample($index)") {{res.referenceNumber}}
 								td: a(href= "", ng-click="viewSample($index)") {{res.sampleType.name}}
 								td(ng-show="res.sampleType.id !== 'pigment'"){{res.artwork.inventoryNum}}
@@ -751,7 +749,8 @@ div#searchContainer
 								td(ng-show="loggedin"): button(ng-click="registerClicked(res)", popover="Edit this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 										span.glyphicon.glyphicon-edit 
 								td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
-										span.glyphicon.glyphicon-remove 
+										span.glyphicon.glyphicon-remove
+					pagination(total-items="totalItems", ng-model="searchResultsPageNum", ng-change="pageChanged()", items-per-page="itemsPerPage", boundary-links="true")
 	div.group.row
 		div.col-sm-10
 

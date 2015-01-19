@@ -106,23 +106,41 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
      * 
      * Maybe fixed this with apply and moving watches
      */
-    $scope.searchResultsList = state.resultList;
-    $scope.searchResultsListSize = state.resultListSize;
+    $scope.searchResultsPage = state.searchResultsPage;
+    $scope.searchResultsTotalSize = state.searchResultsTotalSize;
     $scope.searchTerm = state.searchTerm;
     $scope.filter = state.filter;
     $scope.switchStatus = state.filter.isOpen;
+    
+    /*pagination*/
+    $scope.totalItems = state.searchResultsTotalSize || 1;
+    state.searchResultsPageNum  = state.searchResultsPageNum || 1;
+    $scope.searchResultsPageNum = state.searchResultsPageNum;
+    $scope.maxSize = 5;
+    $scope.itemsPerPage = 20;
+    
+    $scope.setPage = function (pageNum) {
+        $scope.searchResultsPageNum = pageNum;
+        state.searchResultsPageNum =  $scope.searchResultsPageNum;
+    };
+    
+    $scope.pageChanged = function() {
+        $log.log('Page changed to: ' + $scope.searchResultsPageNum);
+        state.searchResultsPageNum = $scope.searchResultsPageNum;
+        $scope.search();
+      };
 
-    /* Update login state whenever user logs in/out*/
+    /* Update login state whenever user logs in/out */
     $scope.$watch(
-            function() { return state.loggedin; },
-            function(newValue, oldValue) {
-                $scope.loggedin = newValue;
-                if (newValue) {
-                    $scope.email = state.email;
-                }else{
-                    $scope.email = '';
-                }
+        function() { return state.loggedin; },
+        function(newValue, oldValue) {
+            $scope.loggedin = newValue;
+            if (newValue) {
+                $scope.email = state.email;
+            }else{
+                $scope.email = '';
             }
+        }
     );
 
 //  $scope.$watch(
@@ -153,11 +171,12 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
 
     /* Call the full text search service (currently returns 100 results) */
     $scope.search = function() {
-        catsAPIservice.search(state.searchTerm, $scope.filter)
+        catsAPIservice.search(state.searchTerm, $scope.filter, 
+                              $scope.itemsPerPage, $scope.searchResultsPageNum)
         .success(function (response) {
             $scope.searchTerm = state.searchTerm;
-            $scope.searchResultsList = response;
-            state.resultList = response;
+            $scope.searchResultsPage = response;
+            state.searchResultsPage = response;
             $scope.searchCount();
         });
     };
@@ -166,11 +185,12 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
     $scope.searchCount = function() {
         catsAPIservice.searchSize(state.searchTerm, $scope.filter)
         .success(function (response) {
-            $scope.searchResultsListSize = response;
-            state.resultListSize = response;
+            $scope.searchResultsTotalSize = response;
+            state.searchResultsTotalSize = response;
+            $scope.totalItems = state.searchResultsTotalSize;
         }).error(function (err) {
-            $scope.searchResultsListSize = 0;
-            state.resultListSize = 0;
+            $scope.searchResultsTotalSize = 0;
+            state.searchResultsTotalSize = 0;
         });
     };
 
@@ -184,7 +204,7 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
      */
     $scope.viewSample = function(index) {
         $location.path('/view');
-        state.sample = state.resultList[index];
+        state.sample = state.searchResultsPage[index];
         state.itemIndex = index;
         state.create = false;
     };
@@ -297,9 +317,12 @@ controller('ViewController', ['$scope', 'state', 'catsAPIservice', '$location',
 
     /* Retrieve the sample details from the state service*/
     //  $scope.record = state.sample;
-    $scope.itemIndex = state.itemIndex;
-    $scope.numResults = state.resultList.length;
-    $scope.record = state.resultList[$scope.itemIndex];
+    $scope.itemIndex = state.itemIndex;   //index within the current page, set by click in list
+    $scope.numResults = state.searchResultsPage.length;
+    $scope.record = state.searchResultsPage[$scope.itemIndex];
+    $scope.searchResultsPageNum = state.searchResultsPageNum;
+    $scope.itemsPerPage = 20;
+    $scope.searchResultsTotalSize = state.searchResultsTotalSize;
 
     $scope.statusMeta = {
             isSampleOpen: true,
@@ -307,19 +330,74 @@ controller('ViewController', ['$scope', 'state', 'catsAPIservice', '$location',
             isAnalysisOpen: true,
             isFirstDisabled: false
     };
+    
+    /* Call the full text search service */
+    $scope.search = function() {
+        catsAPIservice.search(state.searchTerm, state.filter, 
+                              $scope.itemsPerPage, $scope.searchResultsPageNum)
+        .success(function (response) {
+            state.searchResultsPage = response;
+            $scope.record = state.searchResultsPage[$scope.itemIndex];
+            /*force image update, that's why we delayed setting this until now*/
+            state.itemIndex = $scope.itemIndex;
+        });
+    };
 
     $scope.nextItem = function(){
+
         $scope.itemIndex = $scope.itemIndex + 1;
-        $scope.itemIndex = $scope.itemIndex % state.resultList.length;
-        $scope.record = state.resultList[$scope.itemIndex];
-        state.itemIndex = $scope.itemIndex;
+
+        /* if page index has reached the end of the page*/
+        if($scope.itemIndex === state.searchResultsPage.length){
+            
+            /* if there are no more pages*/
+            if((($scope.itemsPerPage * ($scope.searchResultsPageNum - 1)) + $scope.itemIndex) >= $scope.searchResultsTotalSize){
+                /*wrap around*/
+                $scope.searchResultsPageNum = 1;
+                state.searchResultsPageNum = $scope.searchResultsPageNum;
+                $scope.itemIndex = 0; /*don't update state yet*/
+            }
+            else{
+            /*fetch next page of results*/
+                $scope.searchResultsPageNum = state.searchResultsPageNum + 1;
+                state.searchResultsPageNum = $scope.searchResultsPageNum;
+                $scope.itemIndex = $scope.itemIndex % $scope.itemsPerPage; /*don't update state yet*/
+            }
+            $scope.search();
+        }
+        else{
+            $scope.itemIndex = $scope.itemIndex % state.searchResultsPage.length;
+            $scope.record = state.searchResultsPage[$scope.itemIndex];
+            state.itemIndex = $scope.itemIndex;
+        }
     };
 
     $scope.previousItem = function(){
         $scope.itemIndex = $scope.itemIndex - 1;
-        $scope.itemIndex = ($scope.itemIndex < 0) ? (state.resultList.length - 1) : $scope.itemIndex;
-        $scope.record = state.resultList[$scope.itemIndex];
-        state.itemIndex = $scope.itemIndex;
+        
+        /* if page index has reached the start of the page*/
+        if($scope.itemIndex < 0){
+            
+            /* if there are no more pages*/
+            if($scope.searchResultsPageNum <= 1){
+                /*wrap around*/
+                $scope.searchResultsPageNum = Math.ceil($scope.searchResultsTotalSize / $scope.itemsPerPage);
+                state.searchResultsPageNum = $scope.searchResultsPageNum;
+                $scope.itemIndex = (($scope.searchResultsTotalSize % $scope.itemsPerPage) || $scope.itemsPerPage) - 1; /*don't update state yet*/
+            }
+            else{
+            /*fetch previous page of results*/
+                $scope.searchResultsPageNum = state.searchResultsPageNum - 1;
+                state.searchResultsPageNum = $scope.searchResultsPageNum;
+                $scope.itemIndex = $scope.itemsPerPage - 1; /*don't update state yet*/
+            }
+            $scope.search();
+        }
+        else{
+            $scope.itemIndex = ($scope.itemIndex < 0) ? (state.searchResultsPage.length - 1) : $scope.itemIndex;
+            $scope.record = state.searchResultsPage[$scope.itemIndex];
+            state.itemIndex = $scope.itemIndex;
+        }
     };
 
     $scope.backToSearch = function() {
@@ -955,7 +1033,7 @@ var CarouselImageCtrl = ['$scope', 'state',
     var loadSlides = function (index) {
 
         slides = $scope.slides = [];
-        var sample = state.resultList[index];
+        var sample = state.searchResultsPage[index];
 
         /*add artwork image*/
         if(sample && sample.artwork && sample.artwork.externalurl){

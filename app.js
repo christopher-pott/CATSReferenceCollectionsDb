@@ -618,8 +618,9 @@ app.get('/sample', function(req, res) {
 
     if (preferredMedia == 'application/json'){
 
-    //  var pageNum = req.query.pageNum;
         var pageSize = parseInt(req.query.pageSize); /*limit() requires int*/
+        var pageNum = parseInt(req.query.pageNum);
+
         var query = buildSampleQuery(req);
         
         if(req.query.count == 'true'){
@@ -635,8 +636,9 @@ app.get('/sample', function(req, res) {
             });
         }else{    
             db.samples.find(query)
-          //.skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
+            .skip(pageNum > 0 ? ((pageNum-1)*pageSize) : 0)
             .limit(pageSize)
+            .sort('referenceNumber')
             .toArray(function(err, items) {
                 if(err || !items){
                     logger.error(err);
