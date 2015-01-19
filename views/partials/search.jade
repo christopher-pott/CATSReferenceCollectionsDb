@@ -750,7 +750,7 @@ div#searchContainer
 										span.glyphicon.glyphicon-edit 
 								td(ng-show="loggedin"): button(ng-click="deleteClicked(res._id)", popover="Delete this sample record", popover-trigger="mouseenter", popover-popup-delay="1000").btn.btn-default
 										span.glyphicon.glyphicon-remove
-					pagination(total-items="totalItems", ng-model="searchResultsPageNum", ng-change="pageChanged()", items-per-page="itemsPerPage", boundary-links="true")
+					pagination(total-items="totalItems", ng-model="searchResultsPageNum", max-size="maxSize", ng-change="pageChanged()", items-per-page="itemsPerPage", boundary-links="true")
 	div.group.row
 		div.col-sm-10
 

@@ -116,7 +116,7 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
     $scope.totalItems = state.searchResultsTotalSize || 1;
     state.searchResultsPageNum  = state.searchResultsPageNum || 1;
     $scope.searchResultsPageNum = state.searchResultsPageNum;
-    $scope.maxSize = 5;
+    $scope.maxSize = 10;
     $scope.itemsPerPage = 20;
     
     $scope.setPage = function (pageNum) {
