@@ -1291,7 +1291,7 @@ app.get('*', routes.index);
  *    
  *    OR to create a self signed for local testing (expires 10 years)
  *    openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout catsdb-key.pem -out catsdb-cert.pem
- */
+ *
 var options = {
     key: fs.readFileSync('/etc/ssl/certs/catsdb-key.pem'),
     cert: fs.readFileSync('/etc/ssl/certs/catsdb-cert.pem')
@@ -1300,11 +1300,11 @@ var options = {
 https.createServer(options, app).listen(config.port, function () {
    logger.info('Express server listening on port ' + config.port);
 });
-
+*/
 /*For testing, or if encryption is not required, comment out the lines above and
   use this regular http server instead.
-  
-http.createServer(app).listen(app.get('port'), function () {
-    logger.info('Express server listening on port ' + app.get('port'));
+*/  
+http.createServer(app).listen(config.port, function () {
+    logger.info('Express server listening on port ' + config.port);
 });
-*/
+
