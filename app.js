@@ -1237,7 +1237,7 @@ app.post('/image', function(req, res){
                                 logger.error(err);
                                 res.status(500).send(err);
                             } else {
-                                var url = "https://" + config.hostName + "/image/" + name;
+                                var url = config.imageHostName + "/image/" + name;
                                 logger.info("The file was saved to " + url);
                                 res.header('Location', url);
                                 res.status(201).send(url); 
