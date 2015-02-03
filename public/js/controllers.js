@@ -486,7 +486,7 @@ controller('ImageUploadController', ['$scope', '$upload', '$timeout', 'state',
             imageurl,
             smkInternal = 'http://cspic.smk.dk/';
         if (url.indexOf(smkInternal) !== -1){
-            imageurl = url.replace(smkInternal, 'http://catsdb.smk.dk/cspic/?pic=') 
+            imageurl = url.replace(smkInternal, 'https://catsdb.smk.dk/cspic/?pic=') 
                        + "&mode=width&width=" + width;
         } else {
             imageurl = url + "?mode=width&width=" + width;
@@ -1017,7 +1017,7 @@ var CarouselImageCtrl = ['$scope', 'state',
             imageurl,
             smkInternal = 'http://cspic.smk.dk/';
         if (externalurl.indexOf(smkInternal) !== -1){
-            imageurl = externalurl.replace(smkInternal, 'http://catsdb.smk.dk/cspic/?pic=') 
+            imageurl = externalurl.replace(smkInternal, 'https://catsdb.smk.dk/cspic/?pic=') 
                        + "&mode=width&width=" + width;
         } else {
             imageurl = imageurl + "?mode=width&width=" + width;
@@ -1049,7 +1049,7 @@ var CarouselImageCtrl = ['$scope', 'state',
                     imageurl,
                     smkInternal = 'http://cspic.smk.dk/';
                 if (image.url.indexOf(smkInternal) !== -1){
-                    imageurl = image.url.replace(smkInternal, 'http://catsdb.smk.dk/cspic/?pic=') 
+                    imageurl = image.url.replace(smkInternal, 'https://catsdb.smk.dk/cspic/?pic=') 
                                + "&mode=width&width=" + width;
                 } else {
                     imageurl = image.url + "?mode=width&width=" + width;
