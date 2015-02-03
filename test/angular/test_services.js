@@ -7,9 +7,11 @@ var search_filter =  {isOpen : true,
                       sampleType : {name : 'Paint Cross Section'},
                       earliestDate : '1850',
                       latestDate : '1900'};
+var search_items = 10; /*page size*/
+var search_page = 1;   /*page number*/
 
 var excel_url = "sample?fulltext=search string&sampletype=Paint Cross Section&startdate=1850&enddate=1900";
-var search_url = "sample?pageSize=100&fulltext=search string&sampletype=Paint Cross Section&startdate=1850&enddate=1900";
+var search_url = "sample?pageSize=10&pageNum=1&fulltext=search string&sampletype=Paint Cross Section&startdate=1850&enddate=1900";
 var searchsize_url = "sample?count=true&fulltext=search string&sampletype=Paint Cross Section&startdate=1850&enddate=1900";
 
 describe('myApp.services', function() {
@@ -34,7 +36,7 @@ describe('myApp.services', function() {
              * it will mock the http service and send a response */
             httpBackend.whenGET(search_url).respond("ok");
         
-            catsAPIservice.search(search_term, search_filter).then(function(response) {
+            catsAPIservice.search(search_term, search_filter, search_items, search_page).then(function(response) {
                 response.data.should.equal("ok");
             });
             httpBackend.flush();

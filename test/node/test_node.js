@@ -1,5 +1,5 @@
 var should = require('chai').should();
-var app = require("../../app_mongo");
+var app = require("../../app");
 var request = require('supertest');
 var db = require("../../db_mongo");
 

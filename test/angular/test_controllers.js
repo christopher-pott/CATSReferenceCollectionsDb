@@ -250,8 +250,8 @@ describe('Controller Tests', function() {
                 /*receive results (success)*/
                 deferred_search.promise.resolve(search_result);
                 
-                expect(scope.searchResultsList.should.equal(search_result));
-                expect(state.resultList.should.equal(search_result));
+                expect(scope.searchResultsPage.should.equal(search_result));
+                expect(state.searchResultsPage.should.equal(search_result));
             });
             it('should handle results count', function(){
                 /*request search count*/
@@ -259,8 +259,8 @@ describe('Controller Tests', function() {
                 /*receive results (success)*/
                 deferred_search_count.promise.resolve(search_result_size); 
                 
-                expect(scope.searchResultsListSize.should.equal(search_result_size));
-                expect(state.resultListSize.should.equal(search_result_size));
+                expect(scope.searchResultsTotalSize.should.equal(search_result_size));
+                expect(state.searchResultsTotalSize.should.equal(search_result_size));
             });
             it('should handle error in results count', function(){
                 /*request search count */
@@ -268,8 +268,8 @@ describe('Controller Tests', function() {
                 /*receive results (error)*/
                 deferred_search_count.promise.reject(); 
                 
-                expect(scope.searchResultsListSize.should.equal(0));
-                expect(state.resultListSize.should.equal(0));
+                expect(scope.searchResultsTotalSize.should.equal(0));
+                expect(state.searchResultsTotalSize.should.equal(0));
             });
         });
         describe('filter changed', function() {
@@ -289,7 +289,7 @@ describe('Controller Tests', function() {
                 var result = {result: "first result"},
                     index = 0;
                 
-                state.resultList = [result];
+                state.searchResultsPage = [result];
                 
                 scope.viewSample(index);
                 
