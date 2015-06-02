@@ -125,7 +125,7 @@ controller('SearchController', ['$q', '$scope', 'catsAPIservice', 'state', '$mod
     };
     
     $scope.pageChanged = function() {
-        $log.log('Page changed to: ' + $scope.searchResultsPageNum);
+       // console.log('Page changed to: ' + $scope.searchResultsPageNum);
         state.searchResultsPageNum = $scope.searchResultsPageNum;
         $scope.search();
       };

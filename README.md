@@ -34,7 +34,7 @@ Otherwise, to run in development mode, just use:
     
 Server runtime logs will be written to ./catsdb.log (logs are configurable in logging.js).
     
-### Managing the application lifetime    
+### Managing the application lifetime
 
 Install 'supervisor' to ensure the application is kept running, even after reboot
 
