@@ -33,7 +33,7 @@ Grunt will be used to clean and minify the code
 	$ sudo npm install -g grunt-cli
 
 ### Mongodb
-Mongo is used to store the users and persist the sessions. This was tested with version 2.6.5. Visit the link below for installation instructions.
+Mongo is used to store the data, users and to persist the sessions. This was tested with version 2.6.5. Visit the link below for installation instructions.
 
 [http://docs.mongodb.org/manual/administration/install-on-linux/](http://docs.mongodb.org/manual/administration/install-on-linux/)
 
