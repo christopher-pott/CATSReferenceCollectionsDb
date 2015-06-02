@@ -166,4 +166,4 @@ The CATS live instance of the database can be found [here](http://www.cats-cons.
 CATS
 
 ## License
-MIT
+[MIT](/LICENSE)
