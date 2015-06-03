@@ -160,10 +160,10 @@ When called, grunt will automatically run the tests, both backend and frontend. 
 
 ## Example App
 
-The CATS live instance of the database can be found [here](http://www.cats-cons.dk/). Editing records requires login credentials.
+The CATS live instance of the database can be found [here](http://catsdb.smk.dk/). Editing records requires login credentials.
 
 ## Contact
-CATS
+[CATS](http://www.cats-cons.dk/)
 
 ## License
 [MIT](/LICENSE)
