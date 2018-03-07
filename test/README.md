@@ -6,6 +6,8 @@ The Server tests (/test/node/) are written using the **Mocha** framework. We use
 
 Within the tests the **Chai** assertion framework is used. Chai also supports the BDD style, providing the should() and expect() interfaces to construct chain capable assertions (eg. result.should.be.a('string')).
 
+Testing endpoints is enabled in the tests by the use of **Supertest** HTTP test framework which supports assertions such as request(), expect() and send().
+
 Here is what we are testing on the server: The Server API tests build and send asynchronous API requests to the server, wait for a result and then check if the result returned by the server is as expected.
 
 To run just the server tests (with coverage information from the **Istanbul** tool) then run this command from the project root (however, we use 'grunt' instead, see below):
